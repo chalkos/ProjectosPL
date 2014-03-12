@@ -1,3 +1,6 @@
+# Flex output
+lex.yy.c
+
 # Temporary files
 *.swp
 
