@@ -10,7 +10,7 @@ chmod +x colorgcc.pl
 sudo mv colorgcc.pl /usr/local/bin/gcc
 
 # configurar o git
-git config --global color.ui true
 echo "DON'T FORGET TO RUN THESE COMMANDS:"
+echo "git config --global color.ui true"
 echo "git config --global user.name \"My Name\""
 echo "git config --global user.email my@email.example"
