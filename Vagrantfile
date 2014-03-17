@@ -8,5 +8,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Every Vagrant virtual environment requires a box to build off of.
   config.vm.box = "chef/ubuntu-13.10"
 
-  config.vm.provision "shell", path: "https://gist.githubusercontent.com/chalkos/9d90276f504a8fc2cdd5/raw/d969c1bf54bba12124ebd74540bc1ee540260af2/vagrant_ubuntu_pl.sh"
+  config.vm.synced_folder "./", "/vagrant", mount_options: ["dmode=775,fmode=775"]
+
+  config.vm.provision "shell", path: "Vagrantprovision"
 end
