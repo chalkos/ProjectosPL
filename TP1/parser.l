@@ -7,9 +7,13 @@
 %x text
 
 %x link_file
-%x link_URL
+%x hlink1
+%x hlink2
+%x hlink3
 %{
 #include "hlink.h"
+
+int anterior = 0;
 
 %}
 %%
@@ -42,16 +46,26 @@
 
 <text>"</text>" {printf("\n"); BEGIN revision;}
 <text>"[[File:" {BEGIN link_file;}
-<text>"[[" {BEGIN link_URL;}
+<text>"[[Image:" {BEGIN link_file;}
+<text,link_file>"[[":? {anterior = text; BEGIN hlink1;}
 
 <link_file>"]]" {printf("\n"); BEGIN text;}
 <link_file>. {printf("%s", yytext);}
 
-<link_URL>Category: {hlink_set_special("Category");}
-<link_URL>[^\n\[\]]+\| {hlink_set_view(
-<link_URL>[^\n\[]+\]\] {if hlink.
-<link_URL>\|\ *\]\] {hlink_got_rename(yytext);}
-<link_URL>[^\[\n]*\]\][a-zA-Z]* {hlink_got_ending(yytext); BEGIN text;}
+<hlink1>[a-zA-Z]+:[^\]\(,\|]+ {printf("ABJC: %s * ",yytext); BEGIN hlink2;}
+<hlink1>[^\]\(,\|]+ {printf("ABC: %s * ",yytext); BEGIN hlink2;}
+
+<hlink2,hlink3>\]\][a-zA-Z]* {printf("DL: %s * \n\n",yytext); BEGIN anterior;}
+<hlink2>\| {printf("H: %s * ",yytext); BEGIN hlink3;}
+<hlink2>\([^\]\)\|]+\)\]\][a-zA-Z]* {printf("EFGDL: %s * \n\n",yytext); BEGIN anterior;}
+<hlink2>\([^\]\)\|]+\)\| {printf("EFGH: %s * ",yytext); BEGIN hlink3;}
+<hlink2>\([^\]\)\|]+\]\][a-zA-Z]* {printf("EFDL: %s * \n\n",yytext); BEGIN anterior;}
+<hlink2>,\]\][a-zA-Z]* {printf("KDL: %s * \n\n",yytext); BEGIN anterior;}
+<hlink2>,\| {printf("KH: %s * ",yytext); BEGIN hlink3;}
+
+<hlink3>[^\]]+\]\][a-zA-Z]* {printf("IDL: %s * \n\n",yytext); BEGIN anterior;}
+
+<hlink1,hlink2,hlink3>. ECHO;
 
 <*>. ;
 <*>\n ;
