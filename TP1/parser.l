@@ -7,13 +7,15 @@
 %x text
 
 %x link_file
-%x hlink1
-%x hlink2
-%x hlink3
+%x ilink1
+%x ilink2
+%x ilink3
+%x ilink4
 %{
-#include "hlink.h"
+#include "ilink.h"
 
 int anterior = 0;
+ILink* ilink = NULL;
 
 %}
 %%
@@ -47,31 +49,80 @@ int anterior = 0;
 <text>"</text>" {printf("\n"); BEGIN revision;}
 <text>"[[File:" {BEGIN link_file;}
 <text>"[[Image:" {BEGIN link_file;}
-<text,link_file>"[[":? {anterior = text; BEGIN hlink1;}
+<text,link_file>"[[":? {anterior = text; BEGIN ilink1;}
 
 <link_file>"]]" {printf("\n"); BEGIN text;}
 <link_file>. {printf("%s", yytext);}
 
-<hlink1>[a-zA-Z]+:[^\]\(,\|]+ {printf("ABJC: %s * ",yytext); BEGIN hlink2;}
-<hlink1>[^\]\(,\|]+ {printf("ABC: %s * ",yytext); BEGIN hlink2;}
+<ilink1>[a-zA-Z]+:[^\]\(,\|]+       {/*ABCJ */
+                                     ilink = ilink_create();
+                                     ilink_set_especial(ilink, yytext);
+                                     BEGIN ilink2;
+                                     }
 
-<hlink2,hlink3>\]\][a-zA-Z]* {printf("DL: %s * \n\n",yytext); BEGIN anterior;}
-<hlink2>\| {printf("H: %s * ",yytext); BEGIN hlink3;}
-<hlink2>\([^\]\)\|]+\)\]\][a-zA-Z]* {printf("EFGDL: %s * \n\n",yytext); BEGIN anterior;}
-<hlink2>\([^\]\)\|]+\)\| {printf("EFGH: %s * ",yytext); BEGIN hlink3;}
-<hlink2>\([^\]\)\|]+\]\][a-zA-Z]* {printf("EFDL: %s * \n\n",yytext); BEGIN anterior;}
-<hlink2>,\]\][a-zA-Z]* {printf("KDL: %s * \n\n",yytext); BEGIN anterior;}
-<hlink2>,\| {printf("KH: %s * ",yytext); BEGIN hlink3;}
+<ilink1>[^\]\(,\|]+                 {/*ABC  */
+                                     ilink = ilink_create();
+                                     ilink_set_texto(ilink, yytext);
+                                     BEGIN ilink2;
+                                     }
 
-<hlink3>[^\]]+\]\][a-zA-Z]* {printf("IDL: %s * \n\n",yytext); BEGIN anterior;}
+<ilink2,ilink3>\]                   {/*D    */
+                                     BEGIN ilink4;
+                                     }
 
-<hlink1,hlink2,hlink3>. ECHO;
+<ilink2>\|                          {/*H    */
+                                     BEGIN ilink3;
+                                     }
+
+<ilink2>\([^\]\)\|]+\)\]            {/*EFGD */
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     ilink_set_parenteses(ilink, yytext);
+                                     BEGIN ilink4;
+                                     }
+
+<ilink2>\([^\]\)\|]+\)\|            {/*EFGH */
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     ilink_set_parenteses(ilink, yytext);
+                                     BEGIN ilink3;
+                                     }
+
+<ilink2>\([^\]\)\|]+\]              {/*EFD  */
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     ilink_set_parenteses(ilink, yytext);
+                                     BEGIN ilink4;
+                                     }
+
+<ilink2>,[^\]\|]*\]                 {/*KMD  */
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     ilink_set_virgula(ilink, yytext);
+                                     BEGIN ilink4;
+                                     }
+
+<ilink2>,[^\]\|]*\|                 {/*KMH  */
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     ilink_set_virgula(ilink, yytext);
+                                     BEGIN ilink3;
+                                     }
+
+<ilink3>[^\]]*\]                    {/*ID   */
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     ilink_set_apresentar(ilink, yytext);
+                                     BEGIN ilink4;
+                                     }
+
+<ilink4>\][a-zA-Z]*                   {/*L*/
+                                     ilink_set_resto(ilink, yytext+1);
+                                     ilink_destroy(&ilink);
+                                     BEGIN anterior;
+                                     }
+
+<ilink1,ilink2,ilink3>. ;
 
 <*>. ;
 <*>\n ;
 %%
 int yywrap(){
-    hlink_free_all();
+    //ilink_destroy();
     printf("DONE!\n");
     return 1;
 }

@@ -5,7 +5,7 @@ FLEX=flex
 
 all: parser
 
-parser: lex.yy.o hlink.o pagina.o
+parser: lex.yy.o ilink.o pagina.o
 	$(CC) $^ -ll -o $@
 
 lex.yy.c: parser.l
@@ -14,11 +14,14 @@ lex.yy.c: parser.l
 lex.yy.o: lex.yy.c
 	$(CC) -c -ll lex.yy.c
 
-hlink.o: hlink.c hlink.h
-	$(CC) -c hlink.c
+ilink.o: ilink.c ilink.h
+	$(CC) -c ilink.c
 
 pagina.o: pagina.c pagina.h
 	$(CC) -c pagina.c
+
+elementos.o: elementos.c elementos.h
+	$(CC) -c elementos.c
 
 clean:
 	$(RM) lex.yy.c
