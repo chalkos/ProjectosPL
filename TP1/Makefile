@@ -1,6 +1,6 @@
 .PHONY: all clean
 
-CC=gcc -Wall
+CC=gcc -Wall -g
 FLEX=flex
 
 all: parser
