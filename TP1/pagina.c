@@ -14,31 +14,6 @@ void print_italico(Elemento *elem);
 void print_negrito(Elemento *elem);
 void print_ilink(Elemento *elem);
 
-void exemplo(){
-    Pagina* p = (Pagina*) malloc(sizeof(Pagina));
-
-    p->autor = "bruno";
-    p->titulo = "pagina de exemplo";
-    p->ultimaRev = "hoje";
-
-    Elemento* textosimples = (Elemento*) malloc( sizeof(Elemento));
-
-    textosimples->tipo = TIPO_STRING;
-    textosimples->filho=NULL;
-    textosimples->proximo=NULL;
-    textosimples->pai=NULL;
-    textosimples->dados = "este é o texto da página";
-    
-    pagina_print(p);
-}
-
-void pagina_print(Pagina* p){
-    Elemento* elem = p->elementos;
-    
-
-    print_elems(elem);
-}
-
 void print_string(Elemento* elem){
     printf("%s", (char*)elem->dados);
 }
@@ -46,6 +21,7 @@ void print_string(Elemento* elem){
 void print_elems(Elemento *elem){
     switch(elem->tipo){
         case TIPO_ILINK:
+            ilink_print((ILink*)elem->dados);
             break;
         case TIPO_HLINK:
             break;
@@ -57,12 +33,66 @@ void print_elems(Elemento *elem){
             break;
     }
 }
+//-------------------------------------
+//funções acessíveis
+
+// cria uma nova página
+Pagina* pagina_create(){
+    Pagina* p = (Pagina*) malloc(sizeof(Pagina));
+
+    p->titulo = NULL;
+    p->ultimaRev = NULL;
+    p->autor = NULL;
+
+    p->iLinks = NULL;
+    p->nILinks = 0;
+
+    p->hLinks = NULL;
+    p->nHLinks = 0;
+
+    p->seccoes = NULL;
+    p->nSeccoes = 0;
+
+    p->elementos = NULL;
+    p->actual = NULL;
+
+    return p;
+}
+
+void pagina_set_titulo(Pagina* p, char* str){
+    //recebe:
+    //texto da pagina
+
+    p->titulo = (char*) malloc( strlen(str)+1 );
+    strcpy( p->titulo, str);
+}
+
+// destroi a página
+void pagina_destroy(Pagina** pag){
+    Pagina* p = *pag;
+
+    free(p->titulo);
+    free(p->ultimaRev);
+    free(p->autor);
+
+    // mais complicado porque é preciso destruir cada elemento
+    // falta aqui a parte destruir os elementos
+    
+
+    free(*pag);
+}
+
+void pagina_print(Pagina* p){
+    print_elems(p->elementos);
+}
+
+
 
 void pagina_adicionar_proximo(Pagina* p, Tipo tipo, void* dados){
 }
 
 void pagina_adicionar_filho(Pagina* p, Tipo tipo, void* dados){
-
+    
 }
 
 int pagina_seleccionar_pai(Pagina* p){

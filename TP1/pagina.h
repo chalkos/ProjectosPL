@@ -22,8 +22,11 @@ typedef struct sPagina {
    Elemento* actual; //atalho para obter o elemento que vai ser alterado
 } Pagina;
 
+// cria uma nova página
+Pagina* pagina_create();
 
-void exemplo();
+// destroi a página
+void pagina_destroy(Pagina** p);
 
 // adiciona um elemento a seguir ao elemento seleccionado
 void pagina_adicionar_proximo(Pagina* p, Tipo tipo, void* dados);

@@ -12,25 +12,34 @@
 %x ilink3
 %x ilink4
 %{
+#include "pagina.h"
 #include "ilink.h"
 
 int anterior = 0;
 ILink* ilink = NULL;
+Pagina* pag = NULL;
 
 %}
 %%
-"<page>" {printf("inicio nova pagina\n"); BEGIN page;}
+"<page>"           {pag = pagina_create();
+                    printf("inicio nova pagina\n");
+                    BEGIN page;
+                    }
 
-<page>"</page>" {printf("fim pagina\n");
-                BEGIN 0;}
-<page>"<title>" {printf("titulo: ");
-                BEGIN title;}
+<page>"</page>"    {printf("fim pagina\n");
+                    BEGIN 0;
+                    }
+<page>"<title>"    {printf("titulo: ");
+                    BEGIN title;
+                    }
 <page>"<revision>" {printf("last revision: ");
-                BEGIN revision;}
+                    BEGIN revision;
+                    }
 
-<title>"</title>" {printf("\n");
-                BEGIN page;}
-<title>. {printf("%s", yytext);}
+<title>"</title>"  {printf("\n");
+                    BEGIN page;
+                    }
+<title>[^<]*       { pagina_set_titulo(p,yytext); }
 
 <revision>"<timestamp>" {printf("at "); BEGIN timestamp;}
 <revision>"<contributor>" {printf(", by "); BEGIN contributor;}

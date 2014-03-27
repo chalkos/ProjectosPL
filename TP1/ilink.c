@@ -45,7 +45,6 @@ void ilink_set_especial(ILink* ilink, char* str){
 }
 
 void ilink_set_texto(ILink* ilink, char* str){
-
     //recebe:
     //texto da pagina
 
