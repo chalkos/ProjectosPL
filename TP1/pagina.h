@@ -1,3 +1,6 @@
+#ifndef __PAGINA_H
+#define __PAGINA_H
+
 #include "elementos.h"
 
 typedef struct sPagina {
@@ -28,6 +31,9 @@ Pagina* pagina_create();
 // destroi a página
 void pagina_destroy(Pagina** p);
 
+// insere o titulo
+void pagina_set_titulo(Pagina* p, char* str);
+
 // adiciona um elemento a seguir ao elemento seleccionado
 void pagina_adicionar_proximo(Pagina* p, Tipo tipo, void* dados);
 
@@ -40,3 +46,4 @@ int pagina_seleccionar_pai(Pagina* p);
 // imprimir o HTML da página
 void pagina_print(Pagina* p);
 
+#endif

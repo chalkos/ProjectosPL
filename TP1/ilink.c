@@ -57,10 +57,21 @@ void ilink_set_parenteses(ILink* ilink, char* str){
 
     //recebe:
     //(coisas entre parenteses)
-
-    ilink->parenteses = (char*) malloc( strlen(str)+1 );
-    strcpy( ilink->parenteses, str );
-    string_replace(ilink->parenteses, ' ', '_');
+    //(coisas que nao acabam com parenteses
+    
+    if( str[strlen(str)-1] == ')' ){
+        ilink->parenteses = (char*) malloc( strlen(str)+1 );
+        strcpy( ilink->parenteses, str );
+        string_replace(ilink->parenteses, ' ', '_');
+    }else{
+        //nao termina com parenteses e por isso é o segundo caso
+        char* acumulador = (char*) malloc( strlen(str) + strlen(ilink->texto) + 1 );
+        acumulador[0] = '\0';
+        strcat(acumulador, ilink->texto);
+        strcat(acumulador, str);
+        free( ilink->texto );
+        ilink->texto = acumulador;
+    }
 }
 
 void ilink_set_virgula(ILink* ilink, char* str){

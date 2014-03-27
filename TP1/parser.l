@@ -39,7 +39,7 @@ Pagina* pag = NULL;
 <title>"</title>"  {printf("\n");
                     BEGIN page;
                     }
-<title>[^<]*       { pagina_set_titulo(p,yytext); }
+<title>[^<]*       { pagina_set_titulo(pag,yytext); }
 
 <revision>"<timestamp>" {printf("at "); BEGIN timestamp;}
 <revision>"<contributor>" {printf(", by "); BEGIN contributor;}
@@ -95,8 +95,16 @@ Pagina* pag = NULL;
                                      BEGIN ilink3;
                                      }
 
+<ilink2>\([^\]\)\|]+\|              {/*EFH  */
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     // deve adicionar ao texto, e nao meter em parenteses
+                                     ilink_set_parenteses(ilink, yytext);
+                                     BEGIN ilink3;
+                                     }
+
 <ilink2>\([^\]\)\|]+\]              {/*EFD  */
                                      yytext[ strlen(yytext)-1 ] = '\0';
+                                     // deve adicionar ao texto, e nao meter em parenteses
                                      ilink_set_parenteses(ilink, yytext);
                                      BEGIN ilink4;
                                      }

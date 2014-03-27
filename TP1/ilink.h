@@ -1,3 +1,6 @@
+#ifndef __ILINK_H
+#define __ILINK_H
+
 // define um link para a própria wikipedia (interno)
 
 // [[Especial: texto (parenteses)|apresentar]]resto
@@ -28,3 +31,6 @@ void ilink_print(ILink* ilink);
 
 // liberta memória associada ao ilink
 void ilink_destroy(ILink** ilink);
+
+
+#endif
