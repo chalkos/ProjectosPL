@@ -11,6 +11,9 @@
 %x ilink2
 %x ilink3
 %x ilink4
+%x bold
+%x italico
+
 %{
 #include "pagina.h"
 #include "ilink.h"
@@ -56,6 +59,7 @@ Pagina* pag = NULL;
 <username>. {printf("%s", yytext);}
 
 <text>"</text>" {printf("\n"); BEGIN revision;}
+<text>\'\'\' {BEGIN bold;}
 <text>"[[File:" {BEGIN link_file;}
 <text>"[[Image:" {BEGIN link_file;}
 <text,link_file>"[[":? {anterior = text; BEGIN ilink1;}
@@ -135,6 +139,16 @@ Pagina* pag = NULL;
 
 <ilink1,ilink2,ilink3>. ;
 
+<bold>\.*\'\'\'                     {/* Apanhar o bold */
+                                    printf ("<b>%s</b>",yytext);
+                                    BEGIN text;
+                                    }
+
+<italico>\.* \'\'                   {/* Apanhar o italico*/
+                                    printf ("<i> %s </i>,yytext);
+                                    BEGIN text;
+                                    }
+                                    
 <*>. ;
 <*>\n ;
 %%
