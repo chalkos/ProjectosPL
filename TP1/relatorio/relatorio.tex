@@ -58,15 +58,15 @@ Variante 1
   {\small A60987}\\
   \and
   Vanessa Campos\\
-  {\small A-----}\\
+  {\small A54801}\\
 }
 
 \maketitle
-%\begin{abstract}
-%\begin{center}
-%  Lorem Ipsum
-%\end{center}
-%\end{abstract}
+\begin{abstract}
+
+  O presente trabalho foi desenvolvido no âmbito da Unidade Curricular de Processamento de Linguagens e tem como principal objectivo descrever o processo de desenvolvimento de um analisador léxico da \textit{Wikipédia}. Ao longo deste relatório iremos explicar as estruturas de dados que foram implementadas para o desenvolvimento deste trabalho, bem como todas as decisões que foram tomadas.
+
+\end{abstract}
 \newpage
 
 \tableofcontents
@@ -75,30 +75,100 @@ Variante 1
 \newpage
 \section{Introdução}
 
+Atualmente a \textit{Wikipédia} é a maior base de dados de conhecimento livre online e disponível em várias línguas, no qual a lingua portuguesa faz parte integrante. Neste contexto, pretende-se desenvolver um Processador de Texto, exportado do \textit{Wikipédia} e gerar a página html com os dados mais relevantes contidos nessa página, utilizando a ferramenta Flex. 
+Com este trabalho foi necessário implementar Expressões Regulares de modo a retirar informação mais relevante num contexto enorme de informção, encontrando padrões que nos ajudem a descobrir o tipo de informação que estamos a procura e que é útil no contexto deste caso de estudo.
 
 
 \newpage
-\section{Section}
+\section{Desenvolvimento}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin cursus vitae augue eu pulvinar. Fusce vulputate felis non gravida imperdiet. Duis laoreet erat a odio viverra, quis pharetra eros aliquam. Donec orci mi, varius at tellus sed, dignissim euismod leo. Nulla semper convallis est, ut accumsan orci. Mauris vitae turpis sodales felis consectetur elementum ac sed lacus. Praesent gravida lacus sit amet massa ornare condimentum. Aliquam lectus quam, interdum in urna ut, euismod vulputate ligula. Vivamus nibh odio, volutpat id ligula nec, mattis pulvinar lacus. Ut nibh lectus, tristique nec porta sed, convallis sit amet massa. Praesent non sem ipsum. Nam varius blandit massa sed vulputate. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit amet ornare urna.
+\subsection{Contextualização do Problema}
 
-Phasellus consequat elit sit amet ultrices eleifend. Phasellus malesuada semper quam, malesuada malesuada tellus ultricies id. Quisque et scelerisque lectus. Suspendisse rutrum dui quis volutpat volutpat. Maecenas quis molestie massa. Suspendisse aliquam malesuada neque eget accumsan. Nam cursus bibendum tortor vehicula iaculis. Sed tincidunt volutpat dui. Nullam dapibus nulla nulla.
+Flex é uma ferramenta para gerar automáticamente analisadores léxicos, isto é, programas que reconhecem padrões léxicos num texto. O Flex é uma evolução da ferramenta Lex, mas com a caraterística de ser mais rápido que este (Fast Lex). Lex foi desenvolvido por M.E. Lesk e E. Shmidt (Bell Laboratories - ATT) enquanto que o Flex é um produto da Free Software Foundation, Inc. Como são comumente distribuídos em sistemas Unix a sua documentação encontra-se na forma de manual pages para as entradas lex, flex e flexdoc. Ao contrário do programador que escreve manualmene um programa que realize a identificação de padrões numa entrada, o uso do Flex/Lex permite que sejam apenas especificados os padrões desejados e as ações necessárias para processá-los. Para que Flex/Lex reconheçam padrões no texto, tais padrões devem ser descritos através de expressões regulares. A ferramenta Flex é ótima para a realização deste trabalho uma vez que nos permite analisar o contéudo específico, através de expressões regulares de determinada informação de texto.
 
-\subsection{Subsection}
+\subsection{Processamento da \textit{Wikipédia}}
+Neste primeiro trabalho de Processamento de Linguagens foi-nos proposto escolher um tema a escolha, de vários enunciados propostos. Após uma análise cuidada  de cada um deles o nosso grupo optou por escolher o tema de Processamento da \textit{Wikipédia}. Esta escolha reflete-se pelo grande impacto que a \textit{Wikipédia} tem no nosso dia-a-dia e é a principal enciclopédia livre com mais utilizadores. 
+O objectivo deste enunciado é criar um programa utilizando a ferramenta Flex que analise o contéudo de uma página XML da \textit{Wikipédia}, e que retire as informações relevantes dessa página como:
+\begin{itemize}
+\item título,
+\item autor.
+\item data
+\item n.º de links internos
+\item n.º de links externos
+\item n.º de sessões 
+\end{itemize}
+e criar uma página HTML (para cada página XML) com essas informações. Para isso é necessário exportar uma ou mais páginas usando o \textit{Special Export} disponível em \textbf{http://pt.wikipedia.org/wiki/Especial:Exportar (ou \\http://en.wikipedia.org/wiki/Special:Export} para a versão inglesa.
+\newpage
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum id sem vitae velit porta imperdiet ut vitae nunc. Fusce vehicula pharetra dolor, id aliquet ligula facilisis in. Nulla at tellus sapien. Nullam eu diam nec nisi placerat pharetra. Ut a lacus ut augue varius semper. Nulla facilisi. Ut imperdiet, ligula vitae pharetra congue, purus augue semper nisl, sed suscipit eros sem in orci. Vestibulum erat quam, sollicitudin et molestie non, faucibus eu ante. Aliquam egestas ac elit ut rutrum. Mauris pulvinar eleifend eros. Suspendisse euismod euismod elementum.
+\subsection{Enunciado}
 
-\subsubsection{subsubsection}
+De uma maneira geral, para teste trabalhou pretende-se desenvolver os seguintes pontos:
+\begin{itemize}
+\item Especificar padrões de frases que se quer encontrar no texto fonte através de ERs.
+\item Identificar as acções semânticas a realizar como reação ao reconhecimento de cada um desses padrões
+\item Identificar estruturas de dados globais que possa eventualmente precisar para armazenar temporariamente a informação que se vai extraindo ou que se vai construindo à medida que o processamento avança.
+\item Desenvolver um Processador de Texto para fazer reconhecimento dos padrões identificados e proceder à transformação pretendida, com recurso do Flex.
+\end{itemize}
 
-Suspendisse scelerisque nec odio sed rhoncus. Mauris luctus ullamcorper urna. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed scelerisque porta massa id scelerisque. Etiam pharetra porta sapien ac rhoncus. Curabitur non purus aliquet, porttitor lorem dictum, viverra urna. Quisque diam erat, mattis sit amet purus ac, dictum eleifend libero. Maecenas luctus pellentesque mollis. Duis molestie pellentesque turpis a porttitor.
+\subsection{Descrição do Problema}
+
+Usando o \textbf{Especial Export} pretende-se exportar o contéudo da \textit{Wikipédia} e com o recurso do Flex implementar um processador de texto que deverá produzir, por cada página extraída do ficheiro XML, uma página \textbf{html} com as seguintes informações:
+
+\begin{itemize}
+\item Título
+\item Autor da última revisão
+\item Data da última revisão
+\item Número de links internos, e explicitar quais.
+\item Número de links externos, e explicitar quais.
+\item Número de seções, e explicitar quais.
+\item Opcional: mostrar na página \textit{html} o contéudo original do artigo.
+\end{itemize}
 
 \newpage
-\section{WANTED: DEAD OR ALIVE}
-\begin{figure}[h!]
-  \centering
-    \includegraphics[width=0.6\textwidth]{107}
-  \caption[Descrição no titulo]{Descrição abaixo da imagem}
-\end{figure}
+
+\subsection{Desenvolvimento do Programa}
+
+\subsubsection{Estrutura de Dados}
+
+
+\subsubsection{Flex e Expressões Regulares}
+
+Nesta secção iremos fazer uma abordagem as Expressões Regulares que foram desenvolvidas no contexto da resolução deste projecto. Utilizaram-se as seguintes variáveis de contexto:
+
+\begin{verbatim}
+%x page
+%x title
+%x revision
+%x timestamp
+%x contributor
+%x username
+%x text
+\end{verbatim}
+
+A cada uma das expressões regulares apresentadas será feito uma breve descrição de cada uma delas:
+\begin{itemize}
+\item 
+\begin{verbatim}
+"<page>"           {pag = pagina_create();
+                    printf("inicio nova pagina\n");
+                    BEGIN page;
+                    }
+
+<page>"</page>"    {printf("fim pagina\n");
+                    BEGIN 0;
+                    }
+\end{verbatim}
+
+Aqui é guardado o início e o fim da página da leitura do ficheiro XML. Quando se encontra a tag \begin{math}<page>\end{math} inicia a estrutura page. Por outro lado, quando encontra \begin{math}</page>\end{math}, volta ao estado inicial e escreve a página HTML com toda a informação filtrada até então.
+
+
+
+\end{itemize}
+
+
+\newpage
+\section{Conclusão}
+
 \newpage
 
 \todo{pode-se utilizar esta tag para chamar a atenção para coisas que é preciso fazer antes de entregar o relatório}
@@ -119,7 +189,7 @@ Suspendisse scelerisque nec odio sed rhoncus. Mauris luctus ullamcorper urna. Cl
 \end{subfigure}%
 \begin{subfigure}{.33\textwidth}
   \centering
-  \includegraphics[width=0.8\linewidth]{107}
+  \includegraphics[width=0.8\linewidth]{93}
   \caption{Vanessa Campos}
 \end{subfigure}%
 \end{figure}
