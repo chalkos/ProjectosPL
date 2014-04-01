@@ -11,6 +11,17 @@
 %x ilink2
 %x ilink3
 %x ilink4
+%x bold
+%x italico
+%x head1
+%x head2
+%x head3
+%x head4
+%x head5
+%x head6
+%x nowiki
+
+
 %{
 #include "pagina.h"
 #include "ilink.h"
@@ -56,6 +67,18 @@ Pagina* pag = NULL;
 <username>. {printf("%s", yytext);}
 
 <text>"</text>" {printf("\n"); BEGIN revision;}
+
+<text>\'\'\'        {BEGIN bold;}
+<text>\'\'          {BEGIN italico;}
+<text>\=\           {BEGIN head1;}
+<text>\={2}\        {BEGIN head2;}
+<text>\={3}\        {BEGIN head3;}
+<text>\={4}\        {BEGIN head4;}
+<text>\={5}\        {BEGIN head5;}
+<text>\={6}\        {BEGIN head6;}
+
+<text>"<nowiki>"    {BEGIN nowiki;}
+
 <text>"[[File:" {BEGIN link_file;}
 <text>"[[Image:" {BEGIN link_file;}
 <text,link_file>"[[":? {anterior = text; BEGIN ilink1;}
@@ -135,6 +158,57 @@ Pagina* pag = NULL;
 
 <ilink1,ilink2,ilink3>. ;
 
+<bold>[^\']+                        { /*Apanhar o bold */
+                                     printf ("<b>%s</b>\n",yytext);
+                                    }
+<bold>\'\'\'                        {BEGIN text;}
+                                   
+                                 
+<italico>[^\']+                     {/*Apanhar o italico*/
+                                    printf ("<i>%s</i>\n",yytext);}				                                      
+<italico>\'\'                       {BEGIN text;}
+
+<head1>[^\=]+                       {/*Apanhar o cabecalho1/section */
+                                     printf("<h1>%s</h1>\n",yytext);
+                                    }
+<head1>\=                          {BEGIN text;}
+
+<head2>[^\=]+                       {/*Apanhar o cabecalho2/subsection*/
+                                     printf ("<h2>%s</h2>\n",yytext);
+                                    }
+<head2>\={2}                      {BEGIN text; }
+
+
+<head3>[^\=]+                       {/*Apanhar o cabecalho4/subsubsection*/
+                                     printf ("<h3>%s</h3>\n",yytext);
+                                    }
+
+<head3>\={3}                      {BEGIN text; }
+
+
+<head4>[^\=]+                       {/*Apanhar o cabecalho4/subsubsubsection*/
+                                     printf ("<h4>%s</h4>\n",yytext);
+                                    }
+
+<head4>\={4}                      {BEGIN text; }
+                                    
+<head5>[^\=]+                       {/*Apanhar o cabecalho5/subsubsubsubsection*/
+                                     printf ("<h5>%s</h5>\n",yytext);
+                                    }
+
+<head5>\={5}                      {BEGIN text; }
+
+<head6>[^\=]+                       {/*Apanhar o cabecalho6/subsubsubsubsubsection*/
+                                     printf ("<h6>%s</h6>\n",yytext);
+                                    }
+
+<head6>\={4}                      {BEGIN text; }
+
+
+<nowiki>"</nowiki>"               {/*Apanhar a tag de nowiki*/
+                                   BEGIN text; 
+                                  }
+<nowiki>.                         {printf ("<nowiki>%s</nowiki>",yytext);}
 <*>. ;
 <*>\n ;
 %%
