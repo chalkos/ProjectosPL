@@ -58,15 +58,15 @@ Variante 1
   {\small A60987}\\
   \and
   Vanessa Campos\\
-  {\small A-----}\\
+  {\small A54801}\\
 }
 
 \maketitle
-%\begin{abstract}
-%\begin{center}
-%  Lorem Ipsum
-%\end{center}
-%\end{abstract}
+\begin{abstract}
+
+  O presente trabalho foi desenvolvido no âmbito da Unidade Curricular de Processamento de Linguagens e tem como principal objectivo descrever o processo de desenvolvimento de um analisador léxico da \textit{Wikipédia}. Ao longo deste relatório iremos explicar as estruturas de dados que foram implementadas para o desenvolvimento deste trabalho, bem como todas as decisões que foram tomadas.
+
+\end{abstract}
 \newpage
 
 \tableofcontents
@@ -75,22 +75,18 @@ Variante 1
 \newpage
 \section{Introdução}
 
+Atualmente a \textit{Wikipédia} é a maior base de dados de conhecimento livre online e disponível em várias línguas, no qual a lingua portuguesa faz parte integrante. Neste contexto, pretende-se desenvolver um Processador de Texto, exportado do \textit{Wikipédia} e gerar a página html com os dados mais relevantes contidos nessa página, utilizando a ferramenta Flex. 
+Com este trabalho foi necessário implementar Expressões Regulares de modo a retirar informação mais relevante num contexto enorme de informção, encontrando padrões que nos ajudem a descobrir o tipo de informação que estamos a procura e que é útil no contexto deste caso de estudo.
 
 
 \newpage
-\section{Section}
+\section{Desenvolvimento}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin cursus vitae augue eu pulvinar. Fusce vulputate felis non gravida imperdiet. Duis laoreet erat a odio viverra, quis pharetra eros aliquam. Donec orci mi, varius at tellus sed, dignissim euismod leo. Nulla semper convallis est, ut accumsan orci. Mauris vitae turpis sodales felis consectetur elementum ac sed lacus. Praesent gravida lacus sit amet massa ornare condimentum. Aliquam lectus quam, interdum in urna ut, euismod vulputate ligula. Vivamus nibh odio, volutpat id ligula nec, mattis pulvinar lacus. Ut nibh lectus, tristique nec porta sed, convallis sit amet massa. Praesent non sem ipsum. Nam varius blandit massa sed vulputate. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit amet ornare urna.
+\subsection{Contextualização do Problema}
 
-Phasellus consequat elit sit amet ultrices eleifend. Phasellus malesuada semper quam, malesuada malesuada tellus ultricies id. Quisque et scelerisque lectus. Suspendisse rutrum dui quis volutpat volutpat. Maecenas quis molestie massa. Suspendisse aliquam malesuada neque eget accumsan. Nam cursus bibendum tortor vehicula iaculis. Sed tincidunt volutpat dui. Nullam dapibus nulla nulla.
+Flex é uma ferramenta para gerar automáticamente analisadores léxicos, isto é, programas que reconhecem padrões léxicos num texto. O Flex é uma evolução da ferramenta Lex, mas com a caraterística de ser mais rápido que este (Fast Lex). Lex foi desenvolvido por M.E. Lesk 
 
-\subsection{Subsection}
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum id sem vitae velit porta imperdiet ut vitae nunc. Fusce vehicula pharetra dolor, id aliquet ligula facilisis in. Nulla at tellus sapien. Nullam eu diam nec nisi placerat pharetra. Ut a lacus ut augue varius semper. Nulla facilisi. Ut imperdiet, ligula vitae pharetra congue, purus augue semper nisl, sed suscipit eros sem in orci. Vestibulum erat quam, sollicitudin et molestie non, faucibus eu ante. Aliquam egestas ac elit ut rutrum. Mauris pulvinar eleifend eros. Suspendisse euismod euismod elementum.
-
-\subsubsection{subsubsection}
-
-Suspendisse scelerisque nec odio sed rhoncus. Mauris luctus ullamcorper urna. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed scelerisque porta massa id scelerisque. Etiam pharetra porta sapien ac rhoncus. Curabitur non purus aliquet, porttitor lorem dictum, viverra urna. Quisque diam erat, mattis sit amet purus ac, dictum eleifend libero. Maecenas luctus pellentesque mollis. Duis molestie pellentesque turpis a porttitor.
+\subsubsection{Processamento da \textit{Wikipédia}}
 
 \newpage
 \section{WANTED: DEAD OR ALIVE}
@@ -119,7 +115,7 @@ Suspendisse scelerisque nec odio sed rhoncus. Mauris luctus ullamcorper urna. Cl
 \end{subfigure}%
 \begin{subfigure}{.33\textwidth}
   \centering
-  \includegraphics[width=0.8\linewidth]{107}
+  \includegraphics[width=0.8\linewidth]{93}
   \caption{Vanessa Campos}
 \end{subfigure}%
 \end{figure}
