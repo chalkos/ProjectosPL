@@ -7,32 +7,11 @@
 #include "pagina.h"
 
 // funções privadas
-void print_elems(Elemento *elem);
-void print_string(Elemento *elem);
 void print_hlink(Elemento *elem);
-void print_italico(Elemento *elem);
-void print_negrito(Elemento *elem);
 void print_ilink(Elemento *elem);
+void print_header(Elemento *elem);
 
-void print_string(Elemento* elem){
-    printf("%s", (char*)elem->dados);
-}
 
-void print_elems(Elemento *elem){
-    switch(elem->tipo){
-        case TIPO_ILINK:
-            ilink_print((ILink*)elem->dados);
-            break;
-        case TIPO_HLINK:
-            break;
-        case TIPO_NEGRITO:
-            break;
-        case TIPO_ITALICO:
-            break;
-        case TIPO_STRING:
-            break;
-    }
-}
 //-------------------------------------
 //funções acessíveis
 
@@ -53,9 +32,6 @@ Pagina* pagina_create(){
     p->seccoes = NULL;
     p->nSeccoes = 0;
 
-    p->elementos = NULL;
-    p->actual = NULL;
-
     return p;
 }
 
@@ -67,6 +43,35 @@ void pagina_set_titulo(Pagina* p, char* str){
     strcpy( p->titulo, str);
 }
 
+// insere o autor
+void pagina_set_autor(Pagina* p, char* str){
+    p->autor = (char*) malloc( strlen(str)+1 );
+    strcpy( p->autor, str);
+}
+
+// insere o ultimaRevisao
+void pagina_set_ultimaRevisao(Pagina* p, char* str){
+    p->ultimaRev = (char*) malloc( strlen(str)+1 );
+    strcpy( p->ultimaRev, str);
+}
+
+void elemento_add_ilink(Pagina* pagina, ILink* linkinfo){
+    Elemento* e = (Elemento*) malloc( sizeof(Elemento));
+
+    e->dados = linkinfo;
+    e->proximo= NULL;
+    e->tipo = TIPO_ILINK;
+
+    Elemento* itr = pagina->iLinks;
+
+    if( itr == NULL ){
+        pagina->iLinks = e;
+        return;
+    }
+
+    
+}
+
 // destroi a página
 void pagina_destroy(Pagina** pag){
     Pagina* p = *pag;
@@ -75,31 +80,13 @@ void pagina_destroy(Pagina** pag){
     free(p->ultimaRev);
     free(p->autor);
 
-    // mais complicado porque é preciso destruir cada elemento
-    // falta aqui a parte destruir os elementos
+    // falta aqui a parte destruir os elementos das listas
     
 
     free(*pag);
 }
 
 void pagina_print(Pagina* p){
-    print_elems(p->elementos);
-}
-
-
-
-void pagina_adicionar_proximo(Pagina* p, Tipo tipo, void* dados){
-}
-
-void pagina_adicionar_filho(Pagina* p, Tipo tipo, void* dados){
-    
-}
-
-int pagina_seleccionar_pai(Pagina* p){
-    if( p && p->actual && p->actual && p->actual->pai ){
-        p->actual = p->actual->pai;
-        return 1;
-    }
-    return 0;
+    // é preciso adicionar uma cena para escrever o html da pagina
 }
 

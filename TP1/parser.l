@@ -11,15 +11,12 @@
 %x ilink2
 %x ilink3
 %x ilink4
-%x bold
-%x italico
 %x head1
 %x head2
 %x head3
 %x head4
 %x head5
 %x head6
-%x nowiki
 
 
 %{
@@ -68,16 +65,12 @@ Pagina* pag = NULL;
 
 <text>"</text>" {printf("\n"); BEGIN revision;}
 
-<text>\'\'\'        {BEGIN bold;}
-<text>\'\'          {BEGIN italico;}
 <text>\=\           {BEGIN head1;}
 <text>\={2}\        {BEGIN head2;}
 <text>\={3}\        {BEGIN head3;}
 <text>\={4}\        {BEGIN head4;}
 <text>\={5}\        {BEGIN head5;}
 <text>\={6}\        {BEGIN head6;}
-
-<text>"<nowiki>"    {BEGIN nowiki;}
 
 <text>"[[File:" {BEGIN link_file;}
 <text>"[[Image:" {BEGIN link_file;}
@@ -158,16 +151,6 @@ Pagina* pag = NULL;
 
 <ilink1,ilink2,ilink3>. ;
 
-<bold>[^\']+                        { /*Apanhar o bold */
-                                     printf ("<b>%s</b>\n",yytext);
-                                    }
-<bold>\'\'\'                        {BEGIN text;}
-                                   
-                                 
-<italico>[^\']+                     {/*Apanhar o italico*/
-                                    printf ("<i>%s</i>\n",yytext);}				                                      
-<italico>\'\'                       {BEGIN text;}
-
 <head1>[^\=]+                       {/*Apanhar o cabecalho1/section */
                                      printf("<h1>%s</h1>\n",yytext);
                                     }
@@ -204,11 +187,6 @@ Pagina* pag = NULL;
 
 <head6>\={4}                      {BEGIN text; }
 
-
-<nowiki>"</nowiki>"               {/*Apanhar a tag de nowiki*/
-                                   BEGIN text; 
-                                  }
-<nowiki>.                         {printf ("<nowiki>%s</nowiki>",yytext);}
 <*>. ;
 <*>\n ;
 %%
