@@ -155,7 +155,7 @@ void ilink_print(ILink* ilink){
         printf("%s", ilink->apresentar);
     }
     
-    printf("</a><br>\n");
+    printf("</a>\n");
 }
 
 // liberta memória associada ao ilink

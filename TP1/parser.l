@@ -20,21 +20,25 @@
 
 
 %{
+#include "paginas.h"
 #include "pagina.h"
 #include "ilink.h"
 
 int anterior = 0;
 ILink* ilink = NULL;
 Pagina* pag = NULL;
+Elemento* paginas = NULL;
 
 %}
 %%
+    paginas = paginas_create();
+
 "<page>"           {pag = pagina_create();
                     printf("inicio nova pagina\n");
                     BEGIN page;
                     }
 
-<page>"</page>"    {printf("fim pagina\n");
+<page>"</page>"    {paginas_add(paginas, pag);
                     BEGIN 0;
                     }
 <page>"<title>"    {printf("titulo: ");
@@ -191,7 +195,10 @@ Pagina* pag = NULL;
 <*>\n ;
 %%
 int yywrap(){
-    //ilink_destroy();
-    printf("DONE!\n");
+    // escrever todas as infos
+    paginas_print(paginas);
+
+    // os destroys todos
+
     return 1;
 }

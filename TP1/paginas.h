@@ -3,8 +3,9 @@
 
 #include "pagina.h"
 
-Elemento* paginas_create();
-void paginas_add(Pagina* pagina);
+Elemento *paginas_create();
+void paginas_add(Elemento* ps, Pagina* p);
 void paginas_destroy(Elemento** paginas);
+void paginas_print(Elemento* paginas);
 
 #endif

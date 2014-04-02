@@ -1,5 +1,5 @@
-#ifndef __SECCOES_H
-#define __SECCOES_H
+#ifndef __SECCAO_H
+#define __SECCAO_H
 
 
 typedef struct sSeccao{
