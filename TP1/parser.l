@@ -1,3 +1,5 @@
+/*%option debug*/
+
 %x page
 %x title
 %x revision
@@ -61,13 +63,12 @@ Elemento* paginas = NULL;
 
 <text>"</text>"     BEGIN revision;
 
-<text>\=\           BEGIN head1;
-<text>\={2}\        BEGIN head2;
-<text>\={3}\        BEGIN head3;
-<text>\={4}\        BEGIN head4;
-<text>\={5}\        BEGIN head5;
-<text>\={6}\        BEGIN head6;
-
+<text>\n\=          BEGIN head1;
+<text>\n\={2}       BEGIN head2;
+<text>\n\={3}       BEGIN head3;
+<text>\n\={4}       BEGIN head4;
+<text>\n\={5}       BEGIN head5;
+<text>\n\={6}       BEGIN head6;
 <text>"[[File:"     ;/*ignorar [[ caso sejam ficheiros*/
 <text>"[[Image:"    ;/*ignorar [[ caso sejam imagens*/
 <text>"[[":?        BEGIN ilink1;

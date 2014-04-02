@@ -19,10 +19,11 @@ Seccao* seccao_create(char* str, int indentacao){
 // mostra o que tem na variavel seccao
 void seccao_print(Seccao* seccao){
     int i;
-    for(i=0; i<seccao->indent; i++)
+    printf("<h4>");
+    for(i=1; i<seccao->indent; i++)
         printf("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
 
-    printf("%s<br>\n", seccao->texto);
+    printf("%s</h4>\n", seccao->texto);
 }
 
 // liberta memória associada a seccao

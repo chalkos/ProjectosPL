@@ -49,23 +49,6 @@ void pagina_set_ultimaRevisao(Pagina* p, char* str){
     strcpy( p->ultimaRev, str);
 }
 
-void elemento_add_ilink(Pagina* pagina, ILink* linkinfo){
-    Elemento* e = (Elemento*) malloc( sizeof(Elemento));
-
-    e->dados = linkinfo;
-    e->proximo= NULL;
-    e->tipo = TIPO_ILINK;
-
-    Elemento* itr = pagina->iLinks;
-
-    if( itr == NULL ){
-        pagina->iLinks = e;
-        return;
-    }
-
-    
-}
-
 // destroi a página
 void pagina_destroy(Pagina** pag){
     Pagina* p = *pag;
@@ -81,9 +64,18 @@ void pagina_destroy(Pagina** pag){
 }
 
 void pagina_print(Pagina* p){
-    printf("<div class=\"panel panel-default\"><a name=\"pagina%d\"></a><div class=\"panel-heading\"><h1>%s</h1><div style=\"width:100%%\"><button type=\"button\" class=\"btn btn-danger disabled\" align = \"left\">Ultima alteração em %s por %s</button><a href=\"#top\"><button type=\"button\" class=\"btn btn-default\" style =\"float:right\">&uarr;</button></a></div></div><div class=\"panel-body\"><div class=\"subsection\" id=\"cont\"><h2>Conteúdos</h2>\n", p->indice, p->titulo, p->ultimaRev, p->autor);
+    Elemento* itr = NULL;
+    
+    printf("<div class=\"panel panel-default\"><a name=\"pagina%d\"></a><div class=\"panel-heading\"><h1>%s</h1><div style=\"width:100%%\"><button type=\"button\" class=\"btn btn-danger disabled\" align = \"left\">Ultima alteração em %s por %s</button><a href=\"#top\"><button type=\"button\" class=\"btn btn-default\" style =\"float:right\">&uarr;</button></a></div></div><div class=\"panel-body\"><div class=\"subsection\" id=\"cont\"><h3>Secções (%d)</h3>\n", p->indice, p->titulo, p->ultimaRev, p->autor, p->nSeccoes);
 
     // imprimir as seccões
+    Seccao *seccao = NULL;
+
+    for( itr=p->seccoes; itr; itr = itr->proximo ){
+        seccao = itr->dados;
+        seccao_print(seccao);
+    }
+
     
     printf("</div><hr width=100%%><table class=\"table table-striped \"><thead><tr class=\"info\"><th>%d Links Externos</th><th>%d Links Internos</th></tr></thead><tbody>", p->nHLinks, p->nILinks);
 
@@ -100,6 +92,7 @@ void pagina_add_ilink(Pagina* pagina, ILink* linkinfo){
     e->tipo = TIPO_ILINK;
 
     Elemento* itr = pagina->iLinks;
+    pagina->nILinks++;
     
     // se ainda nao houver elementos na lista
     if( itr == NULL ){
@@ -122,6 +115,7 @@ void pagina_add_seccao(Pagina* pagina, Seccao* seccao){
     e->tipo = TIPO_HEADER;
 
     Elemento* itr = pagina->seccoes;
+    pagina->nSeccoes++;
     
     // se ainda nao houver elementos na lista
     if( itr == NULL ){
@@ -132,7 +126,7 @@ void pagina_add_seccao(Pagina* pagina, Seccao* seccao){
     // se ja houver elementos, percorrer até ao ultimo e inserir
     while( itr->proximo != NULL )
         itr = itr->proximo;
-
+    
     itr->proximo = e;
 }
 
