@@ -61,9 +61,9 @@ void paginas_print(Elemento* paginas){
     
     // inicio do body
     printf("<body style=\"width:90%%; margin-left: auto; margin-right: auto; margin-top: 25px;\"><a name=\"top\"></a><div><p align=\"right\"><img src=\"http://corpora.di.uminho.pt/linguateca/pagina_linguateca/logoUM.jpg\" alt=\"Escola de Engenharia da Universidade do Minho\" width=\"150\" height=\"75\" align=\"top;\"></div>");
-
     printf("<div class=\"panel panel-default\"><div class=\"panel-heading\"><h2>Índice de Páginas</h2></div><div class=\"panel-body\"><dl>");
-
+    
+    // lista de paginas
     itr = paginas;
     while( itr ){
         pActual = (Pagina*) itr->dados;
@@ -71,8 +71,19 @@ void paginas_print(Elemento* paginas){
         //pagina_print( (Pagina*)itr->dados);
         itr = itr->proximo;
     }
-
     printf("</dl></div></div>");
+    
+    // imprimir as páginas
+    itr = paginas;
+    while( itr ){
+        pagina_print( (Pagina*)itr->dados);
+        itr = itr->proximo;
+    }
+    printf("</dl></div></div>");
+    
+    
+    // terminar o HTML
+    printf("</body></html>\n\n");
 }
 
 

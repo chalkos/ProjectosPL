@@ -2,7 +2,7 @@
 #define __PAGINA_H
 
 #include "ilink.h"
-#include "elemento.h"
+#include "seccao.h"
 
 typedef enum { TIPO_HLINK // hyperlink
              , TIPO_ILINK // internal link

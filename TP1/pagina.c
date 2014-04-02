@@ -89,7 +89,15 @@ void pagina_destroy(Pagina** pag){
 }
 
 void pagina_print(Pagina* p){
-    // é preciso adicionar uma cena para escrever o html da pagina
+    printf("<div class=\"panel panel-default\"><a name=\"pagina%d\"></a><div class=\"panel-heading\"><h1>%s</h1><div style=\"width:100%%\"><button type=\"button\" class=\"btn btn-danger disabled\" align = \"left\">Ultima alteração em %s por %s</button><a href=\"#top\"><button type=\"button\" class=\"btn btn-default\" style =\"float:right\">&uarr;</button></a></div></div><div class=\"panel-body\"><div class=\"subsection\" id=\"cont\"><h2>Conteúdos</h2>\n", p->indice, p->titulo, p->ultimaRev, p->autor);
+
+    // imprimir as seccões
+    
+    printf("</div><hr width=100%%><table class=\"table table-striped \"><thead><tr class=\"info\"><th>%d Links Externos</th><th>%d Links Internos</th></tr></thead><tbody>", p->nHLinks, p->nILinks);
+
+    // imprimir os links
+    
+    printf("</tbody></table></div></div>");
 }
 
 void pagina_add_ilink(Pagina* pagina, ILink* linkinfo){
