@@ -75,7 +75,6 @@ Elemento* paginas = NULL;
 
 <ilink1>[a-zA-Z]+:[^\]\(,\|]+       {/*ABCJ */
                                      ilink = ilink_create();
-                                     pagina_add_ilink(pag, ilink);
                                      ilink_set_especial(ilink, yytext);
                                      BEGIN ilink2;
                                     }
@@ -140,6 +139,8 @@ Elemento* paginas = NULL;
 
 <ilink4>\][a-zA-Z]*                 {/*L    */
                                      ilink_set_resto(ilink, yytext+1);
+                                     //ilink_print(ilink);
+                                     pagina_add_ilink(pag, ilink);
                                      BEGIN text;
                                     }
 

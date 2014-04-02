@@ -65,21 +65,32 @@ void pagina_destroy(Pagina** pag){
 
 void pagina_print(Pagina* p){
     Elemento* itr = NULL;
+    Elemento* itr2 = NULL;
     
     printf("<div class=\"panel panel-default\"><a name=\"pagina%d\"></a><div class=\"panel-heading\"><h1>%s</h1><div style=\"width:100%%\"><button type=\"button\" class=\"btn btn-danger disabled\" align = \"left\">Ultima alteração em %s por %s</button><a href=\"#top\"><button type=\"button\" class=\"btn btn-default\" style =\"float:right\">&uarr;</button></a></div></div><div class=\"panel-body\"><div class=\"subsection\" id=\"cont\"><h3>Secções (%d)</h3>\n", p->indice, p->titulo, p->ultimaRev, p->autor, p->nSeccoes);
 
     // imprimir as seccões
     Seccao *seccao = NULL;
-
     for( itr=p->seccoes; itr; itr = itr->proximo ){
         seccao = itr->dados;
         seccao_print(seccao);
     }
-
     
-    printf("</div><hr width=100%%><table class=\"table table-striped \"><thead><tr class=\"info\"><th>%d Links Externos</th><th>%d Links Internos</th></tr></thead><tbody>", p->nHLinks, p->nILinks);
+    printf("</div><hr width=100%%><table class=\"table table-striped \"><thead><tr class=\"info\"><th style=\"width:50%%\">%d Links Externos</th><th>%d Links Internos</th></tr></thead><tbody>", p->nHLinks, p->nILinks);
 
     // imprimir os links
+    itr = p->iLinks;
+    itr2 = p->hLinks;
+    while( itr || itr2 ){
+        printf("<tr><td>");
+        if( itr2 ) ilink_print((ILink*)itr2->dados);
+        printf("</td><td>");
+        if( itr  ) ilink_print((ILink*)itr->dados);
+        printf("</td></tr>");
+
+        if( itr  ) itr = itr->proximo;
+        if( itr2 ) itr2= itr2->proximo;
+    }
     
     printf("</tbody></table></div></div>");
 }
