@@ -6,15 +6,6 @@
 
 #include "pagina.h"
 
-// funções privadas
-void print_hlink(Elemento *elem);
-void print_ilink(Elemento *elem);
-void print_header(Elemento *elem);
-
-
-//-------------------------------------
-//funções acessíveis
-
 // cria uma nova página
 Pagina* pagina_create(){
     Pagina* p = (Pagina*) malloc(sizeof(Pagina));
@@ -54,6 +45,7 @@ void pagina_set_autor(Pagina* p, char* str){
 // insere o ultimaRevisao
 void pagina_set_ultimaRevisao(Pagina* p, char* str){
     p->ultimaRev = (char*) malloc( strlen(str)+1 );
+    str[10] = str[19] = ' ';
     strcpy( p->ultimaRev, str);
 }
 
