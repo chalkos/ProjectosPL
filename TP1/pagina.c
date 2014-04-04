@@ -83,7 +83,7 @@ void pagina_print(Pagina* p){
     itr2 = p->hLinks;
     while( itr || itr2 ){
         printf("<tr><td>");
-        if( itr2 ) ilink_print((ILink*)itr2->dados);
+        if( itr2 ) hlink_print((HLink*)itr2->dados);
         printf("</td><td>");
         if( itr  ) ilink_print((ILink*)itr->dados);
         printf("</td></tr>");
@@ -142,3 +142,25 @@ void pagina_add_seccao(Pagina* pagina, Seccao* seccao){
 }
 
 
+void pagina_add_hlink(Pagina* pagina, HLink* linkinfo){
+    Elemento* e = (Elemento*) malloc( sizeof(Elemento));
+
+    e->dados = linkinfo;
+    e->proximo= NULL;
+    e->tipo = TIPO_HLINK;
+
+    Elemento* itr = pagina->hLinks;
+    pagina->nHLinks++;
+    
+    // se ainda nao houver elementos na lista
+    if( itr == NULL ){
+        pagina->hLinks = e;
+        return;
+    }
+    
+    // se ja houver elementos, percorrer até ao ultimo e inserir
+    while( itr->proximo != NULL )
+        itr = itr->proximo;
+    
+    itr->proximo = e;
+}

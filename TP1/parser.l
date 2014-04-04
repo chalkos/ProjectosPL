@@ -12,6 +12,8 @@
 %x ilink2
 %x ilink3
 %x ilink4
+%x hlink1
+%x hlink2
 %x head1
 %x head2
 %x head3
@@ -24,8 +26,10 @@
 #include "paginas.h"
 #include "pagina.h"
 #include "ilink.h"
+#include "hlink.h"
 
 ILink* ilink = NULL;
+HLink* hlink = NULL;
 Pagina* pag = NULL;
 Elemento* paginas = NULL;
 
@@ -72,6 +76,16 @@ Elemento* paginas = NULL;
 <text>"[[File:"     ;/*ignorar [[ caso sejam ficheiros*/
 <text>"[[Image:"    ;/*ignorar [[ caso sejam imagens*/
 <text>"[[":?        BEGIN ilink1;
+<text>"["           BEGIN hlink1;
+
+<hlink1>[^\ \]]+    {/*leu o uri*/
+                     hlink = hlink_create();
+                     pagina_add_hlink(pag, hlink);
+                     hlink_set_uri(hlink, yytext);
+                     BEGIN hlink2;
+                    }
+<hlink2>\ [^\]]+    hlink_set_texto(hlink, yytext+1);
+<hlink2>\]          BEGIN text;
 
 <ilink1>[a-zA-Z]+:[^\]\(,\|]+       {/*ABCJ */
                                      ilink = ilink_create();

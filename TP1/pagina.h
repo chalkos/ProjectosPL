@@ -2,6 +2,7 @@
 #define __PAGINA_H
 
 #include "ilink.h"
+#include "hlink.h"
 #include "seccao.h"
 
 typedef enum { TIPO_HLINK // hyperlink
@@ -61,6 +62,9 @@ void pagina_add_seccao(Pagina* pagina, Seccao* seccao);
 
 // inserir um ILink
 void pagina_add_ilink(Pagina* pagina, ILink* linkinfo);
+
+// inserir um ILink
+void pagina_add_hlink(Pagina* pagina, HLink* linkinfo);
 
 
 #endif
