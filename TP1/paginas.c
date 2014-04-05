@@ -60,8 +60,8 @@ void paginas_print(Elemento* paginas){
     printf("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"http://bootswatch.com/cosmo/bootstrap.css\"><title>Processamento de Linguagens</title></head>");
     
     // inicio do body
-    printf("<body style=\"width:90%%; margin-left: auto; margin-right: auto; margin-top: 25px;\"><a name=\"top\"></a><div><p align=\"right\"><img src=\"http://corpora.di.uminho.pt/linguateca/pagina_linguateca/logoUM.jpg\" alt=\"Escola de Engenharia da Universidade do Minho\" width=\"150\" height=\"75\" align=\"top;\"></div>");
-    printf("<div class=\"panel panel-default\"><div class=\"panel-body\"><h2><b>N</b>ot <b>A</b>nother <b>W</b>ikipedia <b>P</b>arser</h2></div></div><div class=\"panel panel-default\"><div class=\"panel-heading\"><h3>Índice de páginas</h3></div><div class=\"panel-body\"><dl>");
+    printf("<body style=\"width:90%%; margin-left: auto; margin-right: auto; margin-top: 25px;\"><a name=\"top\"></a>");
+    printf("<div class=\"panel panel-default\"><div class=\"panel-body\"><h2><b>N</b>ot <b>A</b>nother <b>W</b>ikipedia <b>P</b>arser<img src=\"http://corpora.di.uminho.pt/linguateca/pagina_linguateca/logoUM.jpg\" alt=\"Escola de Engenharia da Universidade do Minho\" width=\"150\" height=\"75\" align=\"top;\" style=\"float:right;position:relative;bottom:20px\"></h2></div></div><div class=\"panel panel-default\"><div class=\"panel-heading\"><h3>Índice de páginas</h3></div><div class=\"panel-body\"><dl>");
     
     // lista de paginas
     itr = paginas;
