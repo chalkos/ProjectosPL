@@ -128,7 +128,6 @@ void pagina_add_ilink(Pagina* pagina, ILink* linkinfo){
 
     e->dados = linkinfo;
     e->proximo= NULL;
-    e->tipo = TIPO_ILINK;
 
     Elemento* itr = pagina->iLinks;
     pagina->nILinks++;
@@ -151,7 +150,6 @@ void pagina_add_seccao(Pagina* pagina, Seccao* seccao){
 
     e->dados = seccao;
     e->proximo= NULL;
-    e->tipo = TIPO_HEADER;
 
     Elemento* itr = pagina->seccoes;
     pagina->nSeccoes++;
@@ -175,7 +173,6 @@ void pagina_add_hlink(Pagina* pagina, HLink* linkinfo){
 
     e->dados = linkinfo;
     e->proximo= NULL;
-    e->tipo = TIPO_HLINK;
 
     Elemento* itr = pagina->hLinks;
     pagina->nHLinks++;

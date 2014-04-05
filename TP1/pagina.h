@@ -5,15 +5,7 @@
 #include "hlink.h"
 #include "seccao.h"
 
-typedef enum { TIPO_HLINK // hyperlink
-             , TIPO_ILINK // internal link
-             , TIPO_HEADER // header
-
-             , TIPO_PAGINA // uma pagina
-} Tipo;
-
 typedef struct sElemento {
-    Tipo tipo;
     void *dados;
     struct sElemento* proximo; // o proximo elemento
 } Elemento;

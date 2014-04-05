@@ -52,7 +52,6 @@ Elemento* paginas_create(){
 
     paginas->proximo = NULL;
     paginas->dados = NULL;
-    paginas->tipo = TIPO_PAGINA;
 
     return paginas;
 }
@@ -70,7 +69,6 @@ void paginas_add(Elemento* ps, Pagina* p){
 
     e->dados = p;
     e->proximo= NULL;
-    e->tipo = TIPO_PAGINA;
 
     Elemento* itr = ps;
     
