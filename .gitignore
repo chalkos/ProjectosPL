@@ -22,7 +22,7 @@ lex.yy.c
 *.exe
 *.out
 *.app
-parser
+nawp
 
 # vagrant
 .vagrant

@@ -23,7 +23,6 @@ ILink* ilink_create(){
     ilink->apresentar = NULL;
     ilink->resto = NULL;
     ilink->especial = NULL;
-    ilink->autotrim = 0;
 
     return ilink;
 }

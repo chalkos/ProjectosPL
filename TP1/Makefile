@@ -3,13 +3,13 @@
 CC=gcc -Wall -g
 FLEX=flex
 
-all: parser
+all: nawp
 
-parser: lex.yy.o ilink.o pagina.o paginas.o seccao.o
+nawp: lex.yy.o ilink.o hlink.o pagina.o paginas.o seccao.o
 	$(CC) $^ -ll -o $@
 
-lex.yy.c: parser.l
-	flex parser.l
+lex.yy.c: nawp.l
+	flex nawp.l
 
 lex.yy.o: lex.yy.c 
 	$(CC) -c -ll lex.yy.c
@@ -26,7 +26,10 @@ pagina.o: pagina.c pagina.h
 seccao.o: seccao.c seccao.h
 	$(CC) -c seccao.c
 
+hlink.o: hlink.c hlink.h
+	$(CC) -c hlink.c
+
 clean:
 	$(RM) lex.yy.c
 	$(RM) *.o
-	$(RM) parser
+	$(RM) nawp

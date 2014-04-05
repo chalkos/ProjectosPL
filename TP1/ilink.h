@@ -12,7 +12,6 @@ typedef struct sILink{
     char* virgula;
     char* apresentar;
     char* resto;
-    int autotrim;
 } ILink;
 
 // criar um novo link
