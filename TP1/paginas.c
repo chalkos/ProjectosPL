@@ -2,6 +2,50 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+// -1 se str1 <  str2
+//  0 se str1 == str2
+// +1 se str1 >  str2
+int myStrCmp( char* str1, char* str2 ){
+    if( !str1 && !str2 )
+        return 0;
+    
+    if( !str1 && str2)
+        return -1;
+    
+    if( str1 && !str2)
+        return 1;
+    
+
+    //percorrer todos os iguais
+    while(*str1 == *str2 && *str1 != '\0' && *str2 != '\0'){
+        str1++;
+        str2++;
+    }
+    
+    if( *str1 < *str2 )
+        return -1;
+    
+    if( *str1 > *str2 )
+        return 1;
+    
+
+    // caso em que são iguais
+    return 0;
+}
+
+void printTitulos(Elemento* ps){
+    Elemento* itr = ps;
+    
+    // ordenado pelo titulo
+    fprintf(stderr, "PS: ");
+    while( itr ){
+        fprintf(stderr, "%s -> ", ((Pagina*)(itr->dados))->titulo);
+        itr = itr->proximo;
+    }
+    fprintf(stderr, "\n");
+}
 
 Elemento* paginas_create(){
     Elemento* paginas = (Elemento*) malloc(sizeof(Elemento));
@@ -16,11 +60,11 @@ Elemento* paginas_create(){
 void paginas_add(Elemento* ps, Pagina* p){
     if( ps->dados == NULL ){
         // primeira pagina
-        p->indice = 0;
         ps->dados = p;
         return;
     }
     
+    //printTitulos(ps);
     
     Elemento* e = (Elemento*) malloc( sizeof(Elemento));
 
@@ -29,16 +73,22 @@ void paginas_add(Elemento* ps, Pagina* p){
     e->tipo = TIPO_PAGINA;
 
     Elemento* itr = ps;
-    int count = 1;
     
-    // ir até ao fim da lista de paginas
-    while( itr->proximo != NULL ){
+    // inserir ordenado pelo titulo
+    while( itr->proximo != NULL && myStrCmp(((Pagina*)(itr->dados))->titulo, p->titulo) < 0)
         itr = itr->proximo;
-        count++;
-    }
     
-    p->indice = count;
+
+    e->proximo = itr->proximo;
     itr->proximo = e;
+
+    void* dadosSwap;
+    if( myStrCmp(((Pagina*)(itr->dados))->titulo, p->titulo) > 0 ){
+        dadosSwap = e->dados;
+        e->dados = itr->dados;
+        itr->dados = dadosSwap;
+    }
+        
 }
 
 void paginas_destroy(Elemento** paginas){
@@ -55,6 +105,7 @@ void paginas_destroy(Elemento** paginas){
 void paginas_print(Elemento* paginas){
     Elemento* itr;
     Pagina* pActual;
+    int i;
     
     // head
     printf("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\"><link rel=\"stylesheet\" type=\"text/css\" href=\"http://bootswatch.com/cosmo/bootstrap.css\"><title>Processamento de Linguagens</title></head>");
@@ -64,9 +115,11 @@ void paginas_print(Elemento* paginas){
     printf("<div class=\"panel panel-default\"><div class=\"panel-body\"><h2><b>N</b>ot <b>A</b>nother <b>W</b>ikipedia <b>P</b>arser<img src=\"http://corpora.di.uminho.pt/linguateca/pagina_linguateca/logoUM.jpg\" alt=\"Escola de Engenharia da Universidade do Minho\" width=\"150\" height=\"75\" align=\"top;\" style=\"float:right;position:relative;bottom:20px\"></h2></div></div><div class=\"panel panel-default\"><div class=\"panel-heading\"><h3>Índice de páginas</h3></div><div class=\"panel-body\"><dl>");
     
     // lista de paginas
+    i=0;
     itr = paginas;
     while( itr ){
         pActual = (Pagina*) itr->dados;
+        pActual->indice = i++;
         printf("<dt><a href=\"#pagina%d\">%s</a></dt>\n", pActual->indice, pActual->titulo);
         //pagina_print( (Pagina*)itr->dados);
         itr = itr->proximo;

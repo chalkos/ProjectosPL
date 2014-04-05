@@ -39,10 +39,11 @@ Elemento* paginas = NULL;
     paginas = paginas_create();
 
 "<page>"            {pag = pagina_create();
-                     paginas_add(paginas, pag);
                      BEGIN page;
                     }
-<page>"</page>"     BEGIN 0;
+<page>"</page>"     {BEGIN 0;
+                     paginas_add(paginas, pag);
+                    }
 
 <page>"<title>"     BEGIN title;
 
