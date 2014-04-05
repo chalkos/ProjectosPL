@@ -65,7 +65,7 @@ void pagina_destroy(Pagina** pag){
 
 void pagina_print(Pagina* p){
     Elemento* itr = NULL;
-    Elemento* itr2 = NULL;
+    int i;
     
     printf("<div class=\"panel panel-default\"><a name=\"pagina%d\"></a><div class=\"panel-heading\"><h1>%s</h1><div style=\"width:100%%\"><button type=\"button\" class=\"btn btn-danger disabled\" align = \"left\">Ultima alteração em %s por %s</button><a href=\"#top\"><button type=\"button\" class=\"btn btn-default\" style =\"float:right\">&uarr;</button></a></div></div><div class=\"panel-body\"><div class=\"subsection\" id=\"cont\"><h3>Secções (%d)</h3>\n", p->indice, p->titulo, p->ultimaRev, p->autor, p->nSeccoes);
 
@@ -76,20 +76,48 @@ void pagina_print(Pagina* p){
         seccao_print(seccao);
     }
     
-    printf("</div><hr width=100%%><table class=\"table table-striped \"><thead><tr class=\"info\"><th style=\"width:50%%\">%d Links Externos</th><th>%d Links Internos</th></tr></thead><tbody>", p->nHLinks, p->nILinks);
-
-    // imprimir os links
-    itr = p->iLinks;
-    itr2 = p->hLinks;
-    while( itr || itr2 ){
+    printf("</div><hr width=100%%><table class=\"table table-striped \"><thead><tr class=\"info\"><th style=\"width:50%%\" colspan=2>%d Links Externos</th></tr></thead><tbody>", p->nHLinks);
+    
+    itr = p->hLinks;
+    for(i=0; i < p->nHLinks/2; i+=1){
         printf("<tr><td>");
-        if( itr2 ) hlink_print((HLink*)itr2->dados);
-        printf("</td><td>");
-        if( itr  ) ilink_print((ILink*)itr->dados);
-        printf("</td></tr>");
+        hlink_print((HLink*)itr->dados);
 
-        if( itr  ) itr = itr->proximo;
-        if( itr2 ) itr2= itr2->proximo;
+        itr = itr->proximo;
+        printf("</td><td>");
+        hlink_print((HLink*)itr->dados);
+        printf("</td></tr>\n");
+
+        itr = itr->proximo;
+    }
+
+    if( itr ){
+        printf("<tr><td>");
+        hlink_print((HLink*)itr->dados);
+        printf("</td><td></td></tr>");
+    }
+    printf("</tbody></table>");
+
+
+    printf("<hr width=100%%><table class=\"table table-striped \"><thead><tr class=\"info\"><th style=\"width:50%%\" colspan=2>%d Links Internos</th></tr></thead><tbody>", p->nILinks);
+
+    itr = p->iLinks;
+    for(i=0; i < p->nILinks/2; i+=1){
+        printf("<tr><td>");
+        ilink_print((ILink*)itr->dados);
+
+        itr = itr->proximo;
+        printf("</td><td>");
+        ilink_print((ILink*)itr->dados);
+        printf("</td></tr>\n");
+
+        itr = itr->proximo;
+    }
+
+    if( itr ){
+        printf("<tr><td>");
+        ilink_print((ILink*)itr->dados);
+        printf("</td><td></td></tr>");
     }
     
     printf("</tbody></table></div></div>");

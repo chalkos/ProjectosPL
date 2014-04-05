@@ -1,4 +1,5 @@
-/*%option debug*/
+/* Not Another Wikipedia Parser
+%option debug*/
 
 %x page
 %x title
