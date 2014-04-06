@@ -200,11 +200,12 @@ Nesta secção iremos fazer uma abordagem as Expressões Regulares que foram des
 %x username
 %x text
 
-%x link_file
 %x ilink1
 %x ilink2
 %x ilink3
 %x ilink4
+%x hlink1
+%x hlink2
 %x head1
 %x head2
 %x head3
@@ -219,21 +220,73 @@ A cada uma das expressões regulares apresentadas será feito uma breve descriç
 \begin{itemize}
 \item 
 \begin{verbatim}
-"<page>"           {pag = pagina_create();
-                    printf("inicio nova pagina\n");
-                    BEGIN page;
+"<page>"            {pag = pagina_create();
+                     BEGIN page;
                     }
-
-<page>"</page>"    {printf("fim pagina\n");
-                    BEGIN 0;
+<page>"</page>"     {BEGIN 0;
+                     paginas_add(paginas, pag);
                     }
 \end{verbatim}
-
+\end{itemize}
 Aqui é guardado o início e o fim da página da leitura do ficheiro XML. Quando se encontra a tag \begin{math}<page>\end{math} inicia a estrutura page. Por outro lado, quando encontra \begin{math}</page>\end{math}, volta ao estado inicial e escreve a página HTML com toda a informação filtrada até então.
 
 
+\begin{verbatim}
 
-\end{itemize}
+<page>"<title>"     BEGIN title;
+<page>"<revision>"  BEGIN revision;
+<title>"</title>"   BEGIN page;
+<title>[^<]*        pagina_set_titulo(pag,yytext);
+
+\end{verbatim}
+
+
+Quando se está na página e é encontrada a tag \begin{math}<title>\end{math}, entra no estado título e apanha o texto que lá dentro dessa tag até encontrar a \begin{math}</title>\end{math}, e guarda essa informação.
+
+
+\begin{verbatim}
+<page>"<revision>"  BEGIN revision;
+<revision>"<timestamp>"    BEGIN timestamp;
+<revision>"<contributor>"  BEGIN contributor;
+<revision>"</revision>"    BEGIN page;
+<revision>\<text.*?\>      BEGIN text;
+\end{verbatim}
+
+Quando se está na página e é encontrado uma tag \begin{math}<revison>\end{math} significa que foi feita uma revisão à página. Depois de entrar no estado \begin{math}<revison>\end{math} podem encontrar três estados: timestamp, contributor, username e o page para voltar novamente à página inicial. 
+
+No caso de encontrar o timestamp:
+\begin{verbatim}
+<timestamp>"</timestamp>"  BEGIN revision;
+<timestamp>[^<]*           pagina_set_ultimaRevisao(pag, yytext);
+\end{verbatim}
+
+Significa que este vai guardar o data da última revisão.
+\\
+No caso de encontrar o contributor:
+\begin{verbatim}
+<contributor>"</contributor>"  BEGIN revision;
+\end{verbatim}
+
+Significa que depois de terminar o contributor volta para o estado de revision.
+\\
+No caso de encontrar o  username:
+\begin{verbatim}
+<username>"</username>"    BEGIN contributor;
+<username>[^<]*            pagina_set_autor(pag, yytext);
+\end{verbatim}
+
+Significa que vai guardar o nome o autor no texto.
+\\
+
+\begin{verbatim}
+<hlink1>[^\ \]]+    {/*leu o uri*/
+                     hlink = hlink_create();
+                     pagina_add_hlink(pag, hlink);
+                     hlink_set_uri(hlink, yytext);
+                     BEGIN hlink2;
+                    }
+\end{verbatim}
+
 
 
 \newpage
@@ -242,10 +295,1074 @@ Aqui é guardado o início e o fim da página da leitura do ficheiro XML. Quando
 Após concluir todo o desenvolvimento deste projecto é fácil fazer um balanço de todo este precurso. Para além de ter sido um desafio implementar um programa de processamento da \textit{Wikipédia}, foi também aliciante concluir todo o trabalho.
 Ao longo do desenvolvimento do projeto o grupo desenvolveu competências em diversas ferramentas como C,HTML, XML, Flex, etc, que anteriormente eram poucas e até mesmo desconhecidas em alguns dos casos. 
 A utilização do Flex permitiu filtrar a informação mais relevante da página da \textit{Wikipédia} através do uso de expressões regulares. 
+\newpage
+\section{Apêndices - Especificação do Flex}
+
+\subsection{Código escrito em flex}
+\begin{verbatim}
+/* Not Another Wikipedia Parser
+%option debug*/
+
+%x page
+%x title
+%x revision
+%x timestamp
+%x contributor
+%x username
+%x text
+
+%x ilink1
+%x ilink2
+%x ilink3
+%x ilink4
+%x hlink1
+%x hlink2
+%x head1
+%x head2
+%x head3
+%x head4
+%x head5
+%x head6
+
+
+%{
+#include "paginas.h"
+#include "pagina.h"
+#include "ilink.h"
+#include "hlink.h"
+
+ILink* ilink = NULL;
+HLink* hlink = NULL;
+Pagina* pag = NULL;
+Elemento* paginas = NULL;
+
+%}
+%%
+    paginas = paginas_create();
+
+"<page>"            {pag = pagina_create();
+                     BEGIN page;
+                    }
+<page>"</page>"     {BEGIN 0;
+                     paginas_add(paginas, pag);
+                    }
+
+<page>"<title>"     BEGIN title;
+
+<page>"<revision>"  BEGIN revision;
+
+<title>"</title>"   BEGIN page;
+
+<title>[^<]*        pagina_set_titulo(pag,yytext);
+
+<revision>"<timestamp>"    BEGIN timestamp;
+<revision>"<contributor>"  BEGIN contributor;
+<revision>"</revision>"    BEGIN page;
+<revision>\<text.*?\>      BEGIN text;
+
+<timestamp>"</timestamp>"  BEGIN revision;
+<timestamp>[^<]*           pagina_set_ultimaRevisao(pag, yytext);
+
+<contributor>"<username>"      BEGIN username;
+<contributor>"</contributor>"  BEGIN revision;
+
+<username>"</username>"    BEGIN contributor;
+<username>[^<]*            pagina_set_autor(pag, yytext);
+
+<text>"</text>"     BEGIN revision;
+
+<text>\n\=          BEGIN head1;
+<text>\n\={2}       BEGIN head2;
+<text>\n\={3}       BEGIN head3;
+<text>\n\={4}       BEGIN head4;
+<text>\n\={5}       BEGIN head5;
+<text>\n\={6}       BEGIN head6;
+<text>"[[File:"     ;/*ignorar [[ caso sejam ficheiros*/
+<text>"[[Image:"    ;/*ignorar [[ caso sejam imagens*/
+<text>"[[":?        BEGIN ilink1;
+<text>"["           BEGIN hlink1;
+
+<hlink1>[^\ \]]+    {/*leu o uri*/
+                     hlink = hlink_create();
+                     pagina_add_hlink(pag, hlink);
+                     hlink_set_uri(hlink, yytext);
+                     BEGIN hlink2;
+                    }
+<hlink2>\ [^\]]+    hlink_set_texto(hlink, yytext+1);
+<hlink2>\]          BEGIN text;
+
+<ilink1>[a-zA-Z]+:[^\]\(,\|]+       {/*ABCJ */
+                                     ilink = ilink_create();
+                                     ilink_set_especial(ilink, yytext);
+                                     BEGIN ilink2;
+                                    }
+
+<ilink1>[^\]\(,\|]+                 {/*ABC  */
+                                     ilink = ilink_create();
+                                     ilink_set_texto(ilink, yytext);
+                                     BEGIN ilink2;
+                                    }
+
+<ilink2,ilink3>\]                   {/*D    */
+                                     BEGIN ilink4;
+                                    }
+
+<ilink2>\|                          {/*H    */
+                                     BEGIN ilink3;
+                                    }
+
+<ilink2>\([^\]\)\|]+\)\]            {/*EFGD */
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     ilink_set_parenteses(ilink, yytext);
+                                     BEGIN ilink4;
+                                    }
+
+<ilink2>\([^\]\)\|]+\)\|            {/*EFGH */
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     ilink_set_parenteses(ilink, yytext);
+                                     BEGIN ilink3;
+                                    }
+
+<ilink2>\([^\]\)\|]+\|              {/*EFH  */
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     // deve adicionar ao texto, 
+                                     e nao meter em parenteses
+                                     ilink_set_parenteses(ilink, yytext);
+                                     BEGIN ilink3;
+                                    }
+
+<ilink2>\([^\]\)\|]+\]              {/*EFD  */
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     // deve adicionar ao texto, 
+                                     e nao meter em parenteses
+                                     ilink_set_parenteses(ilink, yytext);
+                                     BEGIN ilink4;
+                                    }
+
+<ilink2>,[^\]\|]*\]                 {/*KMD  */
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     ilink_set_virgula(ilink, yytext);
+                                     BEGIN ilink4;
+                                    }
+
+<ilink2>,[^\]\|]*\|                 {/*KMH  */
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     ilink_set_virgula(ilink, yytext);
+                                     BEGIN ilink3;
+                                    }
+
+<ilink3>[^\]]*\]                    {/*ID   */
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     ilink_set_apresentar(ilink, yytext);
+                                     BEGIN ilink4;
+                                    }
+
+<ilink4>\][a-zA-Z]*                 {/*L    */
+                                     ilink_set_resto(ilink, yytext+1);
+                                     //ilink_print(ilink);
+                                     pagina_add_ilink(pag, ilink);
+                                     BEGIN text;
+                                    }
+
+<ilink1,ilink2,ilink3>.             ;
+
+<head1>[^\=]+                       pagina_add_seccao(pag, 
+                                    seccao_create(yytext, 1));
+<head2>[^\=]+                       pagina_add_seccao(pag, 
+                                    seccao_create(yytext, 2));
+<head3>[^\=]+                       pagina_add_seccao(pag, 
+                                    seccao_create(yytext, 3));
+<head4>[^\=]+                       pagina_add_seccao(pag, 
+                                    seccao_create(yytext, 4));
+<head5>[^\=]+                       pagina_add_seccao
+                                    (pag, seccao_create(yytext, 5));
+<head6>[^\=]+                       pagina_add_seccao
+                                    (pag, seccao_create(yytext, 6));
+<head1>\={1}                        BEGIN text;
+<head2>\={2}                        BEGIN text;
+<head3>\={3}                        BEGIN text;
+<head4>\={4}                        BEGIN text;
+<head5>\={5}                        BEGIN text;
+<head6>\={4}                        BEGIN text;
+
+<*>. ;
+<*>\n ;
+%%
+int yywrap(){
+    // escrever todas as infos
+    paginas_print(paginas);
+
+    // os destroys todos
+
+    return 1;
+}
+\end{verbatim}
+\newpage
+
+\subsection{Cógido do Ficheiro Página.c}
+\begin{verbatim}
+#include "pagina.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// -1 se str1 <  str2
+//  0 se str1 == str2
+// +1 se str1 >  str2
+int myStrCmp( char* str1, char* str2 ){
+    if( !str1 && !str2 )
+        return 0;
+    
+    if( !str1 && str2)
+        return -1;
+    
+    if( str1 && !str2)
+        return 1;
+    
+
+    //percorrer todos os iguais
+    while(*str1 == *str2 && *str1 != '\0' && *str2 != '\0'){
+        str1++;
+        str2++;
+    }
+    
+    if( *str1 < *str2 )
+        return -1;
+    
+    if( *str1 > *str2 )
+        return 1;
+    
+
+    // caso em que são iguais
+    return 0;
+}
+
+void printTitulos(Elemento* ps){
+    Elemento* itr = ps;
+    
+    // ordenado pelo titulo
+    fprintf(stderr, "PS: ");
+    while( itr ){
+        fprintf(stderr, "%s -> ", ((Pagina*)(itr->dados))->titulo);
+        itr = itr->proximo;
+    }
+    fprintf(stderr, "\n");
+}
+
+Elemento* paginas_create(){
+    Elemento* paginas = (Elemento*) malloc(sizeof(Elemento));
+
+    paginas->proximo = NULL;
+    paginas->dados = NULL;
+
+    return paginas;
+}
+
+void paginas_add(Elemento* ps, Pagina* p){
+    if( ps->dados == NULL ){
+        // primeira pagina
+        ps->dados = p;
+        return;
+    }
+    
+    //printTitulos(ps);
+    
+    Elemento* e = (Elemento*) malloc( sizeof(Elemento));
+
+    e->dados = p;
+    e->proximo= NULL;
+
+    Elemento* itr = ps;
+    
+    // inserir ordenado pelo titulo
+    while( itr->proximo != NULL && 
+    myStrCmp(((Pagina*)(itr->dados))->titulo, p->titulo) < 0)
+        itr = itr->proximo;
+    
+
+    e->proximo = itr->proximo;
+    itr->proximo = e;
+
+    void* dadosSwap;
+    if( myStrCmp(((Pagina*)(itr->dados))->titulo, p->titulo) > 0 ){
+        dadosSwap = e->dados;
+        e->dados = itr->dados;
+        itr->dados = dadosSwap;
+    }
+        
+}
+
+void paginas_destroy(Elemento** paginas){
+    if( *paginas == NULL )
+        return;
+    
+    pagina_destroy( (Pagina**) &((*paginas)->dados) );
+
+    paginas_destroy( &((*paginas)->proximo) );
+    
+    free(*paginas);
+}
+
+void paginas_print(Elemento* paginas){
+    Elemento* itr;
+    Pagina* pActual;
+    int i;
+    
+    // head
+    printf("<html><head><meta http-equiv=\"Content-Type
+    \" content=\"text/html;charset=UTF-8\"><link rel=
+    \"stylesheet\" type=\"text/css\" 
+    href=\"http://bootswatch.com/cosmo/bootstrap.css\
+    "><title>Processamento de Linguagens</title></head>");
+    
+    // inicio do body
+    printf("<body style=\"width:90%%; margin-left: auto; 
+    margin-right: auto; margin-top: 25px;\"><a name=\"top\"></a>");
+    printf("<div class=\"panel panel-default\"><div class=
+    \"panel-body\"><h2><b>N</b>ot <b>A</b>nother <b>W</b>
+    ikipedia <b>P</b>arser<img src=\"http://corpora.di.uminho.pt/
+    linguateca/pagina_linguateca/logoUM.jpg\" alt=\
+    "Escola de Engenharia da Universidade do Minho\" 
+    width=\"150\" height=\"75\" align=\"top;\" style=\
+    "float:right;position:relative;bottom:20px\">
+    </h2></div></div><div class=\"panel panel-default\">
+    <div class=\"panel-heading\"><h3>Índice de páginas
+    </h3></div><div class=\"panel-body\"><dl>");
+    
+    // lista de paginas
+    i=0;
+    itr = paginas;
+    while( itr ){
+        pActual = (Pagina*) itr->dados;
+        pActual->indice = i++;
+        printf("<dt><a href=\"#pagina%d\">%s</a></dt>\n", 
+        pActual->indice, pActual->titulo);
+        //pagina_print( (Pagina*)itr->dados);
+        itr = itr->proximo;
+    }
+    printf("</dl></div></div>");
+    
+    // imprimir as páginas
+    itr = paginas;
+    while( itr ){
+        pagina_print( (Pagina*)itr->dados);
+        itr = itr->proximo;
+    }
+    printf("</dl></div></div>");
+    
+    
+    // terminar o HTML
+    printf("</body></html>\n\n");
+}
+\end{verbatim}
+\newpage
+\subsection{Código do ficheiro pagina.c}
+\begin{verbatim}
+
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "pagina.h"
+
+// cria uma nova página
+Pagina* pagina_create(){
+    Pagina* p = (Pagina*) malloc(sizeof(Pagina));
+
+    p->titulo = NULL;
+    p->ultimaRev = NULL;
+    p->autor = NULL;
+
+    p->iLinks = NULL;
+    p->nILinks = 0;
+
+    p->hLinks = NULL;
+    p->nHLinks = 0;
+
+    p->seccoes = NULL;
+    p->nSeccoes = 0;
+
+    p->indice = -1;
+
+    return p;
+}
+
+void pagina_set_titulo(Pagina* p, char* str){
+    //recebe:
+    //texto da pagina
+
+    p->titulo = (char*) malloc( strlen(str)+1 );
+    strcpy( p->titulo, str);
+}
+
+// insere o autor
+void pagina_set_autor(Pagina* p, char* str){
+    p->autor = (char*) malloc( strlen(str)+1 );
+    strcpy( p->autor, str);
+}
+
+// insere o ultimaRevisao
+void pagina_set_ultimaRevisao(Pagina* p, char* str){
+    p->ultimaRev = (char*) malloc( strlen(str)+1 );
+    str[10] = str[19] = ' ';
+    strcpy( p->ultimaRev, str);
+}
+
+// destroi a página
+void pagina_destroy(Pagina** pag){
+    Pagina* p = *pag;
+
+    free(p->titulo);
+    free(p->ultimaRev);
+    free(p->autor);
+
+    // falta aqui a parte destruir os elementos das listas
+    
+
+    free(*pag);
+}
+
+void pagina_print(Pagina* p){
+    Elemento* itr = NULL;
+    int i;
+    
+    printf("<div class=\"panel panel-default\"><a name=
+    \"pagina%d\"></a><div class=\"panel-heading\"><h1>%s</h1>
+    <div style=\"width:100%%\"><button type=\"button\" class=
+    \"btn btn-danger disabled\" align = 
+    \"left\">Ultima alteração em %s por %s</button><a href=
+    \"#top\"><button type=\"button\" class=\"btn btn-default\" 
+    style =\"float:right\">&uarr;</button></a></div></div><div 
+    class=\"panel-body\"><div class=\"subsection\" id=\"cont\">
+    <h3>Secções (%d)</h3>\n", p->indice, p->titulo, p->ultimaRev, 
+    p->autor, p->nSeccoes);
+
+    // imprimir as seccões
+    Seccao *seccao = NULL;
+    for( itr=p->seccoes; itr; itr = itr->proximo ){
+        seccao = itr->dados;
+        seccao_print(seccao);
+    }
+    
+    printf("</div><hr width=100%%><table class=\"table 
+    table-striped \"><thead><tr class=\"info\"><th 
+    style=\"width:50%%\" colspan=2>%d Links Externos
+    </th></tr></thead><tbody>", p->nHLinks);
+    
+    itr = p->hLinks;
+    for(i=0; i < p->nHLinks/2; i+=1){
+        printf("<tr><td>");
+        hlink_print((HLink*)itr->dados);
+
+        itr = itr->proximo;
+        printf("</td><td>");
+        hlink_print((HLink*)itr->dados);
+        printf("</td></tr>\n");
+
+        itr = itr->proximo;
+    }
+
+    if( itr ){
+        printf("<tr><td>");
+        hlink_print((HLink*)itr->dados);
+        printf("</td><td></td></tr>");
+    }
+    printf("</tbody></table>");
+
+
+    printf("<hr width=100%%><table class=\
+    "table table-striped\"><thead><tr class=\"info\">
+    <th style=\"width:50%%\"colspan=2>%d Links Internos
+    </th></tr></thead><tbody>", p->nILinks);
+
+    itr = p->iLinks;
+    for(i=0; i < p->nILinks/2; i+=1){
+        printf("<tr><td>");
+        ilink_print((ILink*)itr->dados);
+
+        itr = itr->proximo;
+        printf("</td><td>");
+        ilink_print((ILink*)itr->dados);
+        printf("</td></tr>\n");
+
+        itr = itr->proximo;
+    }
+
+    if( itr ){
+        printf("<tr><td>");
+        ilink_print((ILink*)itr->dados);
+        printf("</td><td></td></tr>");
+    }
+    
+    printf("</tbody></table></div></div>");
+}
+
+void pagina_add_ilink(Pagina* pagina, ILink* linkinfo){
+    Elemento* e = (Elemento*) malloc( sizeof(Elemento));
+
+    e->dados = linkinfo;
+    e->proximo= NULL;
+
+    Elemento* itr = pagina->iLinks;
+    pagina->nILinks++;
+    
+    // se ainda nao houver elementos na lista
+    if( itr == NULL ){
+        pagina->iLinks = e;
+        return;
+    }
+    
+    // se ja houver elementos, percorrer até ao ultimo e 
+    //inserir
+    while( itr->proximo != NULL )
+        itr = itr->proximo;
+
+    itr->proximo = e;
+}
+
+void pagina_add_seccao(Pagina* pagina, Seccao* seccao){
+    Elemento* e = (Elemento*) malloc( sizeof(Elemento));
+
+    e->dados = seccao;
+    e->proximo= NULL;
+
+    Elemento* itr = pagina->seccoes;
+    pagina->nSeccoes++;
+    
+    // se ainda nao houver elementos na lista
+    if( itr == NULL ){
+        pagina->seccoes = e;
+        return;
+    }
+    
+    // se ja houver elementos, percorrer até ao ultimo e 
+    //inserir
+    while( itr->proximo != NULL )
+        itr = itr->proximo;
+    
+    itr->proximo = e;
+}
+
+
+void pagina_add_hlink(Pagina* pagina, HLink* linkinfo){
+    Elemento* e = (Elemento*) malloc( sizeof(Elemento));
+
+    e->dados = linkinfo;
+    e->proximo= NULL;
+
+    Elemento* itr = pagina->hLinks;
+    pagina->nHLinks++;
+    
+    // se ainda nao houver elementos na lista
+    if( itr == NULL ){
+        pagina->hLinks = e;
+        return;
+    }
+    
+    // se ja houver elementos, percorrer até ao ultimo e 
+    //inserir
+    while( itr->proximo != NULL )
+        itr = itr->proximo;
+    
+    itr->proximo = e;
+}
+
+\end{verbatim}
+
+\newpage
+\subsection{Código do ficheiro ilink.c}
+\begin{verbatim}
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
+#include "ilink.h"
+
+static void string_replace(char* str, const char find, 
+const char replace){
+    if(!str) return;
+    
+    while(*str != '\0'){
+        if(*str == find)
+            *str = replace;
+        str++;
+    }
+}
+
+ILink* ilink_create(){
+    ILink* ilink = (ILink*) malloc(sizeof(ILink));
+
+    ilink->parenteses = NULL;
+    ilink->texto = NULL;
+    ilink->virgula = NULL;
+    ilink->apresentar = NULL;
+    ilink->resto = NULL;
+    ilink->especial = NULL;
+
+    return ilink;
+}
+
+void ilink_set_especial(ILink* ilink, char* str){
+    
+    //recebe coisas como:
+    //help:texto da pagina
+    
+    char* especial = strtok(str, ":");
+    char* texto = strtok(NULL, ":");
+
+    ilink->especial = (char*) malloc( strlen(especial)+1 );
+    strcpy( ilink->especial, especial );
+    
+    ilink->texto = (char*) malloc( strlen(texto)+1 );
+    strcpy( ilink->texto, texto );
+    string_replace(ilink->texto, ' ', '_');
+}
+
+void ilink_set_texto(ILink* ilink, char* str){
+    //recebe:
+    //texto da pagina
+
+    ilink->texto = (char*) malloc( strlen(str)+1 );
+    strcpy( ilink->texto, str);
+    //string_replace(ilink->texto, ' ', '_');
+}
+
+void ilink_set_parenteses(ILink* ilink, char* str){
+
+    //recebe:
+    //(coisas entre parenteses)
+    //(coisas que nao acabam com parenteses
+    
+    if( str[strlen(str)-1] == ')' ){
+        ilink->parenteses = (char*) 
+        malloc( strlen(str)+1 );
+        strcpy( ilink->parenteses, str );
+        string_replace(ilink->parenteses, ' ', '_');
+    }else{
+        //nao termina com parenteses e por isso é o 
+        //segundo caso
+        char* acumulador = (char*) malloc( strlen(str) 
+        + strlen(ilink->texto) + 1 );
+        acumulador[0] = '\0';
+        strcat(acumulador, ilink->texto);
+        strcat(acumulador, str);
+        free( ilink->texto );
+        ilink->texto = acumulador;
+    }
+}
+
+void ilink_set_virgula(ILink* ilink, char* str){
+
+    //recebe:
+    //, coisas depois de uma virgula
+
+    ilink->virgula = (char*) malloc( strlen(str)+1 );
+    strcpy( ilink->virgula, str );
+    string_replace(ilink->virgula, ' ', '_');
+}
+
+void ilink_set_apresentar(ILink* ilink, char* str){
+
+    //recebe:
+    //coisas que aparecerem depois do pipe
+    //\ \t
+    
+    while(*str == ' ') //retirar espaços em 
+                        //branco no início
+        str++;
+
+    ilink->apresentar = (char*) malloc( strlen(str)+1 );
+    strcpy( ilink->apresentar, str );
+}
+
+void ilink_set_resto(ILink* ilink, char* str){
+
+    //recebe:
+    //letrasDepoisDosParentesesRectosSemEspacos
+
+    ilink->resto = (char*) malloc( strlen(str)+1 );
+    strcpy( ilink->resto, str );
+}
+
+// mostra o que tem na variavel ilink
+void ilink_print(ILink* ilink){
+    //printf("<a href=\"https:
+    //en.wikipedia.org/wiki/%s", "dummy");
+    //printf("especial: %s\n", ilink->especial);
+    //printf("virgula: %s\n", ilink->virgula);
+    //printf("apresentar: %s\n", ilink->apresentar);
+    //printf("resto: %s\n", ilink->resto);
+    //printf("parenteses: %s\n", ilink->parenteses);
+    //printf("texto: %s\n\n", ilink->texto);
+    
+
+    printf("<a href=\"https://en.wikipedia.org/wiki/");
+    
+    string_replace(ilink->virgula, ' ', '_');
+    string_replace(ilink->parenteses, ' ', '_');
+    string_replace(ilink->texto, ' ', '_');
+
+    if( ilink->especial )
+        printf("%s:",ilink->especial);
+    
+    if( ilink->parenteses )
+        printf("%s%s", ilink->texto, ilink->parenteses);
+    else if( ilink->virgula )
+        printf("%s%s", ilink->texto, ilink->virgula);
+    else
+        printf("%s", ilink->texto);
+
+    printf("\">");
+
+    string_replace(ilink->virgula, '_', ' ');
+    string_replace(ilink->parenteses, '_', ' ');
+    string_replace(ilink->texto, '_', ' ');
+    
+    if(ilink->apresentar == NULL){
+        // mostrar tudo tal como está
+        if( ilink->parenteses )
+            printf("%s%s%s", ilink->texto, 
+            ilink->parenteses, ilink->resto);
+        else if( ilink->virgula )
+            printf("%s%s%s", ilink->texto, 
+            ilink->virgula, ilink->resto);
+        else
+            printf("%s%s", ilink->texto, 
+            ilink->resto);
+    }else if( ilink->apresentar != NULL && i
+    link->apresentar[0] == '\0' ){
+        // ocultar automáticamente os 
+        parenteses ou virgula
+        printf("%s%s", ilink->texto, ilink->resto);
+    } else {
+        // mostrar a parte de apresentacao
+        printf("%s", ilink->apresentar);
+    }
+    
+    printf("</a>\n");
+}
+
+// liberta memória associada ao ilink
+void ilink_destroy(ILink** ilink){
+    ilink_print(*ilink);
+
+    free((*ilink)->texto);
+    free((*ilink)->resto);
+    free((*ilink)->virgula);
+    free((*ilink)->apresentar);
+    free((*ilink)->especial);
+    free((*ilink)->parenteses);
+
+    free(*ilink);
+    *ilink = NULL;
+}
+\end{verbatim}
+\newpage
+
+\subsection{Código do ficheiro seccao.c}
+\begin{verbatim}
+
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include "seccao.h"
+
+// criar uma nova seccao
+Seccao* seccao_create(char* str, int indentacao){
+    Seccao* s = (Seccao*) malloc(sizeof(Seccao));
+
+    s->texto = (char*) malloc( strlen(str)+1 );
+    strcpy( s->texto, str);
+
+    s->indent = indentacao;
+    
+    return s;
+}
+
+// mostra o que tem na variavel seccao
+void seccao_print(Seccao* seccao){
+    int i;
+    printf("<h4>");
+    for(i=1; i<seccao->indent; i++)
+        printf("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+
+    printf("%s</h4>\n", seccao->texto);
+}
+
+// liberta memória associada a seccao
+void seccao_destroy(Seccao** seccao){
+    Seccao* s = *seccao;
+
+    free(s->texto);
+
+    free(*seccao);
+}
+\end{verbatim}
+\newpage
+
+\subsection{Código do ficheiro hlink.c}
+\begin{verbatim}
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include "seccao.h"
+
+// criar uma nova seccao
+Seccao* seccao_create(char* str, int indentacao){
+    Seccao* s = (Seccao*) malloc(sizeof(Seccao));
+
+    s->texto = (char*) malloc( strlen(str)+1 );
+    strcpy( s->texto, str);
+
+    s->indent = indentacao;
+    
+    return s;
+}
+
+// mostra o que tem na variavel seccao
+void seccao_print(Seccao* seccao){
+    int i;
+    printf("<h4>");
+    for(i=1; i<seccao->indent; i++)
+        printf("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+
+    printf("%s</h4>\n", seccao->texto);
+}
+
+// liberta memória associada a seccao
+void seccao_destroy(Seccao** seccao){
+    Seccao* s = *seccao;
+
+    free(s->texto);
+
+    free(*seccao);
+}
+\end{verbatim}
+\newpage
+\subsection{Códido do ficheiro paginas.h}
+\begin{verbatim}
+#ifndef __PAGINAS_H
+#define __PAGINAS_H
+
+#include "pagina.h"
+
+Elemento *paginas_create();
+void paginas_add(Elemento* ps, Pagina* p);
+void paginas_destroy(Elemento** paginas);
+void paginas_print(Elemento* paginas);
+
+#endif
+
+\end{verbatim}
+
+\newpage
+\subsection{Códido do ficheiro pagina.h}
+\begin{verbatim}
+#ifndef __PAGINA_H
+#define __PAGINA_H
+
+#include "ilink.h"
+#include "hlink.h"
+#include "seccao.h"
+
+typedef struct sElemento {
+    void *dados;
+    struct sElemento* proximo; // o proximo elemento
+} Elemento;
+
+typedef struct sPagina {
+   char* titulo;
+   char* autor;
+   char* ultimaRev;
+
+   int indice;
+
+   // links internos
+   Elemento* iLinks;
+   int nILinks;
+
+   // links externos
+   Elemento* hLinks;
+   int nHLinks;
+   
+   // headers
+   Elemento* seccoes;
+   int nSeccoes;
+} Pagina;
+
+
+// cria uma nova página
+Pagina* pagina_create();
+
+// destroi a página
+void pagina_destroy(Pagina** p);
+
+// insere o titulo
+void pagina_set_titulo(Pagina* p, char* str);
+
+// insere o autor
+void pagina_set_autor(Pagina* p, char* str);
+
+// insere o ultimaRevisao
+void pagina_set_ultimaRevisao(Pagina* p, char* str);
+
+// imprimir o HTML da página
+void pagina_print(Pagina* p);
+
+// inserir uma seccao
+void pagina_add_seccao(Pagina* pagina, Seccao* seccao);
+
+// inserir um ILink
+void pagina_add_ilink(Pagina* pagina, ILink* linkinfo);
+
+// inserir um ILink
+void pagina_add_hlink(Pagina* pagina, HLink* linkinfo);
+
+
+#endif
+\end{verbatim}
 
 
 \newpage
+\subsection{Códido do ficheiro ilink.h}
+\begin{verbatim}
+#ifndef __ILINK_H
+#define __ILINK_H
 
+// define um link para a própria wikipedia (interno)
+
+// [[Especial: texto (parenteses)|apresentar]]resto
+// [[Especial: texto, virgula|apresentar]]resto
+typedef struct sILink{
+    char* especial;
+    char* texto;
+    char* parenteses;
+    char* virgula;
+    char* apresentar;
+    char* resto;
+} ILink;
+
+// criar um novo link
+ILink* ilink_create();
+
+// definir partes do link
+void ilink_set_especial(ILink* ilink, char* str);
+void ilink_set_texto(ILink* ilink, char* str);
+void ilink_set_parenteses(ILink* ilink, char* str);
+void ilink_set_virgula(ILink* ilink, char* str);
+void ilink_set_apresentar(ILink* ilink, char* str);
+void ilink_set_resto(ILink* ilink, char* str);
+
+// mostra o que tem na variavel ilink
+void ilink_print(ILink* ilink);
+
+// liberta memória associada ao ilink
+void ilink_destroy(ILink** ilink);
+
+
+#endif
+\end{verbatim}
+
+\newpage
+\subsection{Códido do ficheiro hlink.h}
+\begin{verbatim}
+#ifndef __HLINK_H
+#define __HLINK_H
+
+
+typedef struct sHLink{
+    char* uri;
+    char* texto;
+} HLink;
+
+// criar um novo link
+HLink* hlink_create();
+
+// definir partes do link
+void hlink_set_texto(HLink* hlink, char* str);
+void hlink_set_uri(HLink* hlink, char* str);
+
+// mostra o que tem na variavel hlink
+void hlink_print(HLink* hlink);
+
+// liberta memória associada ao hlink
+void hlink_destroy(HLink** hlink);
+
+#endif
+
+
+
+\end{verbatim}
+
+\newpage
+\subsection{Códido do ficheiro seccao.h}
+\begin{verbatim}
+#ifndef __SECCAO_H
+#define __SECCAO_H
+
+
+typedef struct sSeccao{
+    char* texto;
+    int indent;
+} Seccao;
+
+// criar uma nova seccao
+Seccao* seccao_create(char* str, int indentacao);
+
+// mostra o que tem na variavel seccao
+void seccao_print(Seccao* seccao);
+
+// liberta memória associada a seccao
+void seccao_destroy(Seccao** seccao);
+
+
+#endif
+\end{verbatim}
+\newpage
+
+\subsection{Código do ficheiro Makefile}
+
+\begin{verbatim}
+.PHONY: all clean
+
+CC=gcc -Wall -g
+FLEX=flex
+
+all: nawp
+
+nawp: lex.yy.o ilink.o hlink.o pagina.o paginas.o seccao.o
+  $(CC) $^ -ll -o $@
+
+lex.yy.c: nawp.l
+  flex nawp.l
+
+lex.yy.o: lex.yy.c 
+  $(CC) -c -ll lex.yy.c
+
+ilink.o: ilink.c ilink.h
+  $(CC) -c ilink.c
+
+paginas.o: paginas.c paginas.h
+  $(CC) -c paginas.c
+
+pagina.o: pagina.c pagina.h
+  $(CC) -c pagina.c
+
+seccao.o: seccao.c seccao.h
+  $(CC) -c seccao.c
+
+hlink.o: hlink.c hlink.h
+  $(CC) -c hlink.c
+
+clean:
+  $(RM) lex.yy.c
+  $(RM) *.o
+  $(RM) nawp
+
+\end{verbatim}
+\newpage
 \todo{pode-se utilizar esta tag para chamar a atenção para coisas que é preciso fazer antes de entregar o relatório}
 
 \newpage
