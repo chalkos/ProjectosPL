@@ -64,6 +64,14 @@ Variante 1
 }
 
 \maketitle
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=0.4\linewidth]{logo}
+\end{center}
+\end{figure}
+
+
 \begin{abstract}
 
   O presente trabalho foi desenvolvido no âmbito da Unidade Curricular de Processamento de Linguagens e tem como principal objectivo descrever o processo de desenvolvimento de um analisador léxico da \textit{Wikipédia}. Ao longo deste relatório iremos explicar as estruturas de dados que foram implementadas para o desenvolvimento deste trabalho, bem como todas as decisões que foram tomadas.
@@ -186,10 +194,12 @@ Os campos armazenam a seguinte informação:
 \item \textit{seccoes} é apontador para a estrutura Elemento, que guarda a informação das secções da página;
 \item \textit{nSeccões} guarda o número de secções encontradas na página;
 
+
+\newpage
 \end{itemize}
 \subsubsection{Flex e Expressões Regulares}
 
-Nesta secção iremos fazer uma abordagem as Expressões Regulares que foram desenvolvidas no contexto da resolução deste projecto. Utilizaram-se as seguintes variáveis de contexto:
+Nesta secção iremos fazer uma abordagem as Expressões Regulares que foram desenvolvidas no contexto da resolução deste projecto. Utilizaram-se as seguintes condições de contexto:
 
 \begin{verbatim}
 %x page
@@ -228,8 +238,9 @@ A cada uma das expressões regulares apresentadas será feito uma breve descriç
                     }
 \end{verbatim}
 \end{itemize}
-Aqui é guardado o início e o fim da página da leitura do ficheiro XML. Quando se encontra a tag \begin{math}<page>\end{math} inicia a estrutura page. Por outro lado, quando encontra \begin{math}</page>\end{math}, volta ao estado inicial e escreve a página HTML com toda a informação filtrada até então.
-
+Aqui é guardado o início e o fim da página da leitura do ficheiro XML. Quando se encontra a tag \begin{math}<page>\end{math} inicia o estado page. Por outro lado, quando encontra \begin{math}</page>\end{math}, volta ao estado inicial. 
+\\A função \begin{math}pagina\_create()\end{math} premite inicializar a estrutrua de dados que é uma página.
+\\ A função \begin{math}paginas_add\end{math} adiciona uma nova página à lista ligada de páginas.
 
 \begin{verbatim}
 
@@ -239,7 +250,6 @@ Aqui é guardado o início e o fim da página da leitura do ficheiro XML. Quando
 <title>[^<]*        pagina_set_titulo(pag,yytext);
 
 \end{verbatim}
-
 
 Quando se está na página e é encontrada a tag \begin{math}<title>\end{math}, entra no estado título e apanha o texto que lá dentro dessa tag até encontrar a \begin{math}</title>\end{math}, e guarda essa informação.
 
@@ -252,7 +262,7 @@ Quando se está na página e é encontrada a tag \begin{math}<title>\end{math}, 
 <revision>\<text.*?\>      BEGIN text;
 \end{verbatim}
 
-Quando se está na página e é encontrado uma tag \begin{math}<revison>\end{math} significa que foi feita uma revisão à página. Depois de entrar no estado \begin{math}<revison>\end{math} podem encontrar três estados: timestamp, contributor, username e o page para voltar novamente à página inicial. 
+Quando se está na página e é encontrado uma tag \begin{math}<revison>\end{math} esta indica quando foi feita a revisão à página. Depois entrar no estado \begin{math}<revison>\end{math} onde pode encontrar quatro estados: timestamp, contributor, page e text.
 
 No caso de encontrar o timestamp:
 \begin{verbatim}
@@ -260,24 +270,52 @@ No caso de encontrar o timestamp:
 <timestamp>[^<]*           pagina_set_ultimaRevisao(pag, yytext);
 \end{verbatim}
 
-Significa que este vai guardar o data da última revisão.
-\\
+A tag timestamp dá informação relativa à data e à horada da última revisão efectuada à página.
+Quando se encontra a tag \begin{math}</timestamp>\end{math}  volta-se a tag revision, mas  temos também a função\begin{math}pagina\_set\_ultimaRevisao()\end{math} que vai preencher na estrutura o campo ultimaRev com a informação relativa a esta tag.
+
+
 No caso de encontrar o contributor:
 \begin{verbatim}
+<contributor>"<username>"      BEGIN username;
 <contributor>"</contributor>"  BEGIN revision;
-\end{verbatim}
 
-Significa que depois de terminar o contributor volta para o estado de revision.
-\\
+\end{verbatim}
+A tag \begin{math}<contributor>\end{math} é onde se pode encontrar a definição do autor da página. 
+Quando dentro da tag contributor é apanhada pelo flex o texto "<username>" passa-se a tag  \begin{math}<username>\end{math}.
+Se a tag \begin{math}</contributor>\end{math} é a panhada signifia que chegou ao fim a informação do colaborador da página, onde depois voltamos para o estado anterior que neste caso e a revision. 
+
 No caso de encontrar o  username:
 \begin{verbatim}
 <username>"</username>"    BEGIN contributor;
 <username>[^<]*            pagina_set_autor(pag, yytext);
 \end{verbatim}
+A tag \begin{math}<username>\end{math} é onde está definido quem é o autor da página. Para armazenar o autor na página tem-se a função\begin{math}pagina\_set\_autor\end{math} que vai preencher o campo autor na estrutura da página.
 
-Significa que vai guardar o nome o autor no texto.
-\\
+<text>"</text>"     BEGIN revision;
+Quando estamos neste caso significa que se está a processar o caso em que nós encontramos o fim do texto da página.
 
+
+No caso de encontrarmos as seguintes expressões, significa que todo o tipo de cabeçalhos da wikipédia estão a ser apanhados. Iremos aboradar mais abaixo o que significa cada um deles.
+\begin{verbatim}
+
+<text>\n\=           BEGIN head1;
+<text>\n\={2}       BEGIN head2;
+<text>\n\={3}       BEGIN head3;
+<text>\n\={4}       BEGIN head4;
+<text>\n\={5}       BEGIN head5;
+<text>\n\={6}       BEGIN head6;
+\end{verbatim}
+
+No caso de encontrar no texto "[[File:" ou "[[Image:" não é feita qualquer acção de tratamento por parte do flex. No entanto quando temos "[[" significa que foi apanhado um internal link, se aparecer "[" então foi encontrado um hyper link.
+
+\begin{verbatim}
+<text>"[[File:"     ;
+<text>"[[Image:"    ;
+<text>"[[":?        BEGIN ilink1;
+<text>"["           BEGIN hlink1;
+\end{verbatim}
+
+No caso dos links externos, apanha-se o [, de seguida apanha o URI até encontrar um ] ou um espaço. Se encontrar um espaço tudo o que venha até a ]  é o texto que se vai filtrar.
 \begin{verbatim}
 <hlink1>[^\ \]]+    {/*leu o uri*/
                      hlink = hlink_create();
@@ -286,6 +324,8 @@ Significa que vai guardar o nome o autor no texto.
                      BEGIN hlink2;
                     }
 \end{verbatim}
+
+
 
 
 
