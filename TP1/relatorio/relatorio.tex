@@ -1,5 +1,7 @@
 \documentclass[11pt, a4paper, oneside]{article}
 
+\usepackage{indentfirst}
+
 % hifenização e outras especificações para português
 \usepackage[portuguese]{babel}
 
@@ -130,7 +132,61 @@ Usando o \textbf{Especial Export} pretende-se exportar o contéudo da \textit{Wi
 
 \subsubsection{Estrutura de Dados}
 
+Após termos analisado o ficheiro XML da \textit{Wikipédia} verificou-se que era necessário estruturar a informação encontrada nesses ficheiros. Essa informação é guardada em estruturas de dados que aqui vão ser expostas e explicadas. 
 
+Primeiramente, vamos apresentar a estrutura de dados que armazena a informação de uma página.
+\begin{verbatim}
+typedef enum { TIPO_HLINK // hyperlink
+             , TIPO_ILINK // internal link
+             , TIPO_HEADER // header
+
+             , TIPO_PAGINA // uma pagina
+} Tipo;
+
+typedef struct sElemento {
+    Tipo tipo;
+    void *dados;
+    struct sElemento* proximo; // o proximo elemento
+} Elemento;
+
+typedef struct sPagina {
+   char* titulo;
+   char* autor;
+   char* ultimaRev;
+
+   int indice;
+
+   // links internos
+   Elemento* iLinks;
+   int nILinks;
+
+   // links externos
+   Elemento* hLinks;
+   int nHLinks;
+   
+   // headers
+   Elemento* seccoes;
+   int nSeccoes;
+} Pagina;
+
+\end{verbatim}\
+
+
+Os campos armazenam a seguinte informação:
+\begin{itemize}
+
+\item \textit{titulo} guarda o título do documento \textit{Wikipédia};
+\item \textit{autor} guarda o autor do documento;
+\item \textit{ultimaRev} guarda a data da última revisão;
+\item \textit{indice} guarda o valor do índice da página;
+\item \textit{iLikins} é o apontador para a estrutura Elemento, que guarda a informação dos links internos;
+\item \textit{nILinks} guarda o número de links internos encontrados;
+\item \textit{hLinks} é o apontador para a estrutura Elemento, que guarda a informação dos links externos;
+\item \textit{nHLinks} guarda o número de links externos encontrados;
+\item \textit{seccoes} é apontador para a estrutura Elemento, que guarda a informação das secções da página;
+\item \textit{nSeccões} guarda o número de secções encontradas na página;
+
+\end{itemize}
 \subsubsection{Flex e Expressões Regulares}
 
 Nesta secção iremos fazer uma abordagem as Expressões Regulares que foram desenvolvidas no contexto da resolução deste projecto. Utilizaram-se as seguintes variáveis de contexto:
@@ -143,6 +199,20 @@ Nesta secção iremos fazer uma abordagem as Expressões Regulares que foram des
 %x contributor
 %x username
 %x text
+
+%x link_file
+%x ilink1
+%x ilink2
+%x ilink3
+%x ilink4
+%x head1
+%x head2
+%x head3
+%x head4
+%x head5
+%x head6
+
+
 \end{verbatim}
 
 A cada uma das expressões regulares apresentadas será feito uma breve descrição de cada uma delas:
@@ -168,6 +238,11 @@ Aqui é guardado o início e o fim da página da leitura do ficheiro XML. Quando
 
 \newpage
 \section{Conclusão}
+
+Após concluir todo o desenvolvimento deste projecto é fácil fazer um balanço de todo este precurso. Para além de ter sido um desafio implementar um programa de processamento da \textit{Wikipédia}, foi também aliciante concluir todo o trabalho.
+Ao longo do desenvolvimento do projeto o grupo desenvolveu competências em diversas ferramentas como C,HTML, XML, Flex, etc, que anteriormente eram poucas e até mesmo desconhecidas em alguns dos casos. 
+A utilização do Flex permitiu filtrar a informação mais relevante da página da \textit{Wikipédia} através do uso de expressões regulares. 
+
 
 \newpage
 
