@@ -183,6 +183,9 @@ int yywrap(){
     paginas_print(paginas);
 
     // os destroys todos
+    paginas_destroy(&paginas);
+    
+    yylex_destroy();
 
     return 1;
 }

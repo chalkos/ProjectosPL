@@ -57,11 +57,53 @@ void pagina_destroy(Pagina** pag){
     free(p->ultimaRev);
     free(p->autor);
 
-    // falta aqui a parte destruir os elementos das listas
+    pagina_destroy_hlinks( &(p->hLinks));
+    pagina_destroy_ilinks( &(p->iLinks));
+    pagina_destroy_seccoes( &(p->seccoes));
     
 
     free(*pag);
 }
+
+// destroi os iLinks
+void pagina_destroy_ilinks(Elemento** ilinks){
+    if( *ilinks == NULL )
+        return;
+    
+    ilink_destroy( (ILink**) &((*ilinks)->dados) );
+
+    pagina_destroy_ilinks( &((*ilinks)->proximo) );
+    
+    free(*ilinks);
+    
+    
+}
+
+// destroi os hLinks
+void pagina_destroy_hlinks(Elemento** hlinks){
+    if( *hlinks == NULL )
+        return;
+    
+    hlink_destroy( (HLink**) &((*hlinks)->dados) );
+
+    pagina_destroy_hlinks( &((*hlinks)->proximo) );
+    
+    free(*hlinks);
+
+}
+
+// destroi as seccoes
+void pagina_destroy_seccoes(Elemento** seccoes){
+    if( *seccoes == NULL )
+        return;
+    
+    seccao_destroy( (Seccao**) &((*seccoes)->dados) );
+
+    pagina_destroy_seccoes( &((*seccoes)->proximo) );
+    
+    free(*seccoes);
+}
+
 
 void pagina_print(Pagina* p){
     Elemento* itr = NULL;
