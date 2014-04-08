@@ -212,12 +212,29 @@ Nesta secção iremos fazer uma abordagem as Expressões Regulares que foram des
 
 \end{verbatim}
 
-A cada uma das expressões regulares desenvolvidas neste projeto será feito uma breve descrição de cada uma delas, de modo a explicar a implementação do flex.
+
+Existem também a chamada a todos os .h que foram definidos, para ser mais simples as chamadas das funções em C, bem como a definição de variáveis globais que servirão de "suporte" a cada uma das suas estruturas.
+
+\begin{verbatim}
+%{
+#include "paginas.h"
+#include "pagina.h"
+#include "ilink.h"
+#include "hlink.h"
+
+ILink* ilink = NULL;
+HLink* hlink = NULL;
+Pagina* pag = NULL;
+Elemento* paginas = NULL;
+
+%}
+
+\end{verbatim}
+A cada uma das expressões regulares desenvolvidas neste projeto será feito uma breve descrição de cada uma delas, de modo a explicitar a implementação do flex.
 
 Começando por explicar as primeiras expressões regulares que foram implementadas: 
 
-\begin{itemize}
-\item 
+
 \begin{verbatim}
 "<page>"            {pag = pagina_create();
                      BEGIN page;
@@ -226,10 +243,13 @@ Começando por explicar as primeiras expressões regulares que foram implementad
                      paginas_add(paginas, pag);
                     }
 \end{verbatim}
-\end{itemize}
+
 Aqui é guardado o início e o fim da página da leitura do ficheiro XML. Quando se encontra a tag \begin{math}<page>\end{math} inicia o estado page. Por outro lado, quando encontra \begin{math}</page>\end{math}, volta ao estado inicial. 
-\\A função \begin{math}pagina\_create()\end{math} premite inicializar a estrutrua de dados que é uma página.
-\\ A função \begin{math}paginas_add\end{math} adiciona uma nova página à lista ligada de páginas.
+
+
+A função \begin{math}pagina\_create()\end{math} permite inicializar a estrutura de dados que é uma página.
+
+A função \begin{math}paginas\_add\end{math} adiciona uma nova página à lista ligada de páginas.
 
 \begin{verbatim}
 
@@ -240,7 +260,7 @@ Aqui é guardado o início e o fim da página da leitura do ficheiro XML. Quando
 
 \end{verbatim}
 
-Quando se está no estado page e é encontrada a tag \begin{math}<title>\end{math}, inicia-se o estado título e é apanhada o texto que se encontra dentro dessa tag até encontrar a \begin{math}</title>\end{math}, e guarda essa informação.
+Quando se está no estado page e é encontrada a tag \begin{math}<title>\end{math}, inicia-se o estado título, é apanhado todo o texto até que seja encontrada a tag \begin{math}</title>\end{math},após isto a informaçã é guarda no respectivo campo (neste caso campo titulo da estrutura página).
 
 
 \begin{verbatim}
@@ -261,7 +281,8 @@ No caso de encontrar o timestamp:
 \end{verbatim}
 
 A tag timestamp dá informação relativa à data e à horada da última revisão efectuada à página.
-Quando se encontra a tag \begin{math}</timestamp>\end{math}  volta-se a tag revision, mas  temos também a função\begin{math}pagina\_set\_ultimaRevisao(Pagina* p, char* str)\end{math} que vai preencher na estrutura o campo ultimaRev com a informação relativa a esta tag.
+Quando se encontra a tag \begin{math}</timestamp>\end{math} significa que todo o texto relativo a esta tag foi apanhado e volta-se a tag revision.
+Existe a função\begin{math}pagina\_set\_ultimaRevisao(Pagina* p, char* str)\end{math} que vai preencher na estrutura o campo ultRevisao com a informação relativa a esta tag.
 
 
 No caso de encontrar o contributor:
@@ -270,22 +291,30 @@ No caso de encontrar o contributor:
 <contributor>"</contributor>"  BEGIN revision;
 
 \end{verbatim}
-A tag \begin{math}<contributor>\end{math} é onde se pode encontrar a definição do autor da página. 
+A tag \begin{math}<contributor>\end{math} é onde se pode encontrar a informação relativa ao autor da página. 
 Quando dentro da tag contributor é apanhada pelo flex o texto "<username>" passa-se a tag  \begin{math}<username>\end{math}.
-Se a tag \begin{math}</contributor>\end{math} é a panhada signifia que chegou ao fim a informação do colaborador da página, onde depois voltamos para o estado anterior que neste caso e a revision. 
+Se a tag \begin{math}</contributor>\end{math} é apanhada significa que chegou ao fim a informação do colaborador da página, onde depois voltamos para o estado anterior que neste caso e a revision. 
 
 No caso de encontrar o  username:
 \begin{verbatim}
 <username>"</username>"    BEGIN contributor;
 <username>[^<]*            pagina_set_autor(pag, yytext);
 \end{verbatim}
+
+
 A tag \begin{math}<username>\end{math} é onde está definido quem é o autor da página. Para armazenar o autor na página tem-se a função\begin{math}pagina\_set\_autor(Pagina* p, char* str)\end{math} que vai preencher o campo autor na estrutura da página.
 
+
+Para que depois de o flex possa voltar a analisar o resto do ficheiro existe a expressão de "</username>" para que depois volte a tag \begin{math}<contributor>\end{math}
+
+\begin{verbatim}
 <text>"</text>"     BEGIN revision;
+\end{verbatim}
+
 Quando estamos neste caso significa que se está a processar o caso em que nós encontramos o fim do texto da página.
 
 
-No caso de encontrarmos as seguintes expressões, significa que todo o tipo de cabeçalhos da wikipédia estão a ser apanhados. Iremos aboradar mais abaixo o que significa cada um deles.
+No caso de encontrarmos as seguintes expressões, significa que todo o tipo de cabeçalhos da wikipédia estão a ser apanhados. Podem ser apanhados 5 tipos de cabeçalhos, em que o 1 é o cabeçalho principal e a partir daqui os próximos são os sub cabeçalhos.
 
 \begin{verbatim}
 
@@ -297,7 +326,7 @@ No caso de encontrarmos as seguintes expressões, significa que todo o tipo de c
 <text>\n\={6}       BEGIN head6;
 \end{verbatim}
 
-No caso de encontrar no texto "[[File:" ou "[[Image:" não é feita qualquer acção de tratamento por parte do flex. No entanto quando temos "[[" significa que foi apanhado um internal link, se aparecer "[" então foi encontrado um hyper link.
+No caso de encontrar no texto "[[File:" ou "[[Image:" não é feita qualquer acção de tratamento por parte do flex. No entanto quando temos "[[" significa que foi apanhado um link.
 
 \begin{verbatim}
 <text>"[[File:"     ;
