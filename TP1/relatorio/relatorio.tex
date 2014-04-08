@@ -42,7 +42,7 @@
 
 \newcommand{\todo}[1] {\textcolor{BrickRed}{\begin{quote}#1\end{quote}}}
 
-\usepackage{listings}
+%\usepackage{listings}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -86,7 +86,7 @@ Variante 1
 \newpage
 \section{Introdução}
 
-Atualmente a \textit{Wikipédia} é a maior base de dados de conhecimento livre online e disponível em várias línguas, no qual a lingua portuguesa faz parte integrante. Neste contexto, pretende-se desenvolver um Processador de Texto, exportado do \textit{Wikipédia} e gerar a página html com os dados mais relevantes contidos nessa página, utilizando a ferramenta Flex. 
+Atualmente a \textit{Wikipédia} é a maior base de dados de conhecimento livre online e disponível em várias línguas. Neste contexto, pretende-se desenvolver um Processador de Texto, exportado da \textit{Wikipédia} e gerar a página html com os dados mais relevantes contidos nessa página, utilizando a ferramenta Flex. 
 Com este trabalho foi necessário implementar Expressões Regulares de modo a retirar informação mais relevante num contexto enorme de informção, encontrando padrões que nos ajudem a descobrir o tipo de informação que estamos a procura e que é útil no contexto deste caso de estudo.
 
 
@@ -106,14 +106,14 @@ O objectivo deste enunciado é criar um programa utilizando a ferramenta Flex qu
 \item data
 \item n.º de links internos
 \item n.º de links externos
-\item n.º de sessões 
+\item n.º de secções 
 \end{itemize}
 e criar uma página HTML (para cada página XML) com essas informações. Para isso é necessário exportar uma ou mais páginas usando o \textit{Special Export} disponível em \textbf{http://pt.wikipedia.org/wiki/Especial:Exportar (ou \\http://en.wikipedia.org/wiki/Special:Export} para a versão inglesa.
 \newpage
 
 \subsection{Enunciado}
 
-De uma maneira geral, para teste trabalhou pretende-se desenvolver os seguintes pontos:
+De uma maneira geral, para teste trabalho pretende-se desenvolver os seguintes pontos:
 \begin{itemize}
 \item Especificar padrões de frases que se quer encontrar no texto fonte através de ERs.
 \item Identificar as acções semânticas a realizar como reação ao reconhecimento de cada um desses padrões
@@ -143,7 +143,7 @@ Usando o \textbf{Especial Export} pretende-se exportar o contéudo da \textit{Wi
 
 Após termos analisado o ficheiro XML da \textit{Wikipédia} verificou-se que era necessário estruturar a informação encontrada nesses ficheiros. Essa informação é guardada em estruturas de dados que aqui vão ser expostas e explicadas. 
 
-Primeiramente, vamos apresentar a estrutura de dados que armazena a informação de uma páginas.
+Primeiramente, vamos apresentar a estrutura de dados que armazena a informação das páginas.
 \begin{figure}[h]
 \begin{center}
 \includegraphics[width=0.9\linewidth]{paginas}
@@ -151,7 +151,11 @@ Primeiramente, vamos apresentar a estrutura de dados que armazena a informação
 \end{center}
 \end{figure}
 
-Seguidamente, vamos explicar a estrutura de dados que armazena a informação de uma página.
+
+Como podemos verificar esta estrutura é uma lista-ligada que armazena a informação das páginas.
+
+
+Para armazenar a informação dos componentes de cada página do XML, foi criado a seguinte estrutura de dados: \\
 \begin{figure}[h]
 \begin{center}
 \includegraphics[width=0.9\linewidth]{pagina}
@@ -159,22 +163,22 @@ Seguidamente, vamos explicar a estrutura de dados que armazena a informação de
 \end{center}
 \end{figure}
 
+Cada página consiste numa estrutura com a informação relativa à mesma, como titulo, autor, ultRevisao, mas também existem apontadores para outras listas-ligadas como a lista de links internos, links externos e secções.
 
 
-
-Os campos armazenam a seguinte informação:
+Esses campos armazenam a seguinte informação:
 \begin{itemize}
 
 \item \textit{titulo} guarda o título do documento \textit{Wikipédia};
-\item \textit{autor} guarda o autor do documento;
-\item \textit{ultimaRev} guarda a data da última revisão;
-\item \textit{indice} guarda o valor do índice da página;
-\item \textit{iLikins} é o apontador para a estrutura Elemento, que guarda a informação dos links internos;
+\item \textit{autor} guarda o autor da página;
+\item \textit{ultRevisao} guarda a data da última revisão;
 \item \textit{nILinks} guarda o número de links internos encontrados;
-\item \textit{hLinks} é o apontador para a estrutura Elemento, que guarda a informação dos links externos;
 \item \textit{nHLinks} guarda o número de links externos encontrados;
+\item \textit{nSeccões} guarda o número de secções encontradas;
+\item \textit{iLikins} é o apontador para a estrutura Elemento, que guarda a informação dos links internos;
+\item \textit{hLinks} é o apontador para a estrutura Elemento, que guarda a informação dos links externos;
 \item \textit{seccoes} é apontador para a estrutura Elemento, que guarda a informação das secções da página;
-\item \textit{nSeccões} guarda o número de secções encontradas na página;
+
 
 
 \newpage
