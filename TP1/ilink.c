@@ -151,7 +151,7 @@ void ilink_print(ILink* ilink){
         printf("%s%s", ilink->texto, ilink->resto);
     } else {
         // mostrar a parte de apresentacao
-        printf("%s", ilink->apresentar);
+        printf("%s%s", ilink->apresentar, ilink->resto);
     }
     
     printf("</a>\n");

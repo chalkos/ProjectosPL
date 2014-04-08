@@ -37,6 +37,15 @@ Pagina* pagina_create();
 // destroi a página
 void pagina_destroy(Pagina** p);
 
+// destroi os iLinks
+void pagina_destroy_ilinks(Elemento** ilinks);
+
+// destroi os hLinks
+void pagina_destroy_hlinks(Elemento** hlinks);
+
+// destroi as seccoes
+void pagina_destroy_seccoes(Elemento** seccoes);
+
 // insere o titulo
 void pagina_set_titulo(Pagina* p, char* str);
 
