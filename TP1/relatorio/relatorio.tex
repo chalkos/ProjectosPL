@@ -226,7 +226,10 @@ Nesta secção iremos fazer uma abordagem as Expressões Regulares que foram des
 
 \end{verbatim}
 
-A cada uma das expressões regulares apresentadas será feito uma breve descrição de cada uma delas:
+A cada uma das expressões regulares desenvolvidas neste projeto será feito uma breve descrição de cada uma delas, de modo a explicar a implementação do flex.
+
+Começando por explicar as primeiras expressões regulares que foram implementadas: 
+
 \begin{itemize}
 \item 
 \begin{verbatim}
@@ -251,7 +254,7 @@ Aqui é guardado o início e o fim da página da leitura do ficheiro XML. Quando
 
 \end{verbatim}
 
-Quando se está na página e é encontrada a tag \begin{math}<title>\end{math}, entra no estado título e apanha o texto que lá dentro dessa tag até encontrar a \begin{math}</title>\end{math}, e guarda essa informação.
+Quando se está no estado page e é encontrada a tag \begin{math}<title>\end{math}, inicia-se o estado título e é apanhada o texto que se encontra dentro dessa tag até encontrar a \begin{math}</title>\end{math}, e guarda essa informação.
 
 
 \begin{verbatim}
@@ -262,7 +265,8 @@ Quando se está na página e é encontrada a tag \begin{math}<title>\end{math}, 
 <revision>\<text.*?\>      BEGIN text;
 \end{verbatim}
 
-Quando se está na página e é encontrado uma tag \begin{math}<revison>\end{math} esta indica quando foi feita a revisão à página. Depois entrar no estado \begin{math}<revison>\end{math} onde pode encontrar quatro estados: timestamp, contributor, page e text.
+
+No caso de estarmos no estado page e é encontrado uma tag \begin{math}<revison>\end{math} esta indica quando foi feita a revisão à página. Depois entrar no estado \begin{math}<revison>\end{math} onde pode encontrar quatro estados: timestamp, contributor, page e text.
 
 No caso de encontrar o timestamp:
 \begin{verbatim}
@@ -271,7 +275,7 @@ No caso de encontrar o timestamp:
 \end{verbatim}
 
 A tag timestamp dá informação relativa à data e à horada da última revisão efectuada à página.
-Quando se encontra a tag \begin{math}</timestamp>\end{math}  volta-se a tag revision, mas  temos também a função\begin{math}pagina\_set\_ultimaRevisao()\end{math} que vai preencher na estrutura o campo ultimaRev com a informação relativa a esta tag.
+Quando se encontra a tag \begin{math}</timestamp>\end{math}  volta-se a tag revision, mas  temos também a função\begin{math}pagina\_set\_ultimaRevisao(Pagina* p, char* str)\end{math} que vai preencher na estrutura o campo ultimaRev com a informação relativa a esta tag.
 
 
 No caso de encontrar o contributor:
@@ -289,7 +293,7 @@ No caso de encontrar o  username:
 <username>"</username>"    BEGIN contributor;
 <username>[^<]*            pagina_set_autor(pag, yytext);
 \end{verbatim}
-A tag \begin{math}<username>\end{math} é onde está definido quem é o autor da página. Para armazenar o autor na página tem-se a função\begin{math}pagina\_set\_autor\end{math} que vai preencher o campo autor na estrutura da página.
+A tag \begin{math}<username>\end{math} é onde está definido quem é o autor da página. Para armazenar o autor na página tem-se a função\begin{math}pagina\_set\_autor(Pagina* p, char* str)\end{math} que vai preencher o campo autor na estrutura da página.
 
 <text>"</text>"     BEGIN revision;
 Quando estamos neste caso significa que se está a processar o caso em que nós encontramos o fim do texto da página.
@@ -325,9 +329,182 @@ No caso dos links externos, apanha-se o [, de seguida apanha o URI até encontra
                     }
 \end{verbatim}
 
+Quando é  encontrado pelo flex a expressão exposta em cima, tem-se que é inicializado um hlink através de \begin{math} hlink\_create() \end{math}, depois é adicionado a lista de links da página  \begin{math} paginas\_add(Elemento* ps, Pagina* p)\end{math}. Por fim  é necessário indicar qual o uri que o link tem, usando a função  \begin{math} hlink\_set\_uri(HLink* hlink, char* str)\end{math}.
+No entanto é necessário ver se o hlink possui mais informação dai no fim ser chamado o hlink2.
+
+
+\begin{verbatim}
+<hlink2>\ [^\]]+    hlink_set_texto(hlink, yytext+1);
+<hlink2>\]          BEGIN text;
+
+\end{verbatim}
+
+O hlink2 é onde vai ver onde é que o hlink acaba, pois pode dar-se o caso de o hlink possuir texto para substituir o hlink, e para isso existe a seguinte expressão para apanhar o resto do texto. Depois de apanhado todo o texto até ao "]]" para adicionar ao hlink o resto da informação existe a função \begin{math} hlink\_set\_texto(HLink* hlink, char* str) \end{math} para isso.
+
+Nas descrições que se seguem, vão ser descritos como é que os links internos das páginas são apanhados e tratados.
+Quando se fala de links, existem vários tipos que firam definidos como sendo:
+\begin{itemize}
+\item special;
+\item texto;
+\item parênteses;
+\item virgula;
+\item apresentar;
+\item resto;
+\end{itemize}
+
+
+Vai ser explicado como é que cada tipo é apanhado.
+
+\begin{verbatim}
+<ilink1>[a-zA-Z]+:[^\]\(,\|]+       {
+                                     ilink = ilink_create();
+                                     ilink_set_especial(ilink, yytext);
+                                     BEGIN ilink2;
+                                    }
+\end{verbatim}
+
+
+Quando é apanhada a expressão regular acima significa que foi apanhado um link que é formado como sendo \begin{math}[[Category:Salts]]\end{math} depois o link apanhar vai inicializar a estrutura de links internos \begin{math} ilink\_create() \end{math} e depois vai definir que existe um link e vai armazenar o texto relativo ao link.
+
+\begin{verbatim}
+<ilink1>[^\]\(,\|]+                 {
+                                     ilink = ilink_create();
+                                     ilink_set_texto(ilink, yytext);
+                                     BEGIN ilink2;
+                                    }
+\end{verbatim}
+Esta expressão regular apanha um link internos que seja da seguinte forma :\begin{math}[[Salts]]\end{math}, onde o que se encontra dentro do parênteses é o link em si. Depois de termos o link definido chamamos as função \begin{math} ilink\_create() \end{math} para inicialização do link e  \begin{math}ilink\_set\_texto(ilink, yytext)\end{math} para guardar o link na estrutura de links internos (Ilink).
+
+
+\begin{verbatim}
+
+<ilink2,ilink3>\]                   {
+                                     BEGIN ilink4;
+                                    }
+\end{verbatim}
+Este caso existe para que caso o flex se encontre na condição de contexto \begin{math}<ilink2>\end{math} ou \begin{math}<ilink3>\end{math} e a seguir exista "]" o flex vai entrar na condiçãode contexto \begin{math}ilink4\end{math}
 
 
 
+
+\begin{verbatim}
+<ilink2>\|                          {
+                                     BEGIN ilink3;
+                                    }
+\end{verbatim}
+
+
+Neste ponto significa que existe no link2 mais alguma coisa, isto é o link e do formato \begin{math}[[Crystallite|grain boundaries]]\end{math}, pois o link possui um pipe e para tratar o pipe o flex vai para a condição de contexto link3, onde depois vai analisar o resto do link. 
+
+
+\begin{verbatim}
+<ilink2>\([^\]\)\|]+\)\]            {
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     ilink_set_parenteses(ilink, yytext);
+                                     BEGIN ilink4;
+                                    }
+
+\end{verbatim}
+
+Neste caso está a ser apanhado um link que pode ter a seguinte estrutura \begin{math}[[Opacity (optics)]]\end{math}. Depois de termos o link,  transforma-se para numa string dai o '\\0'.
+Após termos o link vai-se guardar o texto do yytext na estrutura dos links internos (Ilink), mas como não sabemos se o link pode ter mais informação o flex vai a condição de contexto ilink4 "fazer" essa verificação. 
+
+\begin{verbatim}
+<ilink2>\([^\]\)\|]+\)\|            {
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     ilink_set_parenteses(ilink, yytext);
+                                     BEGIN ilink3;
+                                    }
+\end{verbatim}
+Quando existe uma expressão regular deste género significa que o link pode ter o seguinte formato \begin{math}[[Opacity ((optics))|]]\end{math} que quando analisado em profundo concluiu-se que o link é válido por isso era necessário ver os parênteses que o link "trazia".
+Depois de a totalidade do link ser capturada usou-se a função para o armazenar na estrutura definida para os ilinks.
+
+\begin{verbatim}
+<ilink2>\([^\]\)\|]+\|              {
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     ilink_set_parenteses(ilink, yytext);
+                                     BEGIN ilink3;
+                                    }
+\end{verbatim}
+
+Esta expressão serve para apanhar os links internos onde a sua estrutura pode ter a forma \begin{math}[[Opacity ((optics|]]\end{math}, por isso era necessário garantir que os parênteses eram apanhados, pois o link é válido. 
+Depois do link apanhado é tratado com a função \begin{math} ilink\_set\_parenteses(ilink, yytext)\end{math} que adiciona o link à estrutura de dados dos ilinks, como o link esta guardado o flex vai para ilink3 para continuar o tratamento dos links.
+
+\begin{verbatim}
+<ilink2>\([^\]\)\|]+\]              {
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     ilink_set_parenteses(ilink, yytext);
+                                     BEGIN ilink4;
+                                    }
+\end{verbatim}
+Por fim quando o flex entra nesta condição de contexto, significa que foi encontrado um link \begin{math}([[Opacity (optics)|texto]])\end{math} em que temos o link, mas esse link possui um texto para a substituição do endereço do link.
+Neste caso, o link possui mais informação, dai o BEGIN ilink4, pois é necessário apanhar o texto que existe depois dos parênteses.
+
+\begin{verbatim}
+<ilink2>,[^\]\|]*\]                 {
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     ilink_set_virgula(ilink, yytext);
+                                     BEGIN ilink4;
+                                    }
+\end{verbatim}
+A este caso existe um link \begin{math}[[Opacity, Não via ser apanhar]\end{math} em que o que se encontra a seguir a virgula não é apanhado, o que é apenas apanhado é o que neste exemplo é o "Opacity".
+
+\begin{verbatim}
+<ilink2>,[^\]\|]*\|                 {
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     ilink_set_virgula(ilink, yytext);
+                                     BEGIN ilink3;
+                                    }
+\end{verbatim}
+Quando a expressão regular é apanhada significa que o link em causa tem a forma de: \begin{math}[[Opacity, Não via ser apanhar| texto]]\end{math}, onde o texto que se encontra a seguir ao pipe vais substituir o texto que apresentado para esse link.
+
+\begin{verbatim}
+<ilink3>[^\]]*\]                    {
+                                     yytext[ strlen(yytext)-1 ] = '\0';
+                                     ilink_set_apresentar(ilink, yytext);
+                                     BEGIN ilink4;
+                                    }
+\end{verbatim}
+Esta expressão é onde os links são apanhados para depois serem convidos em strings e armazenados na estrutura de dados dos ilinks.
+
+\begin{verbatim}
+<ilink4>\][a-zA-Z]*                 {
+                                     ilink_set_resto(ilink, yytext+1);
+                                     pagina_add_ilink(pag, ilink);
+                                     BEGIN text;
+                                    }
+\end{verbatim}
+
+Nesta expressão vai apanhar o resto do texto do link, e como o link quando aqui já esta na sua totalidade pode-se então guardar a estrutura dos links na página correspondente.
+
+
+\begin{verbatim}
+<ilink1,ilink2,ilink3>.             ;
+\end{verbatim}
+Esta expressão só é apanhada apara que os links que não entrem expressões acima sejam filtrados pelo flex. 
+
+
+
+\begin{verbatim}
+<head1>[^\=]+                       pagina_add_seccao(pag, seccao_create(yytext, 1));
+<head2>[^\=]+                       pagina_add_seccao(pag, seccao_create(yytext, 2));
+<head3>[^\=]+                       pagina_add_seccao(pag, seccao_create(yytext, 3));
+<head4>[^\=]+                       pagina_add_seccao(pag, seccao_create(yytext, 4));
+<head5>[^\=]+                       pagina_add_seccao(pag, seccao_create(yytext, 5));
+<head6>[^\=]+                       pagina_add_seccao(pag, seccao_create(yytext, 6));
+\end{verbatim}
+As expressões que se encontram em cima são as responsáveis para fechar a expressão que permite apanhar o headers, e chama a respetiva função que os vais guardar na estrutura de dados das secções. Os headers são definidos de 1 a 6. em que cada função esta definida para um próprio header. 
+
+\begin{verbatim}
+<head1>\={1}                        BEGIN text;
+<head2>\={2}                        BEGIN text;
+<head3>\={3}                        BEGIN text;
+<head4>\={4}                        BEGIN text;
+<head5>\={5}                        BEGIN text;
+<head6>\={4}                        BEGIN text;
+
+\end{verbatim}
+Já as estas expressões servem para depois de os headers serem apanhados, voltar a text.
 
 \newpage
 \section{Conclusão}
@@ -434,8 +611,7 @@ Elemento* paginas = NULL;
 <ilink1>[a-zA-Z]+:[^\]\(,\|]+       {/*ABCJ */
                                      ilink = ilink_create();
                                      ilink_set_especial(ilink, yytext);
-                                     BEGIN ilink2;
-                                    }
+                                     BEGIN ilink2;                                    }
 
 <ilink1>[^\]\(,\|]+                 {/*ABC  */
                                      ilink = ilink_create();
