@@ -335,7 +335,7 @@ No caso de encontrar no texto "[[File:" ou "[[Image:" não é feita qualquer ac�
 <text>"["           BEGIN hlink1;
 \end{verbatim}
 
-No caso dos links externos, apanha-se o [, de seguida apanha o URI até encontrar um ] ou um espaço. Se encontrar um espaço tudo o que venha até a ]  é o texto que se vai filtrar.
+No caso dos links externos, apanha-se o "[", de seguida apanha o URI até encontrar um "]" ou um espaço. Se encontrar um espaço tudo o que venha até a "]"  é o texto que se vai filtrar.
 \begin{verbatim}
 <hlink1>[^\ \]]+    {/*leu o uri*/
                      hlink = hlink_create();
@@ -346,7 +346,7 @@ No caso dos links externos, apanha-se o [, de seguida apanha o URI até encontra
 \end{verbatim}
 
 Quando é  encontrado pelo flex a expressão exposta em cima, tem-se que é inicializado um hlink através de \begin{math} hlink\_create() \end{math}, depois é adicionado a lista de links da página  \begin{math} paginas\_add(Elemento* ps, Pagina* p)\end{math}. Por fim  é necessário indicar qual o uri que o link tem, usando a função  \begin{math} hlink\_set\_uri(HLink* hlink, char* str)\end{math}.
-No entanto é necessário ver se o hlink possui mais informação dai no fim ser chamado o hlink2.
+
 
 
 \begin{verbatim}
@@ -355,10 +355,10 @@ No entanto é necessário ver se o hlink possui mais informação dai no fim ser
 
 \end{verbatim}
 
-O hlink2 é onde vai ver onde é que o hlink acaba, pois pode dar-se o caso de o hlink possuir texto para substituir o hlink, e para isso existe a seguinte expressão para apanhar o resto do texto. Depois de apanhado todo o texto até ao "]]" para adicionar ao hlink o resto da informação existe a função \begin{math} hlink\_set\_texto(HLink* hlink, char* str) \end{math} para isso.
+O hlink2 é onde se vai ver onde é que o hlink acaba, pois pode dar-se o caso de o hlink possuir texto para substituir o endereço em si, e para isso existe a seguinte expressão para apanhar o resto do texto. Depois de apanhado todo o texto até ao "]]" para adicionar ao hlink o resto da informação existe a função \begin{math} hlink\_set\_texto(HLink* hlink, char* str) \end{math} para isso.
 
 Nas descrições que se seguem, vão ser descritos como é que os links internos das páginas são apanhados e tratados.
-Quando se fala de links, existem vários tipos que firam definidos como sendo:
+Quando se fala de links internos, existem vários tipos que foram definidos como sendo:
 \begin{itemize}
 \item special;
 \item texto;
@@ -395,8 +395,6 @@ Esta expressão regular apanha um link internos que seja da seguinte forma :\beg
 Este caso existe para que caso o flex se encontre na condição de contexto \begin{math}<ilink2>\end{math} ou \begin{math}<ilink3>\end{math} e a seguir exista "]" o flex vai entrar na condiçãode contexto \begin{math}ilink4\end{math}
 
 
-
-
 \begin{verbatim}
 <ilink2>\|               {BEGIN ilink3;}
 \end{verbatim}
@@ -420,7 +418,9 @@ Após termos o link vai-se guardar o texto do yytext na estrutura dos links inte
                          ilink_set_parenteses(ilink, yytext);
                          BEGIN ilink3;}
 \end{verbatim}
-Quando existe uma expressão regular deste género significa que o link pode ter o seguinte formato \begin{math}[[Opacity ((optics))|]]\end{math} que quando analisado em profundo concluiu-se que o link é válido por isso era necessário ver os parênteses que o link "trazia".
+
+
+Quando existe uma expressão regular deste género significa que o link pode ter o seguinte formato \begin{math}[[Opacity ((optics))|]]\end{math} que quando analisado em profundo concluiu-se que o link é válido por isso era necessário ver a quantidade de parênteses que o link "trazia".
 Depois de a totalidade do link ser capturada usou-se a função para o armazenar na estrutura definida para os ilinks.
 
 \begin{verbatim}
@@ -445,21 +445,26 @@ Neste caso, o link possui mais informação, dai o BEGIN ilink4, pois é necess�
                        ilink_set_virgula(ilink, yytext);
                        BEGIN ilink4;}
 \end{verbatim}
-%A este caso existe um link \begin{math}[[Opacity, Não via ser apanhar]\end{math} em que o que se encontra a seguir a virgula não é apanhado, o que é apenas apanhado é o que neste exemplo é o "Opacity".
+A este caso existe um link \begin{math}[[Opacity, texto apanhar ]]\end{math} em que o que se encontra a seguir a virgula não é apanhado, o que é apenas apanhado é o que neste exemplo é o "Opacity".
+
+Como temos um link como uma virgula foi necessário ter um função que trata-se este caso em especifico daí a função \begin{math} ilink\_set\_virgula(ilink, yytext)\end{math}
 
 \begin{verbatim}
 <ilink2>,[^\]\|]*\|    {yytext[ strlen(yytext)-1 ] = '\0';
                        ilink_set_virgula(ilink, yytext);
                        BEGIN ilink3;}
 \end{verbatim}
-%Quando a expressão regular é apanhada significa que o link em causa tem a forma de: \begin{math}[[Opacity, Não via ser apanhar| texto]] \end{math}, onde o texto que se encontra a seguir ao pipe vais substituir o texto que apresentado para esse link.
+
+Quando a expressão regular é apanhada significa que o link em causa tem a forma de: \begin{math}[[Opacity, texto a apanhar| texto]] \end{math}, onde o texto que se encontra a seguir ao pipe vais substituir o texto que apresentado para esse link.
 
 \begin{verbatim}
 <ilink3>[^\]]*\]       {yytext[ strlen(yytext)-1 ] = '\0';
                        ilink_set_apresentar(ilink, yytext);
                        BEGIN ilink4;}
 \end{verbatim}
-Esta expressão é onde os links são apanhados para depois serem convidos em strings e armazenados na estrutura de dados dos ilinks.
+
+
+Esta expressão é onde os links são apanhados para depois serem convertidos em strings e armazenados na estrutura de dados dos ilinks, ficando com a formatação como que depois serão tratados para aparecerem no html.
 
 \begin{verbatim}
 <ilink4>\][a-zA-Z]*    {ilink_set_resto(ilink, yytext+1);
@@ -473,6 +478,8 @@ Nesta expressão vai apanhar o resto do texto do link, e como o link quando aqui
 \begin{verbatim}
 <ilink1,ilink2,ilink3>.             ;
 \end{verbatim}
+
+
 Esta expressão só é apanhada apara que os links que não entrem expressões acima sejam filtrados pelo flex. 
 
 
@@ -497,6 +504,32 @@ As expressões que se encontram em cima são as responsáveis para fechar a expr
 
 \end{verbatim}
 Já as estas expressões servem para depois de os headers serem apanhados, voltar a text.
+
+\begin{verbatim}
+<*>. ;
+<*>\n ;
+\end{verbatim}
+
+Por fim estas expressões regulares, permitem que toda a informação que não foi tratada nas expressões acima, seja filtrada do resultado final do flex.
+
+Quando o flex acaba de executar ele chama por si a função \begin{math} yywrap()\end{math} que é executada no fim do flex executar.
+No entanto a função neste contexto foi utilizada para que no fim do flex executar libertar toda a memória que foi usada para a alocação das estruturas e da informação para as estruturas.
+
+\begin{verbatim}
+int yywrap(){
+
+    paginas_print(paginas);
+
+ 
+    paginas_destroy(&paginas);
+    
+    yylex_destroy();
+
+    return 1;
+}
+\end{verbatim}
+
+
 
 \newpage
 \section{Conclusão}
