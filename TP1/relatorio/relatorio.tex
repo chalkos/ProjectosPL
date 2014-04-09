@@ -144,7 +144,7 @@ Usando o \textbf{Especial Export} pretende-se exportar o conteúdo da \textit{Wi
 
 Após termos analisado o ficheiro XML da \textit{Wikipédia} verificou-se que era necessário estruturar a informação encontrada nesses ficheiros. Essa informação é guardada em estruturas de dados que aqui vão ser expostas e explicadas. 
 
-Decidimos que se ia guardar a informação sobre as páginas e no fim toda a informação ia ser escrita como output do programa. Concordámos que a forma mais simples de manter a informação sobre as páginas é uma lista ligada. Cada página tem informações como o título e o autor, e conjuntos de hiperligações internas, hiperligações externas e secções. Estes conjuntos são todos de fácil representação com listas ligadas, assim sendo criámos uma lista ligada genérica (com void*) e usámos essa lista como suporte a todos os conjuntos de informação.
+Decidimos que se ia guardar a informação sobre as páginas e no fim toda a informação ia ser escrita como output do programa. Concordámos que a forma mais simples de manter a informação sobre as páginas é uma lista ligada. Cada página tem informações como o título e o autor, e conjuntos de hiperligações internas, hiperligações externas e secções. Estes conjuntos são todos de fácil representação com listas ligadas, assim sendo criámos uma lista ligada genérica e usámos essa lista como estrutura de suporte a todos os conjuntos de informação.
 
 O elemento da lista ligada genérica (do tipo Elemento) consiste apenas num apontador para os dados e num apontador para o próximo elemento da lista.
 No que diz respeito às páginas, o tipo do apontador dados é \emph{Pagina}, como é possível ver na seguinte imagem.
@@ -156,8 +156,6 @@ No que diz respeito às páginas, o tipo do apontador dados é \emph{Pagina}, co
 \end{center}
 \end{figure}
 
-
-
 Para armazenar a informação dos componentes de cada página do XML, foi criado a seguinte estrutura de dados: \\
 \begin{figure}[h]
 \begin{center}
@@ -165,9 +163,6 @@ Para armazenar a informação dos componentes de cada página do XML, foi criado
 \caption{Estrutura de Dados de Página}
 \end{center}
 \end{figure}
-
-Cada página consiste numa estrutura com a informação relativa à mesma, como titulo, autor, ultRevisao, mas também existem apontadores para outras listas-ligadas como a lista de links internos, links externos e secções.
-
 
 Nos campos de estrutura da página armazena-se a seguinte informação:
 \begin{itemize}
@@ -178,14 +173,13 @@ Nos campos de estrutura da página armazena-se a seguinte informação:
 \item \textit{nILinks} guarda o número de links internos encontrados;
 \item \textit{nHLinks} guarda o número de links externos encontrados;
 \item \textit{nSeccões} guarda o número de secções encontradas;
-\item \textit{iLikins} é o apontador para a lista ligada, que guarda a informação dos links internos;
-\item \textit{hLinks} é o apontador para a lista ligada, que guarda a informação dos links externos;
-\item \textit{seccoes} é apontador para a lista ligada , que guarda a informação das secções da página;
-
+\item \textit{iLikins} é o apontador para a lista ligada que guarda a informação dos links internos;
+\item \textit{hLinks} é o apontador para a lista ligada que guarda a informação dos links externos;
+\item \textit{seccoes} é apontador para a lista ligada que guarda a informação das secções da página.
+\end{itemize}
 
 
 \newpage
-\end{itemize}
 \subsubsection{Flex e Expressões Regulares}
 
 Nesta secção iremos fazer uma abordagem as Expressões Regulares que foram desenvolvidas no contexto da resolução deste projeto. Utilizaram-se as seguintes condições de contexto:
@@ -216,7 +210,7 @@ Nesta secção iremos fazer uma abordagem as Expressões Regulares que foram des
 \end{verbatim}
 
 
-Existem também a chamada a todos os .h que foram definidos, para ser mais simples as chamadas das funções em C, bem como a definição de variáveis globais que servirão de "suporte" a cada uma das suas estruturas.
+Na primeira fase do documento \emph{flex} importamos as funções dos vários módulos, bem como a definição de variáveis globais que servirão de "suporte" a cada uma das suas estruturas. A variável \texttt{paginas} é a lista ligada onde será guardada toda a informação recolhida. As variáveis \texttt{ilink}, \texttt{hlink} e \texttt{pag} contêm a página, o link interno ou o link externo que está a ser construído, respetivamente.
 
 \begin{verbatim}
 %{
@@ -233,10 +227,9 @@ Elemento* paginas = NULL;
 %}
 
 \end{verbatim}
-A cada uma das expressões regulares desenvolvidas neste projeto será feito uma breve descrição de cada uma delas, de modo a explicitar a implementação do flex.
+Será feita uma breve descrição das expressões regulares desenvolvidas neste projeto. As expressões podem não estar na mesma ordem que estão no ficheiro para que seja mais fácil a sua explicação.
 
 Começando por explicar as primeiras expressões regulares que foram implementadas: 
-
 
 \begin{verbatim}
 "<page>"            {pag = pagina_create();
@@ -247,77 +240,73 @@ Começando por explicar as primeiras expressões regulares que foram implementad
                     }
 \end{verbatim}
 
-Aqui é guardado o início e o fim da página da leitura do ficheiro XML. Quando se encontra a tag \begin{math}<page>\end{math} inicia o estado page. Por outro lado, quando encontra \begin{math}</page>\end{math}, volta ao estado inicial. 
+Quando se encontra a tag \texttt{<page>} inicia o estado page que dá início à interpretação dos dados da página. Por outro lado, quando encontra \texttt{</page>}, volta ao estado inicial e guarda a página na lista de páginas.
 
+A função \texttt{pagina\_create()} permite inicializar a estrutura de dados que serve de suporte a uma página.
 
-A função \begin{math}pagina\_create()\end{math} permite inicializar a estrutura de dados que é uma página.
+A função \texttt{paginas\_add} adiciona a página à lista ligada de páginas.
 
-A função \begin{math}paginas\_add\end{math} adiciona uma nova página à lista ligada de páginas.
+Note-se que no fim da recolha da informação sobre uma página, os conteúdos são guardados na lista ligada de páginas e, portanto, pode-se reutilizar a variável \texttt{pag} para guardar informações da página seguinte.
 
 \begin{verbatim}
-
 <page>"<title>"     BEGIN title;
 <page>"<revision>"  BEGIN revision;
 <title>"</title>"   BEGIN page;
 <title>[^<]*        pagina_set_titulo(pag,yytext);
-
 \end{verbatim}
 
-Quando se está no estado page e é encontrada a tag \begin{math}<title>\end{math}, inicia-se o estado título, é apanhado todo o texto até que seja encontrada a tag \begin{math}</title>\end{math},após isto a informaçã é guarda no respectivo campo (neste caso campo titulo da estrutura página).
-
+Quando se está no estado page e é encontrada a tag \texttt{<title>}, inicia-se o estado título e é apanhado todo o texto até que seja encontrada a tag \texttt{</title>}. Após isto a informação é guarda no respetivo campo (neste caso campo título da estrutura página).
 
 \begin{verbatim}
-<page>"<revision>"  BEGIN revision;
+<page>"<revision>"         BEGIN revision;
 <revision>"<timestamp>"    BEGIN timestamp;
 <revision>"<contributor>"  BEGIN contributor;
-<revision>"</revision>"    BEGIN page;
-<revision>\<text.*?\>      BEGIN text;
 \end{verbatim}
 
+No caso de estarmos no estado page podemos encontrar a tag \texttt{revison}, que contém informações sobre a ultima revisão à página. Depois entrar no estado \texttt{revison} devem-se encontrar dois elementos XML: a \texttt{timestamp} e o \texttt{contributor}.
 
-No caso de estarmos no estado page e é encontrado uma tag \begin{math}<revison>\end{math} esta indica quando foi feita a revisão à página. Depois entrar no estado \begin{math}<revison>\end{math} onde pode encontrar quatro estados: timestamp, contributor, page e text.
+Primeiro encontrará a tag \texttt{timestamp}:
 
-No caso de encontrar o timestamp:
 \begin{verbatim}
 <timestamp>"</timestamp>"  BEGIN revision;
 <timestamp>[^<]*           pagina_set_ultimaRevisao(pag, yytext);
 \end{verbatim}
 
-A tag timestamp dá informação relativa à data e à horada da última revisão efectuada à página.
-Quando se encontra a tag \begin{math}</timestamp>\end{math} significa que todo o texto relativo a esta tag foi apanhado e volta-se a tag revision.
-Existe a função\begin{math}pagina\_set\_ultimaRevisao(Pagina* p, char* str)\end{math} que vai preencher na estrutura o campo ultRevisao com a informação relativa a esta tag.
+A tag \texttt{timestamp} dá informação relativa à data e hora da revisão.
+Quando se encontra a tag de fecho da \texttt{timestamp} significa que todo o texto relativo à data e hora foi capturado e volta-se a estar dentro da tag \texttt{revision}.
+
+A função \texttt{pagina\_set\_ultimaRevisao(Pagina* p, char* str)} preenche na estrutura da página o campo ultRevisao com a informação relativa da data e hora da revisão.
 
 
-No caso de encontrar o contributor:
+Segue-se a tag \texttt{contributor}:
+
 \begin{verbatim}
 <contributor>"<username>"      BEGIN username;
 <contributor>"</contributor>"  BEGIN revision;
 
-\end{verbatim}
-A tag \begin{math}<contributor>\end{math} é onde se pode encontrar a informação relativa ao autor da página. 
-Quando dentro da tag contributor é apanhada pelo flex o texto "<username>" passa-se a tag  \begin{math}<username>\end{math}.
-Se a tag \begin{math}</contributor>\end{math} é apanhada significa que chegou ao fim a informação do colaborador da página, onde depois voltamos para o estado anterior que neste caso e a revision. 
-
-No caso de encontrar o  username:
-\begin{verbatim}
 <username>"</username>"    BEGIN contributor;
 <username>[^<]*            pagina_set_autor(pag, yytext);
 \end{verbatim}
 
+Dentro da tag \texttt{contributor} apenas nos interessa encontrar o nome do utilizador que fez a revisão. Portanto mudamos de estado, lê-mos o nome de utilizador de forma semelhante ao título (mas sabendo que o texto alvo está dentro da tag \texttt{username}) e usamos a função \texttt{pagina\_set\_autor(pag, yytext)} para guardar a informação recolhida. Depois temos regras para retroceder nos estados até estarmos novamente na tag \texttt{revision}.
 
-A tag \begin{math}<username>\end{math} é onde está definido quem é o autor da página. Para armazenar o autor na página tem-se a função\begin{math}pagina\_set\_autor(Pagina* p, char* str)\end{math} que vai preencher o campo autor na estrutura da página.
 
-
-Para que depois de o flex possa voltar a analisar o resto do ficheiro existe a expressão de "</username>" para que depois volte a tag \begin{math}<contributor>\end{math}
+Seguem-se agora expressões que permitem identificar conteúdos dentro do texto principal da página.
 
 \begin{verbatim}
-<text>"</text>"     BEGIN revision;
+<revision>\<text.*?\>      BEGIN text;
+<text>"</text>"            BEGIN revision;
+<revision>"</revision>"    BEGIN page;
 \end{verbatim}
 
-Quando estamos neste caso significa que se está a processar o caso em que nós encontramos o fim do texto da página.
+Quando se está no estado revision, encontrando a tag \texttt{text} passamos ao estado que lhe corresponde e tem o mesmo nome. Esse estado termina quando se encontra a tag de término do elemento \texttt{text} do XML.
+
+Depois de ler informações do elemento \texttt{text}, sabemos que não se segue mais informação relevante sobre a página e, portanto, resta-nos encontrar a tag de fim do elemento \texttt{revision} e passar ao estado \texttt{page} onde iremos depois encontrar a tag que marca o fim do elemento \texttt{page}.
+
+Passamos agora a explicitar as expressões regulares que capturam informações sobre secções e hiperligações.
 
 
-No caso de encontrarmos as seguintes expressões, significa que todo o tipo de cabeçalhos da wikipédia estão a ser apanhados. Podem ser apanhados 5 tipos de cabeçalhos, em que o 1 é o cabeçalho principal e a partir daqui os próximos são os sub cabeçalhos.
+As seguintes expressões tratam de capturar informações sobre as secções da página:
 
 \begin{verbatim}
 
@@ -327,7 +316,35 @@ No caso de encontrarmos as seguintes expressões, significa que todo o tipo de c
 <text>\n\={4}       BEGIN head4;
 <text>\n\={5}       BEGIN head5;
 <text>\n\={6}       BEGIN head6;
+
+<head1>[^\=]+  pagina_add_seccao(pag, seccao_create(yytext, 1));
+<head2>[^\=]+  pagina_add_seccao(pag, seccao_create(yytext, 2));
+<head3>[^\=]+  pagina_add_seccao(pag, seccao_create(yytext, 3));
+<head4>[^\=]+  pagina_add_seccao(pag, seccao_create(yytext, 4));
+<head5>[^\=]+  pagina_add_seccao(pag, seccao_create(yytext, 5));
+<head6>[^\=]+  pagina_add_seccao(pag, seccao_create(yytext, 6));
+
+<head1>\={1}                        BEGIN text;
+<head2>\={2}                        BEGIN text;
+<head3>\={3}                        BEGIN text;
+<head4>\={4}                        BEGIN text;
+<head5>\={5}                        BEGIN text;
+<head6>\={4}                        BEGIN text;
 \end{verbatim}
+
+Podem ser apanhados 5 tipos de cabeçalhos, em que o 1 é o cabeçalho principal e a partir daqui os próximos são os sub cabeçalhos. A utilização do cabeçalho 1 é desaconselhada visto que é o formato utilizado para o título da página, mas incluí-mo-lo de qualquer forma.
+
+A função \texttt{pagina_add_seccao} adiciona uma secção com o tipo especificado 
+
+
+
+
+
+
+
+
+
+
 
 No caso de encontrar no texto "[[File:" ou "[[Image:" não é feita qualquer acção de tratamento por parte do flex. No entanto quando temos "[[" significa que foi apanhado um link.
 
@@ -348,7 +365,7 @@ No caso dos links externos, apanha-se o "[", de seguida apanha o URI até encont
                     }
 \end{verbatim}
 
-Quando é  encontrado pelo flex a expressão exposta em cima, tem-se que é inicializado um hlink através de \begin{math} hlink\_create() \end{math}, depois é adicionado a lista de links da página  \begin{math} paginas\_add(Elemento* ps, Pagina* p)\end{math}. Por fim  é necessário indicar qual o uri que o link tem, usando a função  \begin{math} hlink\_set\_uri(HLink* hlink, char* str)\end{math}.
+Quando é  encontrado pelo flex a expressão exposta em cima, tem-se que é inicializado um hlink através de \texttt{ hlink\_create() }, depois é adicionado a lista de links da página  \texttt{ paginas\_add(Elemento* ps, Pagina* p)}. Por fim  é necessário indicar qual o uri que o link tem, usando a função  \texttt{ hlink\_set\_uri(HLink* hlink, char* str)}.
 
 
 
@@ -358,7 +375,7 @@ Quando é  encontrado pelo flex a expressão exposta em cima, tem-se que é inic
 
 \end{verbatim}
 
-O hlink2 é onde se vai ver onde é que o hlink acaba, pois pode dar-se o caso de o hlink possuir texto para substituir o endereço em si, e para isso existe a seguinte expressão para apanhar o resto do texto. Depois de apanhado todo o texto até ao "]]" para adicionar ao hlink o resto da informação existe a função \begin{math} hlink\_set\_texto(HLink* hlink, char* str) \end{math} para isso.
+O hlink2 é onde se vai ver onde é que o hlink acaba, pois pode dar-se o caso de o hlink possuir texto para substituir o endereço em si, e para isso existe a seguinte expressão para apanhar o resto do texto. Depois de apanhado todo o texto até ao "]]" para adicionar ao hlink o resto da informação existe a função \texttt{ hlink\_set\_texto(HLink* hlink, char* str) } para isso.
 
 Nas descrições que se seguem, vão ser descritos como é que os links internos das páginas são apanhados e tratados.
 Quando se fala de links internos, existem vários tipos que foram definidos como sendo:
@@ -381,21 +398,21 @@ Vai ser explicado como é que cada tipo é apanhado.
 \end{verbatim}
 
 
-Quando é apanhada a expressão regular acima significa que foi apanhado um link que é formado como sendo \begin{math}[[Category:Salts]]\end{math} depois o link apanhar vai inicializar a estrutura de links internos \begin{math} ilink\_create() \end{math} e depois vai definir que existe um link e vai armazenar o texto relativo ao link.
+Quando é apanhada a expressão regular acima significa que foi apanhado um link que é formado como sendo \texttt{[[Category:Salts]]} depois o link apanhar vai inicializar a estrutura de links internos \texttt{ ilink\_create() } e depois vai definir que existe um link e vai armazenar o texto relativo ao link.
 
 \begin{verbatim}
 <ilink1>[^\]\(,\|]+    { ilink = ilink_create();
                        ilink_set_texto(ilink, yytext);
                        BEGIN ilink2;}
 \end{verbatim}
-Esta expressão regular apanha um link internos que seja da seguinte forma :\begin{math}[[Salts]]\end{math}, onde o que se encontra dentro do parênteses é o link em si. Depois de termos o link definido chamamos as função \begin{math} ilink\_create() \end{math} para inicialização do link e  \begin{math}ilink\_set\_texto(ilink, yytext)\end{math} para guardar o link na estrutura de links internos (Ilink).
+Esta expressão regular apanha um link internos que seja da seguinte forma :\texttt{[[Salts]]}, onde o que se encontra dentro do parênteses é o link em si. Depois de termos o link definido chamamos as função \texttt{ ilink\_create() } para inicialização do link e  \texttt{ilink\_set\_texto(ilink, yytext)} para guardar o link na estrutura de links internos (Ilink).
 
 
 \begin{verbatim}
 
 <ilink2,ilink3>\]      {BEGIN ilink4;}
 \end{verbatim}
-Este caso existe para que caso o flex se encontre na condição de contexto \begin{math}<ilink2>\end{math} ou \begin{math}<ilink3>\end{math} e a seguir exista "]" o flex vai entrar na condiçãode contexto \begin{math}ilink4\end{math}
+Este caso existe para que caso o flex se encontre na condição de contexto \texttt{<ilink2>} ou \texttt{<ilink3>} e a seguir exista "]" o flex vai entrar na condiçãode contexto \texttt{ilink4}
 
 
 \begin{verbatim}
@@ -403,7 +420,7 @@ Este caso existe para que caso o flex se encontre na condição de contexto \beg
 \end{verbatim}
 
 
-Neste ponto significa que existe no link2 mais alguma coisa, isto é o link e do formato \begin{math}[[Crystallite|grain boundaries]]\end{math}, pois o link possui um pipe e para tratar o pipe o flex vai para a condição de contexto link3, onde depois vai analisar o resto do link. 
+Neste ponto significa que existe no link2 mais alguma coisa, isto é o link e do formato \texttt{[[Crystallite|grain boundaries]]}, pois o link possui um pipe e para tratar o pipe o flex vai para a condição de contexto link3, onde depois vai analisar o resto do link. 
 
 
 \begin{verbatim}
@@ -413,7 +430,7 @@ Neste ponto significa que existe no link2 mais alguma coisa, isto é o link e do
 
 \end{verbatim}
 
-Neste caso está a ser apanhado um link que pode ter a seguinte estrutura \begin{math}[[Opacity (optics)]]\end{math}. Depois de termos o link,  transforma-se para numa string dai o '\\0'.
+Neste caso está a ser apanhado um link que pode ter a seguinte estrutura \texttt{[[Opacity (optics)]]}. Depois de termos o link,  transforma-se para numa string dai o '\\0'.
 Após termos o link vai-se guardar o texto do yytext na estrutura dos links internos (Ilink), mas como não sabemos se o link pode ter mais informação o flex vai a condição de contexto ilink4 "fazer" essa verificação. 
 
 \begin{verbatim}
@@ -423,7 +440,7 @@ Após termos o link vai-se guardar o texto do yytext na estrutura dos links inte
 \end{verbatim}
 
 
-Quando existe uma expressão regular deste género significa que o link pode ter o seguinte formato \begin{math}[[Opacity ((optics))|]]\end{math} que quando analisado em profundo concluiu-se que o link é válido por isso era necessário ver a quantidade de parênteses que o link "trazia".
+Quando existe uma expressão regular deste género significa que o link pode ter o seguinte formato \texttt{[[Opacity ((optics))|]]} que quando analisado em profundo concluiu-se que o link é válido por isso era necessário ver a quantidade de parênteses que o link "trazia".
 Depois de a totalidade do link ser capturada usou-se a função para o armazenar na estrutura definida para os ilinks.
 
 \begin{verbatim}
@@ -432,15 +449,15 @@ Depois de a totalidade do link ser capturada usou-se a função para o armazenar
                          BEGIN ilink3;}
 \end{verbatim}
 
-Esta expressão serve para apanhar os links internos onde a sua estrutura pode ter a forma \begin{math}[[Opacity ((optics|]]\end{math}, por isso era necessário garantir que os parênteses eram apanhados, pois o link é válido. 
-Depois do link apanhado é tratado com a função \begin{math} ilink\_set\_parenteses(ilink, yytext)\end{math} que adiciona o link à estrutura de dados dos ilinks, como o link esta guardado o flex vai para ilink3 para continuar o tratamento dos links.
+Esta expressão serve para apanhar os links internos onde a sua estrutura pode ter a forma \texttt{[[Opacity ((optics|]]}, por isso era necessário garantir que os parênteses eram apanhados, pois o link é válido. 
+Depois do link apanhado é tratado com a função \texttt{ ilink\_set\_parenteses(ilink, yytext)} que adiciona o link à estrutura de dados dos ilinks, como o link esta guardado o flex vai para ilink3 para continuar o tratamento dos links.
 
 \begin{verbatim}
 <ilink2>\([^\]\)\|]+\]   {yytext[ strlen(yytext)-1 ] = '\0';
                         ilink_set_parenteses(ilink, yytext);
                         BEGIN ilink4;}
 \end{verbatim}
-Por fim quando o flex entra nesta condição de contexto, significa que foi encontrado um link \begin{math}([[Opacity (optics)|texto]])\end{math} em que temos o link, mas esse link possui um texto para a substituição do endereço do link.
+Por fim quando o flex entra nesta condição de contexto, significa que foi encontrado um link \texttt{([[Opacity (optics)|texto]])} em que temos o link, mas esse link possui um texto para a substituição do endereço do link.
 Neste caso, o link possui mais informação, dai o BEGIN ilink4, pois é necessário apanhar o texto que existe depois dos parênteses.
 
 \begin{verbatim}
@@ -448,9 +465,9 @@ Neste caso, o link possui mais informação, dai o BEGIN ilink4, pois é necess�
                        ilink_set_virgula(ilink, yytext);
                        BEGIN ilink4;}
 \end{verbatim}
-A este caso existe um link \begin{math}[[Opacity, texto apanhar ]]\end{math} em que o que se encontra a seguir a virgula não é apanhado, o que é apenas apanhado é o que neste exemplo é o "Opacity".
+A este caso existe um link \texttt{[[Opacity, texto apanhar ]]} em que o que se encontra a seguir a virgula não é apanhado, o que é apenas apanhado é o que neste exemplo é o "Opacity".
 
-Como temos um link como uma virgula foi necessário ter um função que trata-se este caso em especifico daí a função \begin{math} ilink\_set\_virgula(ilink, yytext)\end{math}
+Como temos um link como uma virgula foi necessário ter um função que trata-se este caso em especifico daí a função \texttt{ ilink\_set\_virgula(ilink, yytext)}
 
 \begin{verbatim}
 <ilink2>,[^\]\|]*\|    {yytext[ strlen(yytext)-1 ] = '\0';
@@ -458,7 +475,7 @@ Como temos um link como uma virgula foi necessário ter um função que trata-se
                        BEGIN ilink3;}
 \end{verbatim}
 
-Quando a expressão regular é apanhada significa que o link em causa tem a forma de: \begin{math}[[Opacity, texto a apanhar| texto]] \end{math}, onde o texto que se encontra a seguir ao pipe vais substituir o texto que apresentado para esse link.
+Quando a expressão regular é apanhada significa que o link em causa tem a forma de: \texttt{[[Opacity, texto a apanhar| texto]] }, onde o texto que se encontra a seguir ao pipe vais substituir o texto que apresentado para esse link.
 
 \begin{verbatim}
 <ilink3>[^\]]*\]       {yytext[ strlen(yytext)-1 ] = '\0';
@@ -487,26 +504,7 @@ Esta expressão só é apanhada apara que os links que não entrem expressões a
 
 
 
-\begin{verbatim}
-<head1>[^\=]+  pagina_add_seccao(pag, seccao_create(yytext, 1));
-<head2>[^\=]+  pagina_add_seccao(pag, seccao_create(yytext, 2));
-<head3>[^\=]+  pagina_add_seccao(pag, seccao_create(yytext, 3));
-<head4>[^\=]+  pagina_add_seccao(pag, seccao_create(yytext, 4));
-<head5>[^\=]+  pagina_add_seccao(pag, seccao_create(yytext, 5));
-<head6>[^\=]+  pagina_add_seccao(pag, seccao_create(yytext, 6));
-\end{verbatim}
-As expressões que se encontram em cima são as responsáveis para fechar a expressão que permite apanhar o headers, e chama a respetiva função que os vais guardar na estrutura de dados das secções. Os headers são definidos de 1 a 6. em que cada função esta definida para um próprio header. 
 
-\begin{verbatim}
-<head1>\={1}                        BEGIN text;
-<head2>\={2}                        BEGIN text;
-<head3>\={3}                        BEGIN text;
-<head4>\={4}                        BEGIN text;
-<head5>\={5}                        BEGIN text;
-<head6>\={4}                        BEGIN text;
-
-\end{verbatim}
-Já as estas expressões servem para depois de os headers serem apanhados, voltar a text.
 
 \begin{verbatim}
 <*>. ;
@@ -515,7 +513,7 @@ Já as estas expressões servem para depois de os headers serem apanhados, volta
 
 Por fim estas expressões regulares, permitem que toda a informação que não foi tratada nas expressões acima, seja filtrada do resultado final do flex.
 
-Quando o flex acaba de executar ele chama por si a função \begin{math} yywrap()\end{math} que é executada no fim do flex executar.
+Quando o flex acaba de executar ele chama por si a função \texttt{ yywrap()} que é executada no fim do flex executar.
 No entanto a função neste contexto foi utilizada para que no fim do flex executar libertar toda a memória que foi usada para a alocação das estruturas e da informação para as estruturas.
 
 \begin{verbatim}
