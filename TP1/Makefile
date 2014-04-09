@@ -9,7 +9,7 @@ nawp: lex.yy.o ilink.o hlink.o pagina.o paginas.o seccao.o
 	$(CC) $^ -ll -o $@
 
 lex.yy.c: nawp.l
-	flex nawp.l
+	$(FLEX) nawp.l
 
 lex.yy.o: lex.yy.c 
 	$(CC) -c -ll lex.yy.c

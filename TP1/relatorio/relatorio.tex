@@ -309,7 +309,6 @@ Passamos agora a explicitar as expressões regulares que capturam informações 
 As seguintes expressões tratam de capturar informações sobre as secções da página:
 
 \begin{verbatim}
-
 <text>\n\=          BEGIN head1;
 <text>\n\={2}       BEGIN head2;
 <text>\n\={3}       BEGIN head3;
@@ -334,24 +333,129 @@ As seguintes expressões tratam de capturar informações sobre as secções da 
 
 Podem ser apanhados 5 tipos de cabeçalhos, em que o 1 é o cabeçalho principal e a partir daqui os próximos são os sub cabeçalhos. A utilização do cabeçalho 1 é desaconselhada visto que é o formato utilizado para o título da página, mas incluí-mo-lo de qualquer forma.
 
-A função \texttt{pagina_add_seccao} adiciona uma secção com o tipo especificado 
+A função \texttt{seccao\_create(char* str, int indentacao)} cria uma nova \texttt{Seccao} com o texto e tipo especificado e a função \texttt{pagina\_add\_seccao(Pagina* pagina, Seccao* seccao)} adiciona a secção à página.
+
+O ultimo conjunto de regras faz com que se volte ao estado anterior (\texttt{texto}) depois de interpretar um cabeçalho de secção.
 
 
 
+Relativamente às próximas regras, quando se encontra \texttt{[[} significa que temos um link interno que deve ser interpretado. Exceções a esta regra são links especiais começados por \texttt{[[File:} ou \texttt{[[Image:}, que não correspondem simplesmente a hiperligações, mas a conteúdos multimédia. Nos casos especiais pretende-se ignorar a tag de início do link para permitir a captura de links que estejam na descrição dos conteúdos multimédia.
 
-
-
-
-
-
-
-
-No caso de encontrar no texto "[[File:" ou "[[Image:" não é feita qualquer acção de tratamento por parte do flex. No entanto quando temos "[[" significa que foi apanhado um link.
+A estrutura do link externo consiste apenas num conjunto de strings que permitem depois identificar as várias partes do link que foram capturadas. Esta estrutura pode ser consultada 
 
 \begin{verbatim}
 <text>"[[File:"     ;
 <text>"[[Image:"    ;
 <text>"[[":?        BEGIN ilink1;
+\end{verbatim}
+
+Ao ser encontrada uma hiperligação interna, o programa segue uma sequência de estados conforme identifica mais características do link.
+\begin{verbatim}
+<ilink1>[a-zA-Z]+:[^\]\(,\|]+  {ilink = ilink_create();
+                                ilink_set_especial(ilink, yytext); 
+                                BEGIN ilink2;}
+\end{verbatim}
+
+Quando é apanhada a expressão regular acima significa que foi apanhado um link que começa como, por exemplo, o link \texttt{[[Category:Salts]]}. Neste caso iria ser criado um novo link (com a função \texttt{ilink\_create()}) e a função \texttt{ilink\_set\_especial(ILink* ilink, char* str)} atribuiria a string \texttt{"Category"} ao campo \texttt{especial} e a string \texttt{"Salts"} ao campo \texttt{texto}.
+
+
+\begin{verbatim}
+<ilink1>[^\]\(,\|]+   {ilink = ilink_create();
+                       ilink_set_texto(ilink, yytext);
+                       BEGIN ilink2;}
+\end{verbatim}
+
+Quando é apanhada a expressão regular acima significa que foi apanhado um link que começa como, por exemplo, \texttt{[[Salts]]}. Neste caso iria ser criado um novo link (com a função \texttt{ilink\_create()}) e a função \texttt{ilink\_set\_texto(ILink* ilink, char* str)} atribuiria a string \texttt{"Salts"} ao campo \texttt{texto}.
+
+
+\begin{verbatim}
+<ilink2,ilink3>\]      {BEGIN ilink4;}
+\end{verbatim}
+
+Este caso existe porque em ambas as condições de contexto \texttt{ilink2} e \texttt{ilink3} é possível que o link termine. Qaundo isso acontece deve-se seguir para a condição de contexto \texttt{ilink4}.
+
+\begin{verbatim}
+<ilink2>\|               {BEGIN ilink3;}
+\end{verbatim}
+
+Ao estar na condição de contexto \texttt{ilink2} e encontrar o carácter \texttt{|} deve-se mudar para a condição de contexto \texttt{ilink3}, para capturar o que estiver entre o \texttt{|} e o fim do link.
+
+\begin{verbatim}
+<ilink2>\([^\]\)\|]+\)\]  {yytext[ strlen(yytext)-1 ] = '\0';
+                           ilink_set_parenteses(ilink, yytext);
+                           BEGIN ilink4;}
+<ilink2>\([^\]\)\|]+\)\|  {yytext[ strlen(yytext)-1 ] = '\0';
+                           ilink_set_parenteses(ilink, yytext);
+                           BEGIN ilink3;}
+\end{verbatim}
+
+Ambas estas expressões capturam texto que esteja entre parenteses. A título de exemplo, a primeira expressão faria \emph{match} com o link \texttt{[[Opacity (optics)]]} e no campo \texttt{parenteses} ficaria a string \texttt{"(optics)"}.
+
+Em ambos os casos elimina-se o ultimo carácter da string \texttt{yytext} antes de se chamar a função para guardar o texto, visto que não temos interesse em guardar o \texttt{|} ou \texttt{]}.
+
+A diferença entre as duas expressões está no ultimo carácter, que no primeiro caso indica que o link terminou e no segundo caso indica que ainda haverá um texto a capturar antes de chegar ao fim do link.
+
+\begin{verbatim}
+<ilink2>,[^\]\|]*\]    {yytext[ strlen(yytext)-1 ] = '\0';
+                       ilink_set_virgula(ilink, yytext);
+                       BEGIN ilink4;}
+<ilink2>,[^\]\|]*\|    {yytext[ strlen(yytext)-1 ] = '\0';
+                       ilink_set_virgula(ilink, yytext);
+                       BEGIN ilink3;}
+\end{verbatim}
+
+Estas expressões são muito semelhantes, em termos de funcionalidade, às duas expressões anteriores. A diferença está que estas capturam links como \texttt{[[Seattle, Washington]]} e colocam no campo \texttt{virgula} do ILink a string \texttt{",\_Washington"}.
+
+
+
+
+[[Crystallite|grain boundaries]]
+\begin{verbatim}
+<ilink2>\([^\]\)\|]+\|   {yytext[ strlen(yytext)-1 ] = '\0';
+                         ilink_set_parenteses(ilink, yytext);
+                         BEGIN ilink3;}
+<ilink2>\([^\]\)\|]+\]   {yytext[ strlen(yytext)-1 ] = '\0';
+                        ilink_set_parenteses(ilink, yytext);
+                        BEGIN ilink4;}
+\end{verbatim}
+
+Esta expressão serve para apanhar os links internos com a forma \texttt{[[Opacity (optics]]} (que não têm o fecho dos parênteses curvos). É necessário garantir que este link é capturado corretamente, pois é válido.
+
+De resto, modo de tratamento desta captura é em tudo semelhante ao tratamento de links do tipo \texttt{[[Opacity (optics)]]}.
+
+
+
+\begin{verbatim}
+<ilink3>[^\]]*\]       {yytext[ strlen(yytext)-1 ] = '\0';
+                       ilink_set_apresentar(ilink, yytext);
+                       BEGIN ilink4;}
+\end{verbatim}
+
+Quando esta condição de contexto é atingida e esta expressão regular é capturada significa que o link em causa tem a forma de \texttt{[[Salt (chemistry)|]]} ou \texttt{[[Salting (food)|salting]]}.
+
+O texto que se encontra entre o \texttt{|} e o fim do link (\texttt{]]}) será colocado no campo \texttt{apresentar} do \texttt{ILink}. Desta forma, ao converter o ILink para formato HTML conseguimos identificar se não deve ser feita qualquer substituição (quando \texttt{apresentar == NULL}), se deve ser feita uma substituição automática (quando \texttt{apresentar == ""}) ou se deve ser feita uma substituição direta (nos restantes casos).
+
+Para os links de exemplo, o campo \texttt{apresentar} do \texttt{ILink} ficaria com a string \texttt{""} (vazia) ou \texttt{"salting"}, respetivamente.
+
+\begin{verbatim}
+<ilink4>\][a-zA-Z]*    {ilink_set_resto(ilink, yytext+1);
+                       pagina_add_ilink(pag, ilink);
+                       BEGIN text;}
+\end{verbatim}
+
+Esta expressão captura o resto do texto do link. Após guardar este resultado, pode-se acrescentar o \texttt{ILink} à lista ligada \texttt{iLinks} da \texttt{pag} (página atual).
+
+A função \texttt{ilink\_set\_resto} só tem um efeito em links como \texttt{[[tonne]]s}, que, neste caso, é um link para a página \texttt{tonne} que deve ter o texto \texttt{tonnes}.
+
+
+\begin{verbatim}
+<ilink1,ilink2,ilink3>.             ;
+\end{verbatim}
+
+Esta expressão serve para ignorar tudo aquilo que não for apanhado pelas outras expressões de hiperligações internas.
+
+
+\begin{verbatim}
 <text>"["           BEGIN hlink1;
 \end{verbatim}
 
@@ -367,12 +471,9 @@ No caso dos links externos, apanha-se o "[", de seguida apanha o URI até encont
 
 Quando é  encontrado pelo flex a expressão exposta em cima, tem-se que é inicializado um hlink através de \texttt{ hlink\_create() }, depois é adicionado a lista de links da página  \texttt{ paginas\_add(Elemento* ps, Pagina* p)}. Por fim  é necessário indicar qual o uri que o link tem, usando a função  \texttt{ hlink\_set\_uri(HLink* hlink, char* str)}.
 
-
-
 \begin{verbatim}
 <hlink2>\ [^\]]+    hlink_set_texto(hlink, yytext+1);
 <hlink2>\]          BEGIN text;
-
 \end{verbatim}
 
 O hlink2 é onde se vai ver onde é que o hlink acaba, pois pode dar-se o caso de o hlink possuir texto para substituir o endereço em si, e para isso existe a seguinte expressão para apanhar o resto do texto. Depois de apanhado todo o texto até ao "]]" para adicionar ao hlink o resto da informação existe a função \texttt{ hlink\_set\_texto(HLink* hlink, char* str) } para isso.
@@ -387,122 +488,6 @@ Quando se fala de links internos, existem vários tipos que foram definidos como
 \item apresentar;
 \item resto;
 \end{itemize}
-
-
-Vai ser explicado como é que cada tipo é apanhado.
-
-\begin{verbatim}
-<ilink1>[a-zA-Z]+:[^\]\(,\|]+  { ilink = ilink_create();
-                       ilink_set_especial(ilink, yytext); 
-                       BEGIN ilink2;}
-\end{verbatim}
-
-
-Quando é apanhada a expressão regular acima significa que foi apanhado um link que é formado como sendo \texttt{[[Category:Salts]]} depois o link apanhar vai inicializar a estrutura de links internos \texttt{ ilink\_create() } e depois vai definir que existe um link e vai armazenar o texto relativo ao link.
-
-\begin{verbatim}
-<ilink1>[^\]\(,\|]+    { ilink = ilink_create();
-                       ilink_set_texto(ilink, yytext);
-                       BEGIN ilink2;}
-\end{verbatim}
-Esta expressão regular apanha um link internos que seja da seguinte forma :\texttt{[[Salts]]}, onde o que se encontra dentro do parênteses é o link em si. Depois de termos o link definido chamamos as função \texttt{ ilink\_create() } para inicialização do link e  \texttt{ilink\_set\_texto(ilink, yytext)} para guardar o link na estrutura de links internos (Ilink).
-
-
-\begin{verbatim}
-
-<ilink2,ilink3>\]      {BEGIN ilink4;}
-\end{verbatim}
-Este caso existe para que caso o flex se encontre na condição de contexto \texttt{<ilink2>} ou \texttt{<ilink3>} e a seguir exista "]" o flex vai entrar na condiçãode contexto \texttt{ilink4}
-
-
-\begin{verbatim}
-<ilink2>\|               {BEGIN ilink3;}
-\end{verbatim}
-
-
-Neste ponto significa que existe no link2 mais alguma coisa, isto é o link e do formato \texttt{[[Crystallite|grain boundaries]]}, pois o link possui um pipe e para tratar o pipe o flex vai para a condição de contexto link3, onde depois vai analisar o resto do link. 
-
-
-\begin{verbatim}
-<ilink2>\([^\]\)\|]+\)\]  {yytext[ strlen(yytext)-1 ] = '\0';
-                          ilink_set_parenteses(ilink, yytext);
-                          BEGIN ilink4;}
-
-\end{verbatim}
-
-Neste caso está a ser apanhado um link que pode ter a seguinte estrutura \texttt{[[Opacity (optics)]]}. Depois de termos o link,  transforma-se para numa string dai o '\\0'.
-Após termos o link vai-se guardar o texto do yytext na estrutura dos links internos (Ilink), mas como não sabemos se o link pode ter mais informação o flex vai a condição de contexto ilink4 "fazer" essa verificação. 
-
-\begin{verbatim}
-<ilink2>\([^\]\)\|]+\)\|  {yytext[ strlen(yytext)-1 ] = '\0';
-                         ilink_set_parenteses(ilink, yytext);
-                         BEGIN ilink3;}
-\end{verbatim}
-
-
-Quando existe uma expressão regular deste género significa que o link pode ter o seguinte formato \texttt{[[Opacity ((optics))|]]} que quando analisado em profundo concluiu-se que o link é válido por isso era necessário ver a quantidade de parênteses que o link "trazia".
-Depois de a totalidade do link ser capturada usou-se a função para o armazenar na estrutura definida para os ilinks.
-
-\begin{verbatim}
-<ilink2>\([^\]\)\|]+\|   {yytext[ strlen(yytext)-1 ] = '\0';
-                         ilink_set_parenteses(ilink, yytext);
-                         BEGIN ilink3;}
-\end{verbatim}
-
-Esta expressão serve para apanhar os links internos onde a sua estrutura pode ter a forma \texttt{[[Opacity ((optics|]]}, por isso era necessário garantir que os parênteses eram apanhados, pois o link é válido. 
-Depois do link apanhado é tratado com a função \texttt{ ilink\_set\_parenteses(ilink, yytext)} que adiciona o link à estrutura de dados dos ilinks, como o link esta guardado o flex vai para ilink3 para continuar o tratamento dos links.
-
-\begin{verbatim}
-<ilink2>\([^\]\)\|]+\]   {yytext[ strlen(yytext)-1 ] = '\0';
-                        ilink_set_parenteses(ilink, yytext);
-                        BEGIN ilink4;}
-\end{verbatim}
-Por fim quando o flex entra nesta condição de contexto, significa que foi encontrado um link \texttt{([[Opacity (optics)|texto]])} em que temos o link, mas esse link possui um texto para a substituição do endereço do link.
-Neste caso, o link possui mais informação, dai o BEGIN ilink4, pois é necessário apanhar o texto que existe depois dos parênteses.
-
-\begin{verbatim}
-<ilink2>,[^\]\|]*\]    {yytext[ strlen(yytext)-1 ] = '\0';
-                       ilink_set_virgula(ilink, yytext);
-                       BEGIN ilink4;}
-\end{verbatim}
-A este caso existe um link \texttt{[[Opacity, texto apanhar ]]} em que o que se encontra a seguir a virgula não é apanhado, o que é apenas apanhado é o que neste exemplo é o "Opacity".
-
-Como temos um link como uma virgula foi necessário ter um função que trata-se este caso em especifico daí a função \texttt{ ilink\_set\_virgula(ilink, yytext)}
-
-\begin{verbatim}
-<ilink2>,[^\]\|]*\|    {yytext[ strlen(yytext)-1 ] = '\0';
-                       ilink_set_virgula(ilink, yytext);
-                       BEGIN ilink3;}
-\end{verbatim}
-
-Quando a expressão regular é apanhada significa que o link em causa tem a forma de: \texttt{[[Opacity, texto a apanhar| texto]] }, onde o texto que se encontra a seguir ao pipe vais substituir o texto que apresentado para esse link.
-
-\begin{verbatim}
-<ilink3>[^\]]*\]       {yytext[ strlen(yytext)-1 ] = '\0';
-                       ilink_set_apresentar(ilink, yytext);
-                       BEGIN ilink4;}
-\end{verbatim}
-
-
-Esta expressão é onde os links são apanhados para depois serem convertidos em strings e armazenados na estrutura de dados dos ilinks, ficando com a formatação como que depois serão tratados para aparecerem no html.
-
-\begin{verbatim}
-<ilink4>\][a-zA-Z]*    {ilink_set_resto(ilink, yytext+1);
-                       pagina_add_ilink(pag, ilink);
-                       BEGIN text;}
-\end{verbatim}
-
-Nesta expressão vai apanhar o resto do texto do link, e como o link quando aqui já esta na sua totalidade pode-se então guardar a estrutura dos links na página correspondente.
-
-
-\begin{verbatim}
-<ilink1,ilink2,ilink3>.             ;
-\end{verbatim}
-
-
-Esta expressão só é apanhada apara que os links que não entrem expressões acima sejam filtrados pelo flex. 
-
-
 
 
 
@@ -952,7 +937,7 @@ nawp: lex.yy.o ilink.o hlink.o pagina.o paginas.o seccao.o
 	$(CC) $^ -ll -o $@
 
 lex.yy.c: nawp.l
-	flex nawp.l
+	$(FLEX) nawp.l
 
 lex.yy.o: lex.yy.c 
 	$(CC) -c -ll lex.yy.c
