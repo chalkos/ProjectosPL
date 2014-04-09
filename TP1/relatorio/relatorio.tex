@@ -459,7 +459,17 @@ Esta expressão serve para ignorar tudo aquilo que não for apanhado pelas outra
 <text>"["           BEGIN hlink1;
 \end{verbatim}
 
-No caso dos links externos, apanha-se o "[", de seguida apanha o URI até encontrar um "]" ou um espaço. Se encontrar um espaço tudo o que venha até a "]"  é o texto que se vai filtrar.
+
+
+Os links externos são mais simples de identificar que os internos. Os links externos podem ter dois formatos:
+
+\begin{itemize}
+\item \texttt{[link]}
+\item \texttt{[link<espaço>texto do link]}
+\end{itemize}
+
+Assim sendo, captura-se o "[", e depois o URI até encontrar um "]" ou um espaço. Se encontrar um espaço tudo o que venha até a "]" é o texto que se vai mostrar.
+
 \begin{verbatim}
 <hlink1>[^\ \]]+    {/*leu o uri*/
                      hlink = hlink_create();
@@ -469,37 +479,27 @@ No caso dos links externos, apanha-se o "[", de seguida apanha o URI até encont
                     }
 \end{verbatim}
 
-Quando é  encontrado pelo flex a expressão exposta em cima, tem-se que é inicializado um hlink através de \texttt{ hlink\_create() }, depois é adicionado a lista de links da página  \texttt{ paginas\_add(Elemento* ps, Pagina* p)}. Por fim  é necessário indicar qual o uri que o link tem, usando a função  \texttt{ hlink\_set\_uri(HLink* hlink, char* str)}.
+Esta expressão serve para capturar o URI. Começa por adicionar o \texttt{HLink} à página atual e depois definir o campo \texttt{uri} do \texttt{HLink}.
+
+Segue-se o texto do link:
 
 \begin{verbatim}
 <hlink2>\ [^\]]+    hlink_set_texto(hlink, yytext+1);
 <hlink2>\]          BEGIN text;
 \end{verbatim}
 
-O hlink2 é onde se vai ver onde é que o hlink acaba, pois pode dar-se o caso de o hlink possuir texto para substituir o endereço em si, e para isso existe a seguinte expressão para apanhar o resto do texto. Depois de apanhado todo o texto até ao "]]" para adicionar ao hlink o resto da informação existe a função \texttt{ hlink\_set\_texto(HLink* hlink, char* str) } para isso.
-
-Nas descrições que se seguem, vão ser descritos como é que os links internos das páginas são apanhados e tratados.
-Quando se fala de links internos, existem vários tipos que foram definidos como sendo:
-\begin{itemize}
-\item special;
-\item texto;
-\item parênteses;
-\item virgula;
-\item apresentar;
-\item resto;
-\end{itemize}
-
-
+Estas expressões capturam o texto que estiver depois de um espaço no link externo. A \texttt{hlink\_set\_texto(HLink* hlink, char* str)} adiciona ao \texttt{hlink} a informação sobre o texto a mostrar no link.
 
 \begin{verbatim}
 <*>. ;
 <*>\n ;
 \end{verbatim}
 
-Por fim estas expressões regulares, permitem que toda a informação que não foi tratada nas expressões acima, seja filtrada do resultado final do flex.
+Por fim estas expressões regulares, permitem que toda a informação que não foi tratada nas expressões acima seja filtrada do resultado final do \emph{flex}.
 
-Quando o flex acaba de executar ele chama por si a função \texttt{ yywrap()} que é executada no fim do flex executar.
-No entanto a função neste contexto foi utilizada para que no fim do flex executar libertar toda a memória que foi usada para a alocação das estruturas e da informação para as estruturas.
+Quando o \emph{flex} chega ao fim do ficheiro é chamada função \texttt{yywrap()}.
+
+No nosso caso, esta função escreve a página HTML no \texttt{stdout} e depois liberta toda a memória alocada.
 
 \begin{verbatim}
 int yywrap(){
@@ -520,9 +520,8 @@ int yywrap(){
 \newpage
 \section{Conclusão}
 
-Após concluir todo o desenvolvimento deste projecto é fácil fazer um balanço de todo este precurso. Para além de ter sido um desafio implementar um programa de processamento da \textit{Wikipédia}, foi também aliciante concluir todo o trabalho.
-Ao longo do desenvolvimento do projeto o grupo desenvolveu competências em diversas ferramentas como C,HTML, XML, Flex, etc, que anteriormente eram poucas e até mesmo desconhecidas em alguns dos casos. 
-A utilização do Flex permitiu filtrar a informação mais relevante da página da \textit{Wikipédia} através do uso de expressões regulares. 
+Após concluir todo o desenvolvimento deste projecto é fácil fazer um balanço de todo este percurso. Para além de ter sido um desafio implementar um programa de processamento da \textit{Wikipédia}, foi também aliciante concluir o trabalho.
+Ao longo do desenvolvimento do projeto o grupo desenvolveu competências em diversas ferramentas como C, HTML, XML e Flex. 
 \newpage
 \section{Apêndices - Especificação do Flex}
 
