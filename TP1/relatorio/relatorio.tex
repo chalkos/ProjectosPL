@@ -98,8 +98,8 @@ Com este trabalho foi necessário implementar Expressões Regulares de modo a re
 Flex é uma ferramenta para gerar automáticamente analisadores léxicos, isto é, programas que reconhecem padrões léxicos num texto. O Flex é uma evolução da ferramenta Lex, mas com a caraterística de ser mais rápido que este (Fast Lex). Lex foi desenvolvido por M.E. Lesk e E. Shmidt (Bell Laboratories - ATT) enquanto que o Flex é um produto da Free Software Foundation, Inc. Como são comumente distribuídos em sistemas Unix a sua documentação encontra-se na forma de manual pages para as entradas lex, flex e flexdoc. Ao contrário do programador que escreve manualmene um programa que realize a identificação de padrões numa entrada, o uso do Flex/Lex permite que sejam apenas especificados os padrões desejados e as ações necessárias para processá-los. Para que Flex/Lex reconheçam padrões no texto, tais padrões devem ser descritos através de expressões regulares. A ferramenta Flex é ótima para a realização deste trabalho uma vez que nos permite analisar o contéudo específico, através de expressões regulares de determinada informação de texto.
 
 \subsection{Processamento da \textit{Wikipédia}}
-Neste primeiro trabalho de Processamento de Linguagens foi-nos proposto escolher um tema a escolha, de vários enunciados propostos. Após uma análise cuidada  de cada um deles o nosso grupo optou por escolher o tema de Processamento da \textit{Wikipédia}. Esta escolha reflete-se pelo grande impacto que a \textit{Wikipédia} tem no nosso dia-a-dia e é a principal enciclopédia livre com mais utilizadores. 
-O objectivo deste enunciado é criar um programa utilizando a ferramenta Flex que analise o contéudo de uma página XML da \textit{Wikipédia}, e que retire as informações relevantes dessa página como:
+Neste primeiro trabalho de Processamento de Linguagens foi-nos proposto escolher um tema à escolha, de vários enunciados propostos. Após uma análise de cada um deles, o nosso grupo optou por escolher o tema de Processamento da \textit{Wikipédia}. Esta escolha reflete-se pelo grande impacto que a \textit{Wikipédia} tem no nosso dia-a-dia e é a principal enciclopédia livre com mais utilizadores. 
+O objectivo deste projeto é criar um programa utilizando a ferramenta Flex que analise o contéudo de uma página XML da \textit{Wikipédia} e retire as informações página como:
 \begin{itemize}
 \item título,
 \item autor.
@@ -108,12 +108,14 @@ O objectivo deste enunciado é criar um programa utilizando a ferramenta Flex qu
 \item n.º de links externos
 \item n.º de secções 
 \end{itemize}
-e criar uma página HTML (para cada página XML) com essas informações. Para isso é necessário exportar uma ou mais páginas usando o \textit{Special Export} disponível em \textbf{http://pt.wikipedia.org/wiki/Especial:Exportar (ou \\http://en.wikipedia.org/wiki/Special:Export} para a versão inglesa.
+e criar uma página HTML com essas informações. Para isso é necessário exportar uma ou mais páginas usando o \textit{Special Export} disponível em \textbf{http://pt.wikipedia.org/wiki/Especial:Exportar (ou \\http://en.wikipedia.org/wiki/Special:Export} para a versão inglesa.
+
+De momento, a nossa aplicação apenas interpreta correctamente páginas da Wikipedia em inglês.
 \newpage
 
 \subsection{Enunciado}
 
-De uma maneira geral, para teste trabalho pretende-se desenvolver os seguintes pontos:
+De uma maneira geral, para este trabalho pretende-se desenvolver os seguintes pontos:
 \begin{itemize}
 \item Especificar padrões de frases que se quer encontrar no texto fonte através de ERs.
 \item Identificar as acções semânticas a realizar como reação ao reconhecimento de cada um desses padrões
@@ -123,7 +125,7 @@ De uma maneira geral, para teste trabalho pretende-se desenvolver os seguintes p
 
 \subsection{Descrição do Problema}
 
-Usando o \textbf{Especial Export} pretende-se exportar o contéudo da \textit{Wikipédia} e com o recurso do Flex implementar um processador de texto que deverá produzir, por cada página extraída do ficheiro XML, uma página \textbf{html} com as seguintes informações:
+Usando o \textbf{Especial Export} pretende-se exportar o contéudo da \textit{Wikipédia} e com o recurso do Flex implementar um processador de texto que deverá produzir uma página \textbf{html} com as seguintes informações sobre as páginas especificas no ficheiro XML:
 
 \begin{itemize}
 \item Título
@@ -143,7 +145,11 @@ Usando o \textbf{Especial Export} pretende-se exportar o contéudo da \textit{Wi
 
 Após termos analisado o ficheiro XML da \textit{Wikipédia} verificou-se que era necessário estruturar a informação encontrada nesses ficheiros. Essa informação é guardada em estruturas de dados que aqui vão ser expostas e explicadas. 
 
-Primeiramente, vamos apresentar a estrutura de dados que armazena a informação das páginas.
+Decidimos que se ia guardar a informação sobre as páginas e no fim toda a informação ia ser escrita como output do programa. Concordámos que a forma mais simples de manter a informação sobre as páginas é uma lista ligada. Cada página tem informações como o título e o autor, e conjuntos de hiperligações internas, hiperligações externas e secções. Estes conjuntos são todos de fácil representação com listas ligadas, assim sendo criámos uma lista ligada genérica (com void*) e usámos essa lista como suporte a todos os conjuntos de informação.
+
+O elemento da lista ligada genérica (do tipo Elemento) consiste apenas num apontador para os dados e num apontador para o próximo elemento da lista.
+No que diz respeito às páginas, o tipo do apontador dados é \emph{Pagina}, como é possível ver na seguinte imagem.
+
 \begin{figure}[h]
 \begin{center}
 \includegraphics[width=0.9\linewidth]{paginas}
@@ -151,8 +157,6 @@ Primeiramente, vamos apresentar a estrutura de dados que armazena a informação
 \end{center}
 \end{figure}
 
-
-Como podemos verificar esta estrutura é uma lista-ligada que armazena a informação das páginas.
 
 
 Para armazenar a informação dos componentes de cada página do XML, foi criado a seguinte estrutura de dados: \\
@@ -166,18 +170,18 @@ Para armazenar a informação dos componentes de cada página do XML, foi criado
 Cada página consiste numa estrutura com a informação relativa à mesma, como titulo, autor, ultRevisao, mas também existem apontadores para outras listas-ligadas como a lista de links internos, links externos e secções.
 
 
-Esses campos armazenam a seguinte informação:
+Nos campos de estrutura da página armazena-se a seguinte informação:
 \begin{itemize}
 
-\item \textit{titulo} guarda o título do documento \textit{Wikipédia};
+\item \textit{titulo} guarda o título da página da\textit{Wikipédia};
 \item \textit{autor} guarda o autor da página;
 \item \textit{ultRevisao} guarda a data da última revisão;
 \item \textit{nILinks} guarda o número de links internos encontrados;
 \item \textit{nHLinks} guarda o número de links externos encontrados;
 \item \textit{nSeccões} guarda o número de secções encontradas;
-\item \textit{iLikins} é o apontador para a estrutura Elemento, que guarda a informação dos links internos;
-\item \textit{hLinks} é o apontador para a estrutura Elemento, que guarda a informação dos links externos;
-\item \textit{seccoes} é apontador para a estrutura Elemento, que guarda a informação das secções da página;
+\item \textit{iLikins} é o apontador para a lista ligada, que guarda a informação dos links internos;
+\item \textit{hLinks} é o apontador para a lista ligada, que guarda a informação dos links externos;
+\item \textit{seccoes} é apontador para a lista ligada , que guarda a informação das secções da página;
 
 
 
