@@ -23,6 +23,11 @@ lex.yy.c
 *.out
 *.app
 nawp
+musica
+cabine
+calc
+ag
+tok
 
 # vagrant
 .vagrant
