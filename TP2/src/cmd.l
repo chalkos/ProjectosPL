@@ -23,8 +23,10 @@
 
 "quit"   return QUIT;
 "q"      return QUIT;
-"quit! " return FQUIT;
-"q! "    return FQUIT;
+"quit!" return FQUIT;
+"q!"    return FQUIT;
+
+<<EOF>>  return FQUIT;
 
 [\n]     return '\n';
 
@@ -41,5 +43,5 @@
 %%
 
 int cmdwrap(){
-    return 0;
+    return 1;
 }

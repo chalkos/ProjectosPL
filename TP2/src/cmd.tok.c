@@ -1,5 +1,4 @@
 #include <stdio.h>
-
 #include "cmd.tab.h"
 
 extern int cmdlex();

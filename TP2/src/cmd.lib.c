@@ -1,5 +1,7 @@
 #include "cmd.lib.h"
 #include <stdio.h>
+#include <stdlib.h>
+
 
 void cmd_config(char* ficheiro){
     printf("comando config (%s)\n", ficheiro);
@@ -22,9 +24,11 @@ void cmd_save(char* ficheiro, int force){
 }
 
 void cmd_quit(int force){
-    if( force ) 
+    if( force ){ 
         printf("comando quit (forced)\n");
-    else
+        exit(0);
+    }else{
         printf("comando quit\n");
+    }
 }
 

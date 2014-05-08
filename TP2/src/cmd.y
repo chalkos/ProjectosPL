@@ -5,12 +5,10 @@
 %}
 %union{ char* cmd_ficheiro; }
 %type <cmd_ficheiro> FICHEIRO
-%start Cmd
+%start Comandos
 %%
-Cmd : Comandos '$' { printf("Terminou\n"); };
-
 Comandos : Comandos '\n' Comando
-         | Comando
+         | 
          ;
 
 Comando : Config
