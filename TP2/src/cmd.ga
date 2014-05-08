@@ -1,0 +1,15 @@
+<ga>
+  Cmds -> cons_Cmds(Cmd Cmds)
+       |  cons_Cmds_NIL()
+       ;
+
+  Cmd -> cons_Cmd_Config(STR)
+      |  cons_Cmd_Load(STR)
+      |  cons_Cmd_Import(STR)
+      |  cons_Cmd_Save(STR)
+      |  cons_Cmd_FSave(STR)
+      |  cons_Cmd_Print()
+      |  cons_Cmd_Quit()
+      |  cons_Cmd_FQuit()
+      ;
+</ga>

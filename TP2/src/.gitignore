@@ -1,0 +1,9 @@
+# executáveis
+cmd
+cmdtok
+gabs
+
+# gerados
+*.o
+*.tab.[ch]
+lex.*.c
