@@ -159,7 +159,7 @@ void ilink_print(ILink* ilink){
 
 // liberta memória associada ao ilink
 void ilink_destroy(ILink** ilink){
-    ilink_print(*ilink);
+    //ilink_print(*ilink);
 
     free((*ilink)->texto);
     free((*ilink)->resto);

@@ -107,7 +107,7 @@ Neste primeiro trabalho de Processamento de Linguagens foi-nos proposto escolher
 \item n.º de links externos;
 \item n.º de secções.
 \end{itemize}
-e criar uma página HTML com essas informações. Para isso é necessário exportar uma ou mais páginas usando o \textit{Special Export} disponível em \textbf{http://pt.wikipedia.org/wiki/Especial:Exportar (ou \\http://en.wikipedia.org/wiki/Special:Export} para a versão inglesa.
+e criar uma página HTML com essas informações. Para isso é necessário exportar uma ou mais páginas usando o \textit{Special Export} disponível em \\\textbf{http://pt.wikipedia.org/wiki/Especial:Exportar} (ou \\\textbf{http://en.wikipedia.org/wiki/Special:Export} para a versão inglesa).
 
 De momento, a nossa aplicação apenas interpreta corretamente páginas da Wikipédia em inglês.
 \newpage
@@ -288,7 +288,7 @@ Segue-se a tag \texttt{contributor}:
 <username>[^<]*            pagina_set_autor(pag, yytext);
 \end{verbatim}
 
-Dentro da tag \texttt{contributor} apenas nos interessa encontrar o nome do utilizador que fez a revisão. Portanto mudamos de estado, lê-mos o nome de utilizador de forma semelhante ao título (mas sabendo que o texto alvo está dentro da tag \texttt{username}) e usamos a função \texttt{pagina\_set\_autor(pag, yytext)} para guardar a informação recolhida. Depois temos regras para retroceder nos estados até estarmos novamente na tag \texttt{revision}.
+Dentro da tag \texttt{contributor} apenas nos interessa encontrar o nome do utilizador que fez a revisão. Portanto mudamos de estado, lemos o nome de utilizador de forma semelhante ao título (mas sabendo que o texto alvo está dentro da tag \texttt{username}) e usamos a função \texttt{pagina\_set\_autor(pag, yytext)} para guardar a informação recolhida. Depois temos regras para retroceder nos estados até estarmos novamente na tag \texttt{revision}.
 
 
 Seguem-se agora expressões que permitem identificar conteúdos dentro do texto principal da página.
