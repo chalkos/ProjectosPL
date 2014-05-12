@@ -1,0 +1,16 @@
+<ga>
+  Confs -> cons_cfg_Confs(Conf Confs)
+        |  cons_cfg_Confs_NIL()
+        ;
+
+  Conf -> cons_cfg_Conf_Titulo(STR)
+       |  cons_cfg_Conf_Nprovas(INT)
+       |  cons_cfg_Conf_Ntop(INT)
+       |  cons_cfg_Conf_Campos(Lcampos)
+       |  cons_cfg_Conf_Score(INT)
+       ;
+
+  Lcampos -> cons_cfg_Lcampos_Lcampos(Lcampos INT)
+          |  cons_cfg_Lcampos_Campo(INT)
+          ;
+</ga>

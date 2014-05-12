@@ -7,7 +7,7 @@
 %type <cmd_ficheiro> FICHEIRO
 %start Comandos
 %%
-Comandos : Comandos '\n' Comando
+Comandos : Comando '\n' Comandos
          | 
          ;
 

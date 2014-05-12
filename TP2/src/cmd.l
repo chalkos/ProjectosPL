@@ -38,7 +38,7 @@
                  }
 
 [ \t] ;
-.       { /*printf("flex lixo: %c (%d)\n", *yytext, *yytext)*/; }
+.       { printf("flex lixo: %c (%d)\n", *yytext, *yytext); }
 
 %%
 
