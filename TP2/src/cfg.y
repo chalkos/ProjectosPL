@@ -20,7 +20,12 @@
 %type <cfg_conf> Configuracao
 %type <cfg_campos> Lcampos Campos
 %%
-Z : Configuracoes '$' { $$ = $1; cfg_Confs_print($$); exit(0); };
+Z : Configuracoes '$' { $$ = $1;
+                        cfg_Confs_validate($$);
+                        cfg_Confs_print($$);
+                        free_cfg_Confs($$);
+                        cfglex_destroy();
+                        exit(0); };
 
 Configuracoes : Configuracao '\n' Configuracoes {$$ = cons_cfg_Confs($1,$3);}
               | { $$ = cons_cfg_Confs_NIL(); }
@@ -29,14 +34,14 @@ Configuracoes : Configuracao '\n' Configuracoes {$$ = cons_cfg_Confs($1,$3);}
 Configuracao : Titulo  { $$ = cons_cfg_Conf_Titulo($1); }
              | Nprovas { $$ = cons_cfg_Conf_Nprovas($1); }
              | Ntop    { $$ = cons_cfg_Conf_Ntop($1); }
-             | Campos  { $$ = cons_cfg_Conf_Campos($1); }
              | Score   { $$ = cons_cfg_Conf_Score($1); }
+             | Campos  { $$ = cons_cfg_Conf_Campos($1); }
              ;
 
 Titulo  : TITULO str     { $$ = $2; };
 Nprovas : NPROVAS num    { $$ = $2; };
 Ntop    : NTOP num       { $$ = $2; };
-Campos  : CAMPOS Lcampos { $$ = $2; };
+Campos  : CAMPOS Lcampos { $$ = cfg_Lcampos_reverse( $2 ); }
 Score   : SCORE '$' num  { $$ = $3; };
 
 

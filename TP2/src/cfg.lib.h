@@ -2,11 +2,6 @@
 #define __CFG_LIB_H
 
 /* -----------------------------------
- * Custom Data Types Definition
- * -----------------------------------
- */
-
-/* -----------------------------------
  * Production Selectors
  * -----------------------------------
  */
@@ -102,6 +97,17 @@ struct sLcampos
  */
 
 void cfg_Confs_print( Confs cfgs );
+int cfg_Confs_validate( Confs cfgs );
+Lcampos cfg_Lcampos_reverse( Lcampos l );
+
+/* -----------------------------------
+ * Destructor Function Implementations
+ * -----------------------------------
+ */
+
+void free_cfg_Lcampos( Lcampos campos );
+void free_cfg_Conf( Conf cfg );
+void free_cfg_Confs( Confs cfgs );
 
 /* -----------------------------------
  * Constructor Function Signatures

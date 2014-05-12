@@ -13,8 +13,7 @@
 "=campos="  {BEGIN campos;     return CAMPOS;}
 "=score="   {BEGIN ler_numero; return SCORE;}
 
-<ler_string>[^\n]+ {cfglval.cfg_str = cfgtext;
-                    cfgtext[strlen(cfgtext)-1] = '\0';
+<ler_string>[^\n]+ {cfglval.cfg_str = strdup(cfgtext);
                     BEGIN 0;
                     return str;}
 <ler_numero>\$     return '$';
