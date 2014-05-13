@@ -84,16 +84,16 @@ void csv_print( Linhas lcsv ){
         ls = lcsv->u.d1.s1;
         switch (ls->flag){
             case PScons_csv_Linha_Fim:
-            cp = ls->u.d1.s2;
-            switch (cp->flag){
-                case PScons_csv_Campo:
-                    printf("Passo 1 ->%s\n",cp->u.d1.s1 );
-                    break ;
-                case PScons_csv_Campo_NIL:
-                    printf("Passo 2 -> {}\n");
-                    break;
-            }
-            break;
+                cp = ls->u.d2.s1;
+                switch (cp->flag){
+                    case PScons_csv_Campo:
+                        printf("Passo 1 ->%s\n",cp->u.d1.s1 );
+                        break ;
+                    case PScons_csv_Campo_NIL:
+                        printf("Passo 2 -> {}\n");
+                        break;
+                }
+              break;
 
             case PScons_csv_Linha:
                 while (ls->flag != PScons_csv_Linha_Fim){
@@ -162,3 +162,35 @@ Linha csv_Linha_reverse( Linha l ){
     aux = cons_csv_Linha (aux, c);
     return aux;
 }
+
+/* -----------------------------------
+ * Destructor Function Implementations
+ * -----------------------------------
+ */
+
+void free_csv_Campos (Campo cmp){
+    if (cmp->flag == PScons_csv_Campo)
+        free (cmp);
+}
+
+void free_csv_Linha (Linha l){
+    switch (l->flag){
+        case PScons_csv_Linha_Fim:
+            free_csv_Campos (l->u.d2.s1);
+            break;
+        case PScons_csv_Linha:
+            free_csv_Linha (l->u.d1.s1);
+            break;
+    }
+
+    free(l);
+}
+
+void free_csv_Linhas (Linhas lcsv){
+    if (lcsv->flag == PScons_csv_Linhas){
+       free_csv_Linha (lcsv -> u.d1.s1);
+       free_csv_Linhas(lcsv -> u.d1.s2); 
+    }
+    free (lcsv);
+}
+

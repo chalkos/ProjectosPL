@@ -99,6 +99,13 @@ Campo  cons_csv_Campo_NIL();
 void csv_print( Linhas csv );
 Linha csv_Linha_reverse( Linha l );
 
+/* -----------------------------------
+ * Destructor Function Implementations
+ * -----------------------------------
+ */
 
+void free_csv_Campos (Campo cmp);
+void free_csv_Linha (Linha l);
+void free_csv_Linhas (Linhas lcsv);
 
 #endif
