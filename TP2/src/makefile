@@ -63,6 +63,28 @@ cmd.tab.c cmd.tab.h : cmd.y cmd.lib.h
 lex.cmd.c : cmd.l
 	flex -Pcmd cmd.l
 
+
+#----------------\
+#  CsV          \
+#----------------´
+
+csv : csv.lib.o lex.csv.o csv.tab.o
+	gcc $(GDB) -o $@ $^ -ll
+
+csv.lib.o : csv.lib.c csv.lib.h
+	gcc $(GDB) -c csv.lib.c
+
+csv.tab.o : csv.tab.h csv.tab.c
+	gcc $(GDB) -c csv.tab.c
+
+lex.csv.o : lex.csv.c csv.tab.h
+	gcc $(GDB) -c lex.csv.c -ll
+
+csv.tab.c csv.tab.h : csv.y csv.lib.h
+	yacc -d -pcsv -bcsv csv.y
+
+lex.csv.c : csv.l
+	flex -Pcsv csv.l
 #----------------\
 #  Extras        \
 #----------------´
@@ -72,6 +94,7 @@ clean :
 	$(RM) gco
 	$(RM) cmd
 	$(RM) cfg
+	$(RM) csv
 	$(RM) *.o
 	$(RM) *.tab.[ch]
 	$(RM) lex.*.c
