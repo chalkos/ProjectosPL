@@ -29,24 +29,44 @@ Linhas  cons_csv_Linhas_NIL()
 }
 
 
-Linha  cons_csv_Linha_Campo( Linha a1, char * a2)
+Linha  cons_csv_Linha( Linha a1, Campo a2)
 {
     Linha aux0;
 
   aux0 = (Linha) malloc(sizeof(struct sLinha));
-  aux0->flag = PScons_csv_Linha_Campo;
+  aux0->flag = PScons_csv_Linha;
   aux0->u.d1.s1 = a1;
   aux0->u.d1.s2 = a2;
   return(aux0);
 }
 
-Linha  cons_csv_Campo( char * a1)
+Linha  cons_csv_Linha_Fim( Campo a1)
 {
     Linha aux0;
 
   aux0 = (Linha) malloc(sizeof(struct sLinha));
-  aux0->flag = PScons_csv_Campo;
+  aux0->flag = PScons_csv_Linha_Fim;
   aux0->u.d2.s1 = a1;
+  return(aux0);
+}
+
+
+Campo  cons_csv_Campo( char * a1)
+{
+    Campo aux0;
+
+  aux0 = (Campo) malloc(sizeof(struct sCampo));
+  aux0->flag = PScons_csv_Campo;
+  aux0->u.d1.s1 = a1;
+  return(aux0);
+}
+
+Campo  cons_csv_Campo_NIL()
+{
+    Campo aux0;
+
+  aux0 = (Campo) malloc(sizeof(struct sCampo));
+  aux0->flag = PScons_csv_Campo_NIL;
   return(aux0);
 }
 
@@ -59,45 +79,86 @@ Linha  cons_csv_Campo( char * a1)
 void csv_print( Linhas lcsv ){
 
     Linha ls;
-
-    while (lcsv->flag != PScons_csv_Linhas_NIL){
+    Campo cp;
+    while (lcsv->flag!=PScons_csv_Linhas_NIL ){
         ls = lcsv->u.d1.s1;
         switch (ls->flag){
-            case PScons_csv_Campo:
-                printf("%s\n",ls->u.d1.s2 );
-                break;
-            case PScons_csv_Linha_Campo:
-                while(ls-> flag == PScons_csv_Linha_Campo){
-                    printf("%s\n",ls->u.d1.s2 );
-                    ls = ls ->u.d1.s1;
+            case PScons_csv_Linha_Fim:
+            cp = ls->u.d1.s2;
+            switch (cp->flag){
+                case PScons_csv_Campo:
+                    printf("Passo 1 ->%s\n",cp->u.d1.s1 );
+                    break ;
+                case PScons_csv_Campo_NIL:
+                    printf("Passo 2 -> {}\n");
+                    break;
+            }
+            break;
+
+            case PScons_csv_Linha:
+                while (ls->flag != PScons_csv_Linha_Fim){
+                    cp = ls->u.d1.s2;
+                    switch (cp->flag){
+                        case PScons_csv_Campo:
+                             printf("Passo 3 ->%s\n",cp->u.d1.s1 );
+                             break ;
+                        case PScons_csv_Campo_NIL:
+                              printf("Passo 4 ->{}\n");
+                            break;
+                     }
+                    ls = ls->u.d1.s1;
                 }
+                cp = ls->u.d2.s1;
+                switch (cp->flag){
+                     case PScons_csv_Campo:
+                           printf("Passo 5 ->%s\n",cp->u.d1.s1 );
+                           break ;
+                     case PScons_csv_Campo_NIL:
+                           printf("Passo 6 ->{}\n");
+                           break;
+                 }
                 break;
         }
-        lcsv =  lcsv->u.d1.s2;
+
+        lcsv  = lcsv ->u.d1.s2;
     }
+
 }
 
 Linha csv_Linha_reverse( Linha l ){
-    char * campo;
+    Campo cp;
+    Campo c;
+    Linha init = l;
     Linha aux;
 
-    if (l->flag == PScons_csv_Campo)
+    if (l->flag == PScons_csv_Linha_Fim)
         return l;
-    campo = (char*) malloc (sizeof (strlen(l->u.d1.s2)));
-    campo = l->u.d1.s2;
+
+    cp = l->u.d1.s2;
+
+    if (cp->flag == PScons_csv_Campo)
+        c = cons_csv_Campo (cp->u.d1.s1);
+    else
+        c = cons_csv_Campo_NIL ();
+
     l = l->u.d1.s1;
-    aux = cons_csv_Campo(campo);
+    aux = cons_csv_Linha_Fim(c);
+    while(l->flag == PScons_csv_Linha){
+        cp = l->u.d1.s2;
+        if (cp->flag == PScons_csv_Campo)
+            c = cons_csv_Campo (cp->u.d1.s1);
+        else
+            c = cons_csv_Campo_NIL ();
 
-
-    while(l->flag == PScons_csv_Linha_Campo){
-        campo = (char*)malloc (sizeof (strlen(l->u.d1.s2)));
-        campo = l->u.d1.s2;
         l = l->u.d1.s1;
-        aux = cons_csv_Linha_Campo(aux,campo);
-
+        aux = cons_csv_Linha(aux,c);
     }
+    cp = l->u.d2.s1;
+    if (cp->flag == PScons_csv_Campo)
+        c = cons_csv_Campo (cp->u.d1.s1);
+    else
+        c = cons_csv_Campo_NIL ();
+    
+    aux = cons_csv_Linha (aux, c);
     return aux;
 }
-
-
-

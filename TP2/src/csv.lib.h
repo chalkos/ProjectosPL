@@ -9,9 +9,11 @@
 #define PScons_csv_Linhas  2000
 #define PScons_csv_Linhas_NIL  2001
 
-#define PScons_csv_Linha_Campo  2002
-#define PScons_csv_Campo  2003
+#define PScons_csv_Linha  2002
+#define PScons_csv_Linha_Fim  2003
 
+#define PScons_csv_Campo  2004
+#define PScons_csv_Campo_NIL  2005
 
 /* -----------------------------------
  * Abstract Data Types Definition
@@ -27,6 +29,10 @@ typedef struct sLinhas *Linhas;
 /* --- dummy Linha ---*/
 struct sLinha;
 typedef struct sLinha *Linha;
+
+/* --- dummy Campo ---*/
+struct sCampo;
+typedef struct sCampo *Campo;
 
 /* Now the types definition...*/
 
@@ -50,10 +56,23 @@ struct sLinha
   union {  
     struct {
         Linha s1;
-        char * s2;
+        Campo s2;
       } d1;
     struct {
+        Campo s1;
+      } d2;
+
+  } u;
+};
+
+/* --- Campo ---*/
+struct sCampo 
+{ int flag;
+  union {  
+    struct {
         char * s1;
+      } d1;
+    struct {
       } d2;
 
   } u;
@@ -67,8 +86,11 @@ struct sLinha
 Linhas  cons_csv_Linhas( Linha a1, Linhas a2);
 Linhas  cons_csv_Linhas_NIL();
 
-Linha  cons_csv_Linha_Campo( Linha a1, char * a2);
-Linha  cons_csv_Campo( char * a1);
+Linha  cons_csv_Linha( Linha a1, Campo a2);
+Linha  cons_csv_Linha_Fim( Campo a1);
+
+Campo  cons_csv_Campo( char * a1);
+Campo  cons_csv_Campo_NIL();
 
 /* -----------------------------------
  * Custom Function Signatures

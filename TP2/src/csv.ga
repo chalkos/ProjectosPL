@@ -4,8 +4,13 @@
           | cons_csv_Linhas_NIL()
           ;
 
-  Linha -> cons_csv_Linha_Campo(Linha STR)
-        | cons_csv_Campo(STR)
+  Linha -> cons_csv_Linha(Linha Campo)
+        | cons_csv_Linha_Fim(Campo)
         ;
+
+  Campo -> cons_csv_Campo(STR)
+        | cons_csv_Campo_NIL()
+        ;
+
 
  </ga>
