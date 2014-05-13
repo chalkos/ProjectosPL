@@ -43,8 +43,3 @@ Campo : str {$$ = cons_csv_Campo ($1);}
 int yyerror (char *s){
 	fprintf (stderr," %s",s);
 }
-
-int main(){
-	csvparse ();
-	return 0;
-}
