@@ -1,7 +1,13 @@
 # executáveis
+gabs
 cmd
 cmdtok
-gabs
+csv
+csvtok
+cfg
+cfgtok
+gco
+
 
 # gerados
 *.o

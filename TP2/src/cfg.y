@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "cfg.lib.h"
+
+extern void gco_set_Config(Confs cfg);
 %}
 %union{
     char* cfg_str;
@@ -21,11 +23,10 @@
 %type <cfg_campos> Lcampos Campos
 %%
 Z : Configuracoes '$' { $$ = $1;
-                        cfg_Confs_validate($$);
-                        cfg_Confs_print($$);
-                        free_cfg_Confs($$);
+                        gco_set_Config($$);
                         cfglex_destroy();
-                        exit(0); };
+                        YYACCEPT;
+                        /*exit(0);*/ };
 
 Configuracoes : Configuracao '\n' Configuracoes {$$ = cons_cfg_Confs($1,$3);}
               | { $$ = cons_cfg_Confs_NIL(); }

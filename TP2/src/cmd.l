@@ -1,6 +1,7 @@
 %{
 #include <string.h>
 #include "cmd.tab.h"
+#include "cmd.lib.h"
 %}
 %x ficheiro
 %%
@@ -28,7 +29,7 @@
 
 <<EOF>>  return FQUIT;
 
-[\n]     return '\n';
+[\n]+    return '\n';
 
 <ficheiro>[^\n]+ { /* se houver erros, tentar um duplicate aqui */
                    //cmdlval.cmd_ficheiro = strdup(cmdtext);
@@ -37,8 +38,14 @@
                    return FICHEIRO;
                  }
 
-[ \t] ;
-.       { printf("flex lixo: %c (%d)\n", *yytext, *yytext); }
+ /** capturar comandos inválidos especiais **/
+[clis]\n          { printf("Comando inválido1.\n%s", CMD_PROMPT); }
+[^clipsq\n][^\n]* { printf("Comando inválido2.\n%s", CMD_PROMPT); }
+"q"[^\n]+         { printf("Comando inválido3.\n%s", CMD_PROMPT); }
+"p"[^\n]+         { printf("Comando inválido4.\n%s", CMD_PROMPT); }
+"config"[^ ]      { printf("Comando inválido5.\n%s", CMD_PROMPT); }
+
+. ;
 
 %%
 
