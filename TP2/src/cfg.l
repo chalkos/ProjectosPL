@@ -27,7 +27,7 @@
 <campos>\;     { return ';'; }
 <campos>\n     { BEGIN 0; return '\n'; }
 
-<*><<EOF>>  {printf("such force quit\n"); return '$';}
+<*><<EOF>>  return '$';
 
 [\n]+       return '\n';
 
