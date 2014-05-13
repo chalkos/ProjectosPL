@@ -41,8 +41,3 @@ int yyerror( char* s ){
     //fprintf(stderr, "%s", s);
 }
 
-int main(){
-    cmdparse();
-    return 0;
-}
-

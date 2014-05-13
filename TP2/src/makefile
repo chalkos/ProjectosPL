@@ -3,17 +3,27 @@
 GDB=-g
 
 #----------------\
-#  Tokens        \
+#  Tokenizers    \
 #----------------´
 
 cmdtok : cmd.tok.c lex.cmd.o cmd.tab.o cmd.lib.o
 	gcc $(GDB) -o $@ $^ -ll
 
+cfgtok : cfg.tok.c lex.cfg.o cfg.tab.o cfg.lib.o
+	gcc $(GDB) -o $@ $^ -ll
+
+#----------------\
+#  Gco           \
+#----------------´
+
+gco : gco.lib.c cfg.lib.o lex.cfg.o cfg.tab.o cmd.lib.o lex.cmd.o cmd.tab.o
+	gcc $(GDB) -o $@ $^
+
 #----------------\
 #  Cfg           \
 #----------------´
 
-cfg : cfg.lib.o lex.cfg.o cfg.tab.o
+cfg : cfg.main.c cfg.lib.o lex.cfg.o cfg.tab.o
 	gcc $(GDB) -o $@ $^ -ll
 
 cfg.lib.o : cfg.lib.c cfg.lib.h
@@ -35,7 +45,7 @@ lex.cfg.c : cfg.l
 #  Cmd           \
 #----------------´
 
-cmd : cmd.lib.o lex.cmd.o cmd.tab.o
+cmd : cmd.main.c cmd.lib.o lex.cmd.o cmd.tab.o
 	gcc $(GDB) -o $@ $^ -ll
 
 cmd.lib.o : cmd.lib.c cmd.lib.h
@@ -59,11 +69,13 @@ lex.cmd.c : cmd.l
 
 clean :
 	$(RM) gabs
+	$(RM) gco
 	$(RM) cmd
 	$(RM) cfg
 	$(RM) *.o
 	$(RM) *.tab.[ch]
 	$(RM) lex.*.c
+	$(RM) *tok
 
 gabs:
 	cd ./../gabs/ && $(MAKE) gabs && mv ./gabs ./../src/gabs

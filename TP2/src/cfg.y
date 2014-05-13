@@ -56,8 +56,4 @@ int yyerror( char* s ){
     fprintf(stderr, "%s", s);
 }
 
-int main(){
-    cfgparse();
-    return 0;
-}
 
