@@ -98,6 +98,7 @@ Campo  cons_csv_Campo_NIL();
  */
 void csv_print( Linhas csv );
 Linha csv_Linha_reverse( Linha l );
+int csv_Linhas_validate (Linhas lcsv);
 
 /* -----------------------------------
  * Destructor Function Implementations

@@ -76,7 +76,64 @@ Campo  cons_csv_Campo_NIL()
  * -----------------------------------
  */
  
-//int csv_Linhas_validate(){}
+int csv_Linhas_validate(Linhas lcsv){
+    int campo = 0;
+    int campoLinha =0;
+
+    Linha l;
+    Campo cmp;
+    
+    while (lcsv -> flag != PScons_csv_Linhas_NIL){
+        l = lcsv->u.d1.s1;
+        switch (l->flag){
+            case PScons_csv_Linha_Fim:
+                cmp = l->u.d1.s1;
+                switch(cmp->flag){
+                    case PScons_csv_Campo_NIL:
+                        campo++;
+                        break;
+                    case PScons_csv_Campo:
+                        campo++;
+                        break;
+                }
+                break;
+            case PScons_csv_Linha:
+                while (l->flag != PScons_csv_Linha_Fim){
+                    cmp = l->u.d1.s2;
+                    switch (cmp->flag){
+                        case PScons_csv_Campo:
+                            campoLinha ++;
+                            break;
+                        case PScons_csv_Campo_NIL:
+                            campoLinha ++;
+                            break;
+                    } 
+                    l = l->u.d1.s1;  
+                }
+                cmp = l->u.d2.s1;
+                switch (cmp->flag){
+                     case PScons_csv_Campo:
+                           campoLinha++;
+                           break ;
+                     case PScons_csv_Campo_NIL:
+                           campoLinha++;
+                           break;
+                }
+                campo = campoLinha;    
+                break;
+           
+            default :
+                fprintf(stderr, "WARNING : flag %d na struct Linha ignorada\n",l->flag );
+        }
+         
+         lcsv = lcsv->u.d1.s2;
+    }
+     if (campo!= campoLinha)    
+             fprintf(stderr, "WARNING: Linhas com nº de campos diferentes campos\n");
+    return 0;
+}
+
+
 void csv_print( Linhas lcsv ){
 
     Linha ls;
