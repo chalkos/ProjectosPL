@@ -21,13 +21,19 @@ Comando : Config
         ;
 
 Config : CONFIG FICHEIRO { cmd_config($2); printf(CMD_PROMPT); };
+       | CONFIG
 
 Load : LOAD FICHEIRO { cmd_load($2); printf(CMD_PROMPT); };
+     | LOAD
 
-Import : IMPORT FICHEIRO { cmd_import($2); printf(CMD_PROMPT); };
+Import : IMPORT FICHEIRO { cmd_import($2); printf(CMD_PROMPT); }
+       | IMPORT
+       ;
 
 Save : SAVE FICHEIRO { cmd_save($2, 0); printf(CMD_PROMPT); }
      | FSAVE FICHEIRO { cmd_save($2, 1); printf(CMD_PROMPT); }
+     | SAVE
+     | FSAVE
      ;
 
 Print : PRINT { cmd_print(); printf(CMD_PROMPT); };

@@ -29,7 +29,7 @@
 
 <<EOF>>  return FQUIT;
 
-[\n]+    return '\n';
+[\n]+    { return '\n'; }
 
 <ficheiro>[^\n]+ { /* se houver erros, tentar um duplicate aqui */
                    //cmdlval.cmd_ficheiro = strdup(cmdtext);
@@ -37,6 +37,9 @@
                    BEGIN 0;
                    return FICHEIRO;
                  }
+<ficheiro>[\n]    { BEGIN 0;
+                    printf("Comando inválido6.\n%s", CMD_PROMPT);
+                    return '\n'; }
 
  /** capturar comandos inválidos especiais **/
 [clis]\n          { printf("Comando inválido1.\n%s", CMD_PROMPT); }

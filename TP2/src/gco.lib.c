@@ -4,9 +4,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-
 #include "cfg.lib.h"
-#include "gco.lib.h"
 #include "cmd.lib.h"
 #include "error.lib.h"
 

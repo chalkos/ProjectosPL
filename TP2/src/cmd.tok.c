@@ -26,7 +26,6 @@ int main(){
             case FQUIT: printf("FQUIT\n");
                            break;
 
-
             case FICHEIRO: printf("FICHEIRO\n");
                            break;
                            
