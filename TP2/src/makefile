@@ -1,6 +1,6 @@
 .PHONY: clean
 
-GDB=-g
+GDB=-Wall -g
 
 #----------------\
 #  Tokenizers    \

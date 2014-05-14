@@ -5,7 +5,7 @@
 %}
 
 %%
-[^\n\;]+ {csvlval.csv_str= strdup(csvtext);
+[^\n\;]+ {csvlval.csv_str = strdup(csvtext);
          return str;}
 \n+     {return '\n';}
 \;      {return ';';}

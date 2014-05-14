@@ -76,6 +76,7 @@ Campo  cons_csv_Campo_NIL()
  * -----------------------------------
  */
  
+//int csv_Linhas_validate(){}
 void csv_print( Linhas lcsv ){
 
     Linha ls;
@@ -137,7 +138,7 @@ Linha csv_Linha_reverse( Linha l ){
     cp = l->u.d1.s2;
 
     if (cp->flag == PScons_csv_Campo)
-        c = cons_csv_Campo (cp->u.d1.s1);
+        c = cons_csv_Campo (strdup(cp->u.d1.s1));
     else
         c = cons_csv_Campo_NIL ();
 
@@ -146,7 +147,7 @@ Linha csv_Linha_reverse( Linha l ){
     while(l->flag == PScons_csv_Linha){
         cp = l->u.d1.s2;
         if (cp->flag == PScons_csv_Campo)
-            c = cons_csv_Campo (cp->u.d1.s1);
+            c = cons_csv_Campo (strdup(cp->u.d1.s1));
         else
             c = cons_csv_Campo_NIL ();
 
@@ -155,11 +156,14 @@ Linha csv_Linha_reverse( Linha l ){
     }
     cp = l->u.d2.s1;
     if (cp->flag == PScons_csv_Campo)
-        c = cons_csv_Campo (cp->u.d1.s1);
+        c = cons_csv_Campo (strdup(cp->u.d1.s1));
     else
         c = cons_csv_Campo_NIL ();
     
     aux = cons_csv_Linha (aux, c);
+
+    free_csv_Linha(init);
+
     return aux;
 }
 
@@ -168,17 +172,19 @@ Linha csv_Linha_reverse( Linha l ){
  * -----------------------------------
  */
 
-void free_csv_Campos (Campo cmp){
+void free_csv_Campo (Campo cmp){
     if (cmp->flag == PScons_csv_Campo)
-        free (cmp);
+        free(cmp->u.d1.s1);
+    free (cmp);
 }
 
 void free_csv_Linha (Linha l){
     switch (l->flag){
         case PScons_csv_Linha_Fim:
-            free_csv_Campos (l->u.d2.s1);
+            free_csv_Campo (l->u.d2.s1);
             break;
         case PScons_csv_Linha:
+            free_csv_Campo (l->u.d1.s2);
             free_csv_Linha (l->u.d1.s1);
             break;
     }

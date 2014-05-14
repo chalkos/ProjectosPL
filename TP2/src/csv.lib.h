@@ -104,7 +104,7 @@ Linha csv_Linha_reverse( Linha l );
  * -----------------------------------
  */
 
-void free_csv_Campos (Campo cmp);
+void free_csv_Campo (Campo cmp);
 void free_csv_Linha (Linha l);
 void free_csv_Linhas (Linhas lcsv);
 

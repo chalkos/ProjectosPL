@@ -22,6 +22,8 @@
 %%
 X : Linhascsv '$' {$$ = $1; 
                    csv_print($$);
+                   free_csv_Linhas($$);
+                   csvlex_destroy();
                    YYACCEPT;}
   ;
 
