@@ -7,6 +7,87 @@
  * Custom Function Implementations
  * -----------------------------------
  */
+// getters
+int cfg_get_Nprovas( Confs cfgs ){
+    int res = 0;
+    Conf cfg;
+    while( cfgs->flag != PScons_cfg_Confs_NIL ){
+        cfg = cfgs->u.d1.s1;
+        if( cfg->flag == PScons_cfg_Conf_Nprovas )
+            res = cfg->u.d2.s1;
+        cfgs = cfgs->u.d1.s2;
+    }
+    
+    return res;
+}
+
+int cfg_get_Ntop( Confs cfgs ){
+    int res = 0;
+    Conf cfg;
+    while( cfgs->flag != PScons_cfg_Confs_NIL ){
+        cfg = cfgs->u.d1.s1;
+        if( cfg->flag == PScons_cfg_Conf_Ntop )
+            res = cfg->u.d3.s1;
+        cfgs = cfgs->u.d1.s2;
+    }
+    
+    return res;
+
+}
+
+int cfg_get_Score( Confs cfgs ){
+    int res = 0;
+    Conf cfg;
+    while( cfgs->flag != PScons_cfg_Confs_NIL ){
+        cfg = cfgs->u.d1.s1;
+        if( cfg->flag == PScons_cfg_Conf_Score )
+            res = cfg->u.d5.s1;
+        cfgs = cfgs->u.d1.s2;
+    }
+    
+    return res;
+}
+
+char* cfg_get_Titulo( Confs cfgs ){
+    char *res = NULL;
+    Conf cfg;
+    while( cfgs->flag != PScons_cfg_Confs_NIL ){
+        cfg = cfgs->u.d1.s1;
+        if( cfg->flag == PScons_cfg_Conf_Nprovas )
+            res = cfg->u.d1.s1;
+        cfgs = cfgs->u.d1.s2;
+    }
+    
+    return res;
+
+}
+
+// questões
+char* cfg_Campos_seleccionado( Confs cfgs, int totalCampos ){
+    char* res = (char*) malloc( sizeof( char ) * totalCampos );
+    Conf cfg;
+    Lcampos cmps;
+    
+    // obter o ultimo =campos=
+    while( cfgs->flag != PScons_cfg_Confs_NIL ){
+        cfg = cfgs->u.d1.s1;
+        if( cfg->flag == PScons_cfg_Conf_Campos )
+                cmps = cfg->u.d4.s1;
+        cfgs = cfgs->u.d1.s2;
+    }
+    
+    // verificar se o indice pertence
+    while( cmps->flag == PScons_cfg_Lcampos_Lcampos ){
+        if( cmps->u.d1.s2 < totalCampos )
+            res[cmps->u.d1.s2] = 1;
+        cmps = cmps->u.d1.s1;
+    }
+    if( cmps->u.d2.s1 < totalCampos )
+        res[cmps->u.d2.s1] = 1;
+
+    return res;
+}
+
 int cfg_Confs_validate( Confs cfgs ){
     int n_titulos = 0;
     int n_nprovas = 0;
@@ -50,9 +131,23 @@ int cfg_Confs_validate( Confs cfgs ){
         fprintf(stderr, "[WARNING]: Encontrados %d =score=.", n_score);
     if( n_campos > 1 )
         fprintf(stderr, "[WARNING]: Encontrados %d =campos=.", n_campos);
-    
     if(  n_titulos > 1 ||  n_nprovas > 1 || n_ntop > 1 || n_score > 1 || n_campos > 1 )
         fprintf(stderr, "Será usada a ultima ocorrência.\n");
+    
+    
+    if( n_titulos > 1 )
+        fprintf(stderr, "[ERRO]: Não foi encontrada a tag =titulo=.");
+    if( n_nprovas > 1 )
+        fprintf(stderr, "[ERRO]: Não foi encontrada a tag =nprovas=.");
+    if( n_ntop > 1 )
+        fprintf(stderr, "[ERRO]: Não foi encontrada a tag =ntop=.");
+    if( n_score > 1 )
+        fprintf(stderr, "[ERRO]: Não foi encontrada a tag =score=.");
+    if( n_campos > 1 )
+        fprintf(stderr, "[ERRO]: Não foi encontrada a tag =campos=.");
+    
+    if(  n_titulos < 1 ||  n_nprovas < 1 || n_ntop < 1 || n_score < 1 || n_campos < 1 )
+        return 0; // faltam campos
 
     return 1; //tudo bem
 }

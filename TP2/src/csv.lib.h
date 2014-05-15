@@ -107,8 +107,6 @@ Linha  cons_csv_Linha_Fim( Campo a1);
 Campo  cons_csv_Campo( char * a1);
 Campo  cons_csv_Campo_NIL();
 
-void csv_free_ListaCSV(Lcsv elem);
-void csv_import_csv( Linhas dados );
 
 /* -----------------------------------
  * Custom Function Signatures
@@ -118,10 +116,14 @@ void csv_print( Linhas csv );
 Linha csv_Linha_reverse( Linha l );
 int csv_Linhas_validate (Linhas lcsv);
 
+void csv_import_csv( Linhas dados );
+
 /* -----------------------------------
  * Destructor Function Implementations
  * -----------------------------------
  */
+
+void csv_free_ListaCSV(Lcsv elem);
 
 void free_csv_Campo (Campo cmp);
 void free_csv_Linha (Linha l);

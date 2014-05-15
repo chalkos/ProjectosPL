@@ -100,6 +100,15 @@ void cfg_Confs_print( Confs cfgs );
 int cfg_Confs_validate( Confs cfgs );
 Lcampos cfg_Lcampos_reverse( Lcampos l );
 
+// getters
+int cfg_get_Nprovas( Confs cfgs );
+int cfg_get_Ntop( Confs cfgs );
+int cfg_get_Score( Confs cfgs );
+char* cfg_get_Titulo( Confs cfgs );
+
+// obtém um array de bytes que está a 1 nos campos que foram seleccionados
+char* cfg_Campos_seleccionado( Confs cfgs, int totalCampos );
+
 /* -----------------------------------
  * Destructor Function Implementations
  * -----------------------------------

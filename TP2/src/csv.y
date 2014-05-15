@@ -24,7 +24,6 @@ extern void csvlex_destroy();
 %%
 X : Linhascsv '$' { $$ = $1; 
                     csv_Linhas_validate($$);
-                    csv_print($$);
                     csv_import_csv($$);
                     csvlex_destroy();
                     YYACCEPT;};
