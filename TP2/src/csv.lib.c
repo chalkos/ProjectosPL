@@ -89,7 +89,7 @@ int csv_Linhas_validate(Linhas lcsv){
         l = lcsv->u.d1.s1;
         switch (l->flag){
             case PScons_csv_Linha_Fim:
-                cmp = l->u.d1.s1;
+                cmp = l->u.d2.s1;
                 switch(cmp->flag){
                     case PScons_csv_Campo_NIL:
                         campo++;
