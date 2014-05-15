@@ -1,6 +1,6 @@
 .PHONY: clean
 
-GDB=-g
+GDB=-Wall -g
 
 #----------------\
 #  Tokenizers    \
@@ -10,6 +10,9 @@ cmdtok : cmd.tok.c lex.cmd.o cmd.tab.o cmd.lib.o
 	gcc $(GDB) -o $@ $^ -ll
 
 cfgtok : cfg.tok.c lex.cfg.o cfg.tab.o cfg.lib.o
+	gcc $(GDB) -o $@ $^ -ll
+
+csvtok : csv.tok.c lex.csv.o csv.tab.o csv.lib.o
 	gcc $(GDB) -o $@ $^ -ll
 
 #----------------\
@@ -68,7 +71,7 @@ lex.cmd.c : cmd.l
 #  CsV          \
 #----------------´
 
-csv : csv.lib.o lex.csv.o csv.tab.o
+csv : csv.main.c csv.lib.o lex.csv.o csv.tab.o
 	gcc $(GDB) -o $@ $^ -ll
 
 csv.lib.o : csv.lib.c csv.lib.h

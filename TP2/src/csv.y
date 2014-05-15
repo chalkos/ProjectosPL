@@ -21,7 +21,10 @@
 
 %%
 X : Linhascsv '$' {$$ = $1; 
+                   csv_Linhas_validate($$);
                    csv_print($$);
+                   free_csv_Linhas($$);
+                   csvlex_destroy();
                    YYACCEPT;}
   ;
 
@@ -42,9 +45,4 @@ Campo : str {$$ = cons_csv_Campo ($1);}
 %%
 int yyerror (char *s){
 	fprintf (stderr," %s",s);
-}
-
-int main(){
-	csvparse ();
-	return 0;
 }

@@ -76,6 +76,64 @@ Campo  cons_csv_Campo_NIL()
  * -----------------------------------
  */
  
+int csv_Linhas_validate(Linhas lcsv){
+    int campo = 0;
+    int campoLinha =0;
+
+    Linha l;
+    Campo cmp;
+    
+    while (lcsv -> flag != PScons_csv_Linhas_NIL){
+        l = lcsv->u.d1.s1;
+        switch (l->flag){
+            case PScons_csv_Linha_Fim:
+                cmp = l->u.d1.s1;
+                switch(cmp->flag){
+                    case PScons_csv_Campo_NIL:
+                        campo++;
+                        break;
+                    case PScons_csv_Campo:
+                        campo++;
+                        break;
+                }
+                break;
+            case PScons_csv_Linha:
+                while (l->flag != PScons_csv_Linha_Fim){
+                    cmp = l->u.d1.s2;
+                    switch (cmp->flag){
+                        case PScons_csv_Campo:
+                            campoLinha ++;
+                            break;
+                        case PScons_csv_Campo_NIL:
+                            campoLinha ++;
+                            break;
+                    } 
+                    l = l->u.d1.s1;  
+                }
+                cmp = l->u.d2.s1;
+                switch (cmp->flag){
+                     case PScons_csv_Campo:
+                           campoLinha++;
+                           break ;
+                     case PScons_csv_Campo_NIL:
+                           campoLinha++;
+                           break;
+                }
+                campo = campoLinha;    
+                break;
+           
+            default :
+                fprintf(stderr, "WARNING : flag %d na struct Linha ignorada\n",l->flag );
+        }
+         
+         lcsv = lcsv->u.d1.s2;
+    }
+     if (campo!= campoLinha)    
+             fprintf(stderr, "WARNING: Linhas com nº de campos diferentes campos\n");
+    return 0;
+}
+
+
 void csv_print( Linhas lcsv ){
 
     Linha ls;
@@ -84,16 +142,16 @@ void csv_print( Linhas lcsv ){
         ls = lcsv->u.d1.s1;
         switch (ls->flag){
             case PScons_csv_Linha_Fim:
-            cp = ls->u.d1.s2;
-            switch (cp->flag){
-                case PScons_csv_Campo:
-                    printf("Passo 1 ->%s\n",cp->u.d1.s1 );
-                    break ;
-                case PScons_csv_Campo_NIL:
-                    printf("Passo 2 -> {}\n");
-                    break;
-            }
-            break;
+                cp = ls->u.d2.s1;
+                switch (cp->flag){
+                    case PScons_csv_Campo:
+                        printf("Passo 1 ->%s\n",cp->u.d1.s1 );
+                        break ;
+                    case PScons_csv_Campo_NIL:
+                        printf("Passo 2 -> {}\n");
+                        break;
+                }
+              break;
 
             case PScons_csv_Linha:
                 while (ls->flag != PScons_csv_Linha_Fim){
@@ -137,7 +195,7 @@ Linha csv_Linha_reverse( Linha l ){
     cp = l->u.d1.s2;
 
     if (cp->flag == PScons_csv_Campo)
-        c = cons_csv_Campo (cp->u.d1.s1);
+        c = cons_csv_Campo (strdup(cp->u.d1.s1));
     else
         c = cons_csv_Campo_NIL ();
 
@@ -146,7 +204,7 @@ Linha csv_Linha_reverse( Linha l ){
     while(l->flag == PScons_csv_Linha){
         cp = l->u.d1.s2;
         if (cp->flag == PScons_csv_Campo)
-            c = cons_csv_Campo (cp->u.d1.s1);
+            c = cons_csv_Campo (strdup(cp->u.d1.s1));
         else
             c = cons_csv_Campo_NIL ();
 
@@ -155,10 +213,47 @@ Linha csv_Linha_reverse( Linha l ){
     }
     cp = l->u.d2.s1;
     if (cp->flag == PScons_csv_Campo)
-        c = cons_csv_Campo (cp->u.d1.s1);
+        c = cons_csv_Campo (strdup(cp->u.d1.s1));
     else
         c = cons_csv_Campo_NIL ();
     
     aux = cons_csv_Linha (aux, c);
+
+    free_csv_Linha(init);
+
     return aux;
 }
+
+/* -----------------------------------
+ * Destructor Function Implementations
+ * -----------------------------------
+ */
+
+void free_csv_Campo (Campo cmp){
+    if (cmp->flag == PScons_csv_Campo)
+        free(cmp->u.d1.s1);
+    free (cmp);
+}
+
+void free_csv_Linha (Linha l){
+    switch (l->flag){
+        case PScons_csv_Linha_Fim:
+            free_csv_Campo (l->u.d2.s1);
+            break;
+        case PScons_csv_Linha:
+            free_csv_Campo (l->u.d1.s2);
+            free_csv_Linha (l->u.d1.s1);
+            break;
+    }
+
+    free(l);
+}
+
+void free_csv_Linhas (Linhas lcsv){
+    if (lcsv->flag == PScons_csv_Linhas){
+       free_csv_Linha (lcsv -> u.d1.s1);
+       free_csv_Linhas(lcsv -> u.d1.s2); 
+    }
+    free (lcsv);
+}
+
