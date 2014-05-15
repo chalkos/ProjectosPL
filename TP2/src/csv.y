@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "csv.lib.h"
+
+extern void csvlex_destroy();
 %}
 %union{
 	char * csv_str;
@@ -20,14 +22,12 @@
 %start X
 
 %%
-X : Linhascsv '$' {$$ = $1; 
-                   csv_Linhas_validate($$);
-                   csv_print($$);
-                   free_csv_Linhas($$);
-                   csvlex_destroy();
-                   YYACCEPT;}
-  ;
-
+X : Linhascsv '$' { $$ = $1; 
+                    csv_Linhas_validate($$);
+                    csv_print($$);
+                    csv_import_csv($$);
+                    csvlex_destroy();
+                    YYACCEPT;};
 
 Linhascsv : Linha '\n' Linhascsv {$1 = csv_Linha_reverse($1);
                                   $$ = cons_csv_Linhas ($1,$3);}
@@ -45,4 +45,5 @@ Campo : str {$$ = cons_csv_Campo ($1);}
 %%
 int yyerror (char *s){
 	fprintf (stderr," %s",s);
+    return 0;
 }

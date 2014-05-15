@@ -25,9 +25,13 @@ void cmd_import(char* ficheiro){
     }
     
     csvset_in(csvFile);
-    if( csvparse() == 0 ){
-        
+    if( csvparse() == 1 ){
+        // houve problemas ao ler o csv
+        fprintf( stderr, "[ERRO] Não foi possível carregar a configuração. Abortar.\n");
+        fclose(csvFile);
+        return;
     }
+    fclose(csvFile);
 }
 
 void cmd_print(){
@@ -38,12 +42,16 @@ void cmd_save(char* ficheiro, int force){
     printf("comando save(force:%d) (%s)\n", force, ficheiro);
 }
 
-void cmd_quit(int force){
-    if( force ){ 
-        printf("comando quit (forced)\n");
-        exit(0);
-    }else{
-        printf("comando quit\n");
-    }
+int cmd_quit(){
+    printf("comando quit\n");
+    // se o ficheiro não tiver sido guardado recentemente,
+    // avisar e dizer para guardar o ficheiro antes de sair
+    // ou entao sair com quit!
+    
+    // verificar se o ficheiro foi alterado recentemente
+    return 0; //nao pode sair
+
+
+    return 1; //pode sair
 }
 

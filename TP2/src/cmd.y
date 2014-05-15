@@ -2,6 +2,8 @@
 %{
 #include <stdio.h>
 #include "cmd.lib.h"
+
+extern void cmdlex_destroy();
 %}
 %union{ char* cmd_ficheiro; }
 %type <cmd_ficheiro> FICHEIRO
@@ -38,12 +40,18 @@ Save : SAVE FICHEIRO { cmd_save($2, 0); printf(CMD_PROMPT); }
 
 Print : PRINT { cmd_print(); printf(CMD_PROMPT); };
 
-Quit : QUIT  { cmd_quit(0); printf(CMD_PROMPT); }
-     | FQUIT { cmd_quit(1); printf(CMD_PROMPT); }
+Quit : QUIT  { if(cmd_quit()){
+                    cmdlex_destroy();
+                    YYACCEPT;
+               }else{
+                    printf(CMD_PROMPT);
+               }}
+     | FQUIT { cmdlex_destroy(); YYACCEPT; }
      ;
 
 %%
 int yyerror( char* s ){
     //fprintf(stderr, "%s", s);
+    return 0;
 }
 

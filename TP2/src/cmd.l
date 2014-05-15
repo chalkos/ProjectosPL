@@ -1,8 +1,10 @@
 %{
+#define YY_NO_INPUT
 #include <string.h>
 #include "cmd.tab.h"
 #include "cmd.lib.h"
 %}
+%option nounput
 %x ficheiro
 %%
 "config " {BEGIN ficheiro; return CONFIG;}

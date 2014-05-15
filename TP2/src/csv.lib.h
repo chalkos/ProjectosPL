@@ -1,6 +1,9 @@
 #ifndef __CSV_LIB_H
 #define __CSV_LIB_H
 
+#include <stdlib.h>
+
+
 /* -----------------------------------
  * Production Selectors
  * -----------------------------------
@@ -79,6 +82,18 @@ struct sCampo
 };
 
 /* -----------------------------------
+ * Custom Datatypes definition
+ * -----------------------------------
+ */
+
+typedef struct sLcsv {
+    struct sLcsv *next;
+    Linhas csv;
+} *Lcsv;
+
+extern Lcsv ListaCSV;
+
+/* -----------------------------------
  * Constructor Function Signatures
  * -----------------------------------
  */
@@ -91,6 +106,9 @@ Linha  cons_csv_Linha_Fim( Campo a1);
 
 Campo  cons_csv_Campo( char * a1);
 Campo  cons_csv_Campo_NIL();
+
+void csv_free_ListaCSV(Lcsv elem);
+void csv_import_csv( Linhas dados );
 
 /* -----------------------------------
  * Custom Function Signatures

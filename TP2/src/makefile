@@ -19,7 +19,7 @@ csvtok : csv.tok.c lex.csv.o csv.tab.o csv.lib.o
 #  Gco           \
 #----------------´
 
-gco : gco.lib.c cfg.lib.o lex.cfg.o cfg.tab.o cmd.lib.o lex.cmd.o cmd.tab.o
+gco : gco.lib.c cfg.lib.o lex.cfg.o cfg.tab.o cmd.lib.o lex.cmd.o cmd.tab.o csv.lib.o lex.csv.o csv.tab.o
 	gcc $(GDB) -o $@ $^
 
 #----------------\
@@ -48,8 +48,11 @@ lex.cfg.c : cfg.l
 #  Cmd           \
 #----------------´
 
-cmd : cmd.main.c cmd.lib.o lex.cmd.o cmd.tab.o
+cmd : cmd.main.c cmd.lib.o lex.cmd.o cmd.tab.o cmd.dummy.o
 	gcc $(GDB) -o $@ $^ -ll
+
+cmd.dummy.o : cmd.dummy.c cmd.dummy.h
+	gcc $(GDB) -c cmd.dummy.c
 
 cmd.lib.o : cmd.lib.c cmd.lib.h
 	gcc $(GDB) -c cmd.lib.c
@@ -68,7 +71,7 @@ lex.cmd.c : cmd.l
 
 
 #----------------\
-#  CsV          \
+#  CSV          \
 #----------------´
 
 csv : csv.main.c csv.lib.o lex.csv.o csv.tab.o

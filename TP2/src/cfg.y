@@ -5,6 +5,7 @@
 #include "cfg.lib.h"
 
 extern void gco_set_Config(Confs cfg);
+extern void cfglex_destroy();
 %}
 %union{
     char* cfg_str;
@@ -55,6 +56,7 @@ Campo : '$' num { $$ = $2; };
 %%
 int yyerror( char* s ){
     fprintf(stderr, "%s", s);
+    return 0;
 }
 
 

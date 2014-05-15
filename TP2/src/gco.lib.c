@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include "cfg.lib.h"
 #include "cmd.lib.h"
-#include "error.lib.h"
+#include "csv.lib.h"
 
 /************************
  * Definições
@@ -16,6 +16,7 @@ void gco_set_Config(Confs cfg);
 
 extern int cmdparse();
 extern int cfgparse();
+extern void csvlex_destroy();
 
 extern void cfgset_in(FILE * in_str);
 
@@ -55,6 +56,14 @@ int main(int argc, char* argv[]){
     cfgset_in(NULL);
 
     cmdparse();
+
+
+    // close config file
+    fclose(configFile);
+
+    // free memory
+    free_cfg_Confs( gco_config );
+    csv_free_ListaCSV( ListaCSV );
     printf("\n:)\n");
 
     return 0;

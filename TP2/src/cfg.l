@@ -1,8 +1,10 @@
 %{
+#define YY_NO_INPUT
 #include <string.h>
 #include "cfg.lib.h"
 #include "cfg.tab.h"
 %}
+%option nounput
 %x ler_string
 %x ler_numero
 %x campos

@@ -3,6 +3,8 @@
 #include <string.h>
 #include "csv.lib.h"
 
+Lcsv ListaCSV = NULL;
+
 /* -----------------------------------
  * Constructor Function Implementations
  * -----------------------------------
@@ -222,6 +224,28 @@ Linha csv_Linha_reverse( Linha l ){
     free_csv_Linha(init);
 
     return aux;
+}
+
+void csv_import_csv( Linhas dados ){
+    if( !ListaCSV ){
+        ListaCSV = (Lcsv) malloc( sizeof( struct sLcsv ) );
+        ListaCSV->next = NULL;
+        ListaCSV->csv = dados;
+        return;
+    }
+
+    Lcsv nova = (Lcsv) malloc( sizeof( struct sLcsv ) );
+    nova->next = ListaCSV;
+    nova->csv = dados;
+    ListaCSV = nova;
+}
+
+void csv_free_ListaCSV(Lcsv elem){
+    if( elem ){
+        free_csv_Linhas( elem->csv );
+        csv_free_ListaCSV( elem->next );
+        free( elem );
+    }
 }
 
 /* -----------------------------------
