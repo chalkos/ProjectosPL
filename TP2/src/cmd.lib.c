@@ -2,11 +2,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+extern int cfgparse();
+extern void cfgset_in(FILE * in_str);
 extern int csvparse();
 extern void csvset_in(FILE * in_str);
 
 void cmd_config(char* ficheiro){
     printf("comando config (%s)\n", ficheiro);
+
+    FILE *cfgFile;
+    if( !( cfgFile = fopen(ficheiro, "r") )){
+        fprintf( stderr, "[ERRO] Não foi possível abrir o ficheiro %s\n", ficheiro);
+        fprintf( stderr, "[ERRO] Não foi possível carregar a configuração. Abortar.\n");
+        return;
+    }
+    
+    cfgset_in(cfgFile);
+    if( cfgparse() == 1 ){
+        // houve problemas ao ler o cfg
+        fprintf( stderr, "[ERRO] Não foi possível carregar a configuração. Abortar.\n");
+        fclose(cfgFile);
+        return;
+    }
+    fclose(cfgFile);
+    
 }
 
 void cmd_load(char* ficheiro){
@@ -20,14 +39,14 @@ void cmd_import(char* ficheiro){
     FILE *csvFile;
     if( !( csvFile = fopen(ficheiro, "r") )){
         fprintf( stderr, "[ERRO] Não foi possível abrir o ficheiro %s\n", ficheiro);
-        fprintf( stderr, "[ERRO] Não foi possível carregar a configuração. Abortar.\n");
+        fprintf( stderr, "[ERRO] Não foi possível carregar o ficheiro CSV. Abortar.\n");
         return;
     }
     
     csvset_in(csvFile);
     if( csvparse() == 1 ){
         // houve problemas ao ler o csv
-        fprintf( stderr, "[ERRO] Não foi possível carregar a configuração. Abortar.\n");
+        fprintf( stderr, "[ERRO] Não foi possível carregar o ficheiro CSV. Abortar.\n");
         fclose(csvFile);
         return;
     }

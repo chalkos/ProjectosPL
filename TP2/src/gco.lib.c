@@ -53,8 +53,6 @@ int main(int argc, char* argv[]){
 
     printf("-----------------------\n%s", CMD_PROMPT);
 
-    cfgset_in(NULL);
-
     cmdparse();
 
 
@@ -75,7 +73,15 @@ void gco_set_Config(Confs cfg){
         fprintf( stderr, "[ERRO] Não foi possível carregar a configuração. Abortar.\n");
         exit(2);
     }
+    if(gco_config) free_cfg_Confs(gco_config);
     gco_config = cfg;
+    
+    printf("------------------\n");
+    printf("Nova Configuração:\n");
+    printf("------------------\n");
+    cfg_Confs_print(gco_config);
+
+    printf("-----------------------\n%s", CMD_PROMPT);
 }
 
 

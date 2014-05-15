@@ -3,6 +3,8 @@
 #include "cfg.lib.h"
 #include "cfg.tab.h"
 
+void gco_set_Config(Confs cfg){}
+
 extern int cfglex();
 
 int main(){
@@ -37,9 +39,15 @@ int main(){
             case num :
                 printf("num\n");
                 break;
+            
+            case '\n':
+                printf("SEPARADOR_LINHA\n");
+                break;
                            
             default: printf("token: %d (char: '%c')\n", token, token);
         }
     }
+
+    return 0;
 }
 

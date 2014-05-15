@@ -34,23 +34,25 @@ int cfg_Confs_validate( Confs cfgs ){
                 n_score++;
                 break;
             default:
-                fprintf(stderr, "WARNING: flag %d na struct Conf ignorada!\n", cfg->flag);
+                fprintf(stderr, "[WARNING]: flag %d na struct Conf ignorada!\n", cfg->flag);
         }
 
         cfgs = cfgs->u.d1.s2;
     }
 
     if( n_titulos > 1 )
-        fprintf(stderr, "WARNING: Encontrados %d =titulo=\n", n_titulos);
+        fprintf(stderr, "[WARNING]: Encontrados %d =titulo=.", n_titulos);
     if( n_nprovas > 1 )
-        fprintf(stderr, "WARNING: Encontrados %d =nprovas=\n", n_nprovas);
+        fprintf(stderr, "[WARNING]: Encontrados %d =nprovas=.", n_nprovas);
     if( n_ntop > 1 )
-        fprintf(stderr, "WARNING: Encontrados %d =ntop=\n", n_ntop);
+        fprintf(stderr, "[WARNING]: Encontrados %d =ntop=.", n_ntop);
     if( n_score > 1 )
-        fprintf(stderr, "WARNING: Encontrados %d =score=.\n", n_score);
+        fprintf(stderr, "[WARNING]: Encontrados %d =score=.", n_score);
     if( n_campos > 1 )
-        fprintf(stderr, "WARNING: Encontrados %d =campos=.\n", n_campos);
-    //TODO: ver como lidar de forma genérica com erros e warnings, tanto nos módulos como no yacc.
+        fprintf(stderr, "[WARNING]: Encontrados %d =campos=.", n_campos);
+    
+    if(  n_titulos > 1 ||  n_nprovas > 1 || n_ntop > 1 || n_score > 1 || n_campos > 1 )
+        fprintf(stderr, "Será usada a ultima ocorrência.\n");
 
     return 1; //tudo bem
 }
