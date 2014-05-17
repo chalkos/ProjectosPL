@@ -4,7 +4,11 @@
 #include <stdlib.h>
 #include "cfg.lib.h"
 
-extern void gco_set_Config(Confs cfg);
+#define YYERROR_VERBOSE
+
+extern unsigned int cfglineno;
+extern int cfglex (void);
+extern int gco_set_Config(Confs cfg);
 extern void cfglex_destroy();
 %}
 %union{
@@ -24,10 +28,10 @@ extern void cfglex_destroy();
 %type <cfg_campos> Lcampos Campos
 %%
 Z : Configuracoes '$' { $$ = $1;
-                        gco_set_Config($$);
                         cfglex_destroy();
-                        YYACCEPT;
-                        /*exit(0);*/ };
+                        if( gco_set_Config($$) == 0 )
+                            YYACCEPT;
+                        YYABORT; };
 
 Configuracoes : Configuracao '\n' Configuracoes {$$ = cons_cfg_Confs($1,$3);}
               | { $$ = cons_cfg_Confs_NIL(); }
@@ -55,7 +59,7 @@ Campo : '$' num { $$ = $2; };
 
 %%
 int yyerror( char* s ){
-    fprintf(stderr, "%s", s);
+    fprintf(stderr, "Line %d: %s\n", cfglineno, s);
     return 0;
 }
 

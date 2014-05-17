@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include "cmd.lib.h"
 
+#define YYERROR_VERBOSE
+
+extern int cmdlex (void);
 extern void cmdlex_destroy();
 %}
 %union{ char* cmd_ficheiro; }

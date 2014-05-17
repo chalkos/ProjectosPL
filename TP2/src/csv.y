@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include "csv.lib.h"
 
+#define YYERROR_VERBOSE
+
+extern unsigned int csvlineno;
+extern int csvlex (void);
 extern void csvlex_destroy();
 %}
 %union{
@@ -42,7 +46,7 @@ Campo : str {$$ = cons_csv_Campo ($1);}
       ;
 
 %%
-int yyerror (char *s){
-	fprintf (stderr," %s",s);
+int yyerror( char* s ){
+    fprintf(stderr, "Line %d: %s\n", csvlineno, s);
     return 0;
 }

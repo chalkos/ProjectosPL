@@ -4,6 +4,7 @@
 #include "csv.lib.h"
 #include "csv.tab.h"
 %}
+%option yylineno
 %option nounput
 
 %%

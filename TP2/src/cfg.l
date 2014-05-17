@@ -5,6 +5,7 @@
 #include "cfg.tab.h"
 %}
 %option nounput
+%option yylineno
 %x ler_string
 %x ler_numero
 %x campos
@@ -34,7 +35,7 @@
 [\n]+       return '\n';
 
 <*>[ \t] ;
-<*>.     { printf("flex lixo: %c (%d)\n", *cfgtext, *cfgtext); }
+<*>.     { /*printf("flex: %c (%d)\n", *cfgtext, *cfgtext);*/ }
 
 %%
 
