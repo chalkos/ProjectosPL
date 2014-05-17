@@ -7,6 +7,8 @@ extern void cfgset_in(FILE * in_str);
 extern int csvparse();
 extern void csvset_in(FILE * in_str);
 
+extern void cfglex_destroy();
+
 void cmd_config(char* ficheiro){
     printf("comando config (%s)\n", ficheiro);
 
@@ -21,6 +23,7 @@ void cmd_config(char* ficheiro){
     if( cfgparse() == 1 ){
         // houve problemas ao ler o cfg
         fprintf( stderr, "[ERRO] Não foi possível carregar a configuração. Abortar.\n");
+        cfglex_destroy();
         fclose(cfgFile);
         return;
     }

@@ -53,7 +53,7 @@ char* cfg_get_Titulo( Confs cfgs ){
     Conf cfg;
     while( cfgs->flag != PScons_cfg_Confs_NIL ){
         cfg = cfgs->u.d1.s1;
-        if( cfg->flag == PScons_cfg_Conf_Nprovas )
+        if( cfg->flag == PScons_cfg_Conf_Titulo )
             res = cfg->u.d1.s1;
         cfgs = cfgs->u.d1.s2;
     }
@@ -62,9 +62,15 @@ char* cfg_get_Titulo( Confs cfgs ){
 
 }
 
-// questões
+// obtém um array de 0 e 1 consoante devem ser escritos no html ou não
+// exemplo:
+// se =campos= $2, $4, $9
+// e totalCampos = 5
+// então res = {0,1,0,1,0}
 char* cfg_Campos_seleccionado( Confs cfgs, int totalCampos ){
     char* res = (char*) malloc( sizeof( char ) * totalCampos );
+    int i; for(i=0; i<totalCampos; res[i++] = 0);
+
     Conf cfg;
     Lcampos cmps;
     
@@ -72,11 +78,11 @@ char* cfg_Campos_seleccionado( Confs cfgs, int totalCampos ){
     while( cfgs->flag != PScons_cfg_Confs_NIL ){
         cfg = cfgs->u.d1.s1;
         if( cfg->flag == PScons_cfg_Conf_Campos )
-                cmps = cfg->u.d4.s1;
+            cmps = cfg->u.d4.s1;
         cfgs = cfgs->u.d1.s2;
     }
     
-    // verificar se o indice pertence
+    // meter os indices que pertencem aos campos a 1
     while( cmps->flag == PScons_cfg_Lcampos_Lcampos ){
         if( cmps->u.d1.s2 < totalCampos )
             res[cmps->u.d1.s2] = 1;

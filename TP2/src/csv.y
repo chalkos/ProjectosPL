@@ -27,10 +27,14 @@ extern void csvlex_destroy();
 
 %%
 X : Linhascsv '$' { $$ = $1; 
-                    csv_Linhas_validate($$);
-                    csv_import_csv($$);
                     csvlex_destroy();
-                    YYACCEPT;};
+                    if( csv_Linhas_validate($$) ){
+                        csv_import_csv($$);
+                        YYACCEPT;
+                    }else{
+                        YYABORT;
+                    }
+                  };
 
 Linhascsv : Linha '\n' Linhascsv {$1 = csv_Linha_reverse($1);
                                   $$ = cons_csv_Linhas ($1,$3);}

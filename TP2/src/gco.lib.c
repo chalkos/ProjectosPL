@@ -17,6 +17,7 @@ int gco_set_Config(Confs cfg);
 extern int cmdparse();
 extern int cfgparse();
 extern void csvlex_destroy();
+extern void cfglex_destroy();
 
 extern void cfgset_in(FILE * in_str);
 
@@ -50,6 +51,7 @@ int main(int argc, char* argv[]){
     // ler a configuração
     if( cfgparse() != 0 ){
         // erro ao ler a configuração
+        cfglex_destroy();
         fclose(configFile);
         return 2;
     }

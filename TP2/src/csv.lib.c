@@ -78,61 +78,53 @@ Campo  cons_csv_Campo_NIL()
  * -----------------------------------
  */
  
-int csv_Linhas_validate(Linhas lcsv){
-    int campo = 0;
-    int campoLinha =0;
 
-    Linha l;
-    Campo cmp;
+// Retorna 1 se o ficheiro csv estiver bom
+int csv_Linhas_validate(Linhas linhas){
+    int numLinha = 0;
+    int numCamposCerto = 0;
+    int numCamposLido = 0;
+    int ocorreuErro = 0; //se ocorrer fica a 1
+    
+    Linha linha;
+    
+    if( linhas->flag == PScons_csv_Linhas_NIL ){
+        fprintf(stderr, "[ERRO] O ficheiro csv apenas tem o cabeçalho.\n");
+        return 0;
+    }
 
-    while (lcsv -> flag != PScons_csv_Linhas_NIL){
-        l = lcsv->u.d1.s1;
-        switch (l->flag){
-            case PScons_csv_Linha_Fim:
-                cmp = l->u.d2.s1;
-                switch(cmp->flag){
-                    case PScons_csv_Campo_NIL:
-                        campo++;
-                        break;
-                    case PScons_csv_Campo:
-                        campo++;
-                        break;
-                }
-                break;
-            case PScons_csv_Linha:
-                while (l->flag != PScons_csv_Linha_Fim){
-                    cmp = l->u.d1.s2;
-                    switch (cmp->flag){
-                        case PScons_csv_Campo:
-                            campoLinha ++;
-                            break;
-                        case PScons_csv_Campo_NIL:
-                            campoLinha ++;
-                            break;
-                    } 
-                    l = l->u.d1.s1;  
-                }
-                cmp = l->u.d2.s1;
-                switch (cmp->flag){
-                    case PScons_csv_Campo:
-                        campoLinha++;
-                        break ;
-                    case PScons_csv_Campo_NIL:
-                        campoLinha++;
-                        break;
-                }
-                campo = campoLinha;    
-                break;
+    // tem mais linhas além do cabeçalho. guardar o nr de campos do cabeçalho
+    linha = linhas->u.d1.s1;
+    while( linha->flag == PScons_csv_Linha ){
+        numCamposCerto++;
+        linha = linha->u.d1.s1;
+    }
+    numCamposCerto++; //linha->flag == PScons_csv_Linha_Fim
+    numLinha++;
 
-            default :
-                fprintf(stderr, "WARNING : flag %d na struct Linha ignorada\n",l->flag );
+    while( linhas->flag == PScons_csv_Linhas ){
+        linha = linhas->u.d1.s1;
+        
+        numCamposLido = 0;
+        while( linha->flag == PScons_csv_Linha ){
+            numCamposLido++;
+            linha = linha->u.d1.s1;
+        }
+        numCamposLido++;//linha->flag == PScons_csv_Linha_Fim
+        
+        //validar
+        if( numCamposLido != numCamposCerto ){
+            ocorreuErro = 1;
+            fprintf(stderr, "[ERRO] CSV (linha %d): esperados %d campo(s), lidos %d campo(s)\n", numLinha, numCamposCerto, numCamposLido);
         }
 
-        lcsv = lcsv->u.d1.s2;
+        numLinha++;
+        linhas = linhas->u.d1.s2;
     }
-    if (campo!= campoLinha)    
-        fprintf(stderr, "WARNING: Linhas com nº de campos diferentes campos\n");
-    return 0;
+    
+    if( ocorreuErro )
+        return 0;
+    return 1;
 }
 
 

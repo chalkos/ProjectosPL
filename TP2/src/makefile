@@ -6,7 +6,7 @@ GDB=-Wall -g
 #  Tokenizers    \
 #----------------´
 
-cmdtok : cmd.tok.c lex.cmd.o cmd.tab.o cmd.lib.o
+cmdtok : cmd.tok.c lex.cmd.o cmd.tab.o cmd.lib.o cmd.mockups.o
 	gcc $(GDB) -o $@ $^ -ll
 
 cfgtok : cfg.tok.c lex.cfg.o cfg.tab.o cfg.lib.o
@@ -48,11 +48,11 @@ lex.cfg.c : cfg.l
 #  Cmd           \
 #----------------´
 
-cmd : cmd.main.c cmd.lib.o lex.cmd.o cmd.tab.o cmd.dummy.o
+cmd : cmd.main.c cmd.lib.o lex.cmd.o cmd.tab.o cmd.mockups.o
 	gcc $(GDB) -o $@ $^ -ll
 
-cmd.dummy.o : cmd.dummy.c cmd.dummy.h
-	gcc $(GDB) -c cmd.dummy.c
+cmd.mockups.o : cmd.mockups.c cmd.mockups.h
+	gcc $(GDB) -c cmd.mockups.c
 
 cmd.lib.o : cmd.lib.c cmd.lib.h
 	gcc $(GDB) -c cmd.lib.c

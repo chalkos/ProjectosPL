@@ -32,4 +32,5 @@ int main(){
             default: printf("token: %d\n", token);
         }
     }
+    return 0;
 }
