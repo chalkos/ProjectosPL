@@ -1,4 +1,4 @@
-%token TITULO NPROVAS NTOP CAMPOS SCORE str num
+%token TITULO NPROVAS NTOP CAMPOS TEMPO CHAVE NOME str num
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,7 +20,7 @@ extern void cfglex_destroy();
     Lcampos cfg_campos;
 }
 %type <cfg_str> str Titulo
-%type <cfg_num> num Nprovas Ntop Score Campo
+%type <cfg_num> num Nprovas Ntop Tempo Campo Chave Nome
 %start Z
 
 %type <cfg_confs> Z Configuracoes
@@ -40,15 +40,19 @@ Configuracoes : Configuracao '\n' Configuracoes {$$ = cons_cfg_Confs($1,$3);}
 Configuracao : Titulo  { $$ = cons_cfg_Conf_Titulo($1); }
              | Nprovas { $$ = cons_cfg_Conf_Nprovas($1); }
              | Ntop    { $$ = cons_cfg_Conf_Ntop($1); }
-             | Score   { $$ = cons_cfg_Conf_Score($1); }
+             | Tempo { $$ = cons_cfg_Conf_Tempo($1); }
              | Campos  { $$ = cons_cfg_Conf_Campos($1); }
+             | Chave { $$ = cons_cfg_Conf_Chave($1); }
+             | Nome { $$ = cons_cfg_Conf_Nome($1); }
              ;
 
 Titulo  : TITULO str     { $$ = $2; };
 Nprovas : NPROVAS num    { $$ = $2; };
 Ntop    : NTOP num       { $$ = $2; };
 Campos  : CAMPOS Lcampos { $$ = cfg_Lcampos_reverse( $2 ); }
-Score   : SCORE '$' num  { $$ = $3; };
+Tempo   : TEMPO '$' num  { $$ = $3; };
+Chave   : CHAVE '$' num  { $$ = $3; };
+Nome    : NOME '$' num   { $$ = $3; };
 
 
 Lcampos : Lcampos ';' Campo { $$ = cons_cfg_Lcampos_Lcampos($1,$3); }

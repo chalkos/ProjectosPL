@@ -7,7 +7,9 @@
        |  cons_cfg_Conf_Nprovas(INT)
        |  cons_cfg_Conf_Ntop(INT)
        |  cons_cfg_Conf_Campos(Lcampos)
-       |  cons_cfg_Conf_Score(INT)
+       |  cons_cfg_Conf_Tempo(INT)
+       |  cons_cfg_Conf_Chave(INT)
+       |  cons_cfg_Conf_Nome(INT)
        ;
 
   Lcampos -> cons_cfg_Lcampos_Lcampos(Lcampos INT)

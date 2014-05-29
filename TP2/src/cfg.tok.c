@@ -28,8 +28,16 @@ int main(){
                 printf("CAMPOS\n");
                 break;
                            
-            case SCORE :
-                printf("SCORE\n");
+            case TEMPO :
+                printf("TEMPO\n");
+                break;
+                           
+            case CHAVE :
+                printf("CHAVE\n");
+                break;
+                           
+            case NOME :
+                printf("NOME\n");
                 break;
                            
             case str :

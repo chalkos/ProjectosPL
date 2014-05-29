@@ -13,10 +13,12 @@
 #define PScons_cfg_Conf_Nprovas  2003
 #define PScons_cfg_Conf_Ntop  2004
 #define PScons_cfg_Conf_Campos  2005
-#define PScons_cfg_Conf_Score  2006
+#define PScons_cfg_Conf_Tempo  2006
+#define PScons_cfg_Conf_Chave  2007
+#define PScons_cfg_Conf_Nome  2008
 
-#define PScons_cfg_Lcampos_Lcampos  2007
-#define PScons_cfg_Lcampos_Campo  2008
+#define PScons_cfg_Lcampos_Lcampos  2009
+#define PScons_cfg_Lcampos_Campo  2010
 
 /* -----------------------------------
  * Abstract Data Types Definition
@@ -72,6 +74,12 @@ struct sConf
     struct {
         int s1;
       } d5;
+    struct {
+        int s1;
+      } d6;
+    struct {
+        int s1;
+      } d7;
 
   } u;
 };
@@ -92,6 +100,25 @@ struct sLcampos
 };
 
 /* -----------------------------------
+ * Constructor Function Signatures
+ * -----------------------------------
+ */
+
+Confs  cons_cfg_Confs( Conf a1, Confs a2);
+Confs  cons_cfg_Confs_NIL();
+
+Conf  cons_cfg_Conf_Titulo( char * a1);
+Conf  cons_cfg_Conf_Nprovas( int a1);
+Conf  cons_cfg_Conf_Ntop( int a1);
+Conf  cons_cfg_Conf_Campos( Lcampos a1);
+Conf  cons_cfg_Conf_Tempo( int a1);
+Conf  cons_cfg_Conf_Chave( int a1);
+Conf  cons_cfg_Conf_Nome( int a1);
+
+Lcampos  cons_cfg_Lcampos_Lcampos( Lcampos a1, int a2);
+Lcampos  cons_cfg_Lcampos_Campo( int a1);
+
+/* -----------------------------------
  * Custom Function Signatures
  * -----------------------------------
  */
@@ -103,7 +130,9 @@ Lcampos cfg_Lcampos_reverse( Lcampos l );
 // getters
 int cfg_get_Nprovas( Confs cfgs );
 int cfg_get_Ntop( Confs cfgs );
-int cfg_get_Score( Confs cfgs );
+int cfg_get_Tempo( Confs cfgs );
+int cfg_get_Chave( Confs cfgs );
+int cfg_get_Nome( Confs cfgs );
 char* cfg_get_Titulo( Confs cfgs );
 
 // obtém um array de bytes que está a 1 nos campos que foram seleccionados
@@ -117,22 +146,5 @@ char* cfg_Campos_seleccionado( Confs cfgs, int totalCampos );
 void free_cfg_Lcampos( Lcampos campos );
 void free_cfg_Conf( Conf cfg );
 void free_cfg_Confs( Confs cfgs );
-
-/* -----------------------------------
- * Constructor Function Signatures
- * -----------------------------------
- */
-
-Confs  cons_cfg_Confs( Conf a1, Confs a2);
-Confs  cons_cfg_Confs_NIL();
-
-Conf  cons_cfg_Conf_Titulo( char * a1);
-Conf  cons_cfg_Conf_Nprovas( int a1);
-Conf  cons_cfg_Conf_Ntop( int a1);
-Conf  cons_cfg_Conf_Campos( Lcampos a1);
-Conf  cons_cfg_Conf_Score( int a1);
-
-Lcampos  cons_cfg_Lcampos_Lcampos( Lcampos a1, int a2);
-Lcampos  cons_cfg_Lcampos_Campo( int a1);
 
 #endif

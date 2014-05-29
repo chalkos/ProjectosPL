@@ -2,4 +2,6 @@
 =nprovas= 60
 =campos= $1; $2; $5
 =ntop= 10
-=score= $2
+=tempo= $2
+=chave= $3
+=nome= $4
