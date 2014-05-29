@@ -1,0 +1,5 @@
+<ga>
+    Arv -> cons_arv( INT Arv Arv )
+         | cons_arv_NIL()
+         ;
+</ga>

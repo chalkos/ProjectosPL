@@ -1,0 +1,7 @@
+Ident ( "2364", 2014-05-25, "Mário Ferreira", "LEI" )
+Avaliacao ( Par("D1", 10)
+            Par("D2", 20)
+            Par("D3", 13))
+Disciplinas ( Disc( "D1", "Bases de dados", 1.0 )
+              Disc( "D2", "Matemática Discreta", 0.8 )
+              Disc( "D3", "Processamento de Linguagens", 1.5 ))          
