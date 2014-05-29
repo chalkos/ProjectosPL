@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include "csv.lib.h"
 
 Lcsv ListaCSV = NULL;
@@ -77,7 +78,29 @@ Campo  cons_csv_Campo_NIL()
  * Custom Function Implementations
  * -----------------------------------
  */
- 
+
+// retorna o tempo em segundos a partir de uma string de tempo
+int csv_tempo_to_int(char* str){
+    if( strlen(str) != 8 )
+        return -1;
+
+    if( str[2] != ':' || str[5] != ':' )
+        return -1;
+
+    if( !isdigit( str[0] ) ||
+        !isdigit( str[1] ) ||
+        !isdigit( str[3] ) ||
+        !isdigit( str[4] ) ||
+        !isdigit( str[6] ) ||
+        !isdigit( str[7] ))
+        return -1;
+    
+    // o tempo é válido da forma hh:mm:ss
+    return ( atoi(str) * 3600 +
+             atoi(str+3) * 60 +
+             atoi(str+6));
+
+}
 
 // Retorna 1 se o ficheiro csv estiver bom
 int csv_Linhas_validate(Linhas linhas){

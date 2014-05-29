@@ -117,6 +117,7 @@ Linha csv_Linha_reverse( Linha l );
 int csv_Linhas_validate (Linhas lcsv);
 
 void csv_import_csv( Linhas dados );
+int csv_tempo_to_int(char* str);
 
 /* -----------------------------------
  * Destructor Function Implementations
