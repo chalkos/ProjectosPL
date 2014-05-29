@@ -3,8 +3,13 @@
 #include <string.h>
 #include <ctype.h>
 #include "csv.lib.h"
+#include "atl.lib.h"
+
+// fix
+char* strdup(const char * s);
 
 Lcsv ListaCSV = NULL;
+extern Confs gco_config;
 
 /* -----------------------------------
  * Constructor Function Implementations
@@ -100,6 +105,34 @@ int csv_tempo_to_int(char* str){
              atoi(str+3) * 60 +
              atoi(str+6));
 
+}
+
+
+char* csv_get_campo(Linha campos, int indice_campo){
+    Campo campo = NULL;
+    while( indice_campo > 1 ){
+        // se o indice_campo for >1 e ja estivermos no
+        // ultimo campo da linha, nao há mais campos
+        if( campos->flag == PScons_csv_Linha_Fim )
+            return NULL;
+
+        if( campos->flag == PScons_csv_Linha )
+            campos = campos->u.d1.s1;
+        indice_campo--;
+    }
+
+    if( indice_campo == 1 ){
+        if( campos->flag == PScons_csv_Linha )
+            campo = campos->u.d1.s2;
+        else // PScons_csv_Linha_Fim
+            campo = campos->u.d2.s1;
+
+        if( campo->flag == PScons_csv_Campo )
+            return strdup(campo->u.d1.s1);
+        else
+            return NULL;
+    }
+    return NULL;
 }
 
 // Retorna 1 se o ficheiro csv estiver bom
@@ -241,6 +274,10 @@ Linha csv_Linha_reverse( Linha l ){
 }
 
 void csv_import_csv( Linhas dados ){
+    ListaAtletas = atl_ler_csv( gco_config, dados, ListaAtletas);
+
+    atl_print( ListaAtletas );
+
     if( !ListaCSV ){
         ListaCSV = (Lcsv) malloc( sizeof( struct sLcsv ) );
         ListaCSV->next = NULL;
