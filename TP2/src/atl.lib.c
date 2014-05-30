@@ -10,6 +10,13 @@ char* strdup(const char * s);
 
 Atletas ListaAtletas = NULL;
 
+void atl_free_AtletasList(Atletas atletas){
+    if( atletas ){
+        atl_free_AtletasList(atletas->proximo);
+        free(atletas);
+    }
+}
+
 Atletas atl_ordenar_por_Score(Atletas atletas){
     Atletas res = NULL;
     while( atletas ){

@@ -33,6 +33,10 @@ Atletas atl_insere_por_Score(Atletas atletas, Atleta atleta);
 void atl_print(Atletas atletas);
 
 void atl_free_Atletas(Atletas atletas);
+
+// versão que não liberta memória dos atletas em sí (apenas da lista)
+// usado para libertar a lista ordenada por score
+void atl_free_AtletasList(Atletas atletas);
 void atl_free_Atleta(Atleta atleta);
 
 
