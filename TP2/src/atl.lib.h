@@ -26,6 +26,7 @@ struct sAtleta{
 
 Atleta atl_novo_atleta(char* id, char* nome);
 
+Atletas atl_ordenar_por_Score(Atletas atletas);
 Atletas atl_insere_por_ID(Atletas atletas, Atleta atleta);
 Atletas atl_insere_por_Score(Atletas atletas, Atleta atleta);
 

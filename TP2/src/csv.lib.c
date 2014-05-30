@@ -278,6 +278,11 @@ void csv_import_csv( Linhas dados ){
 
     atl_print( ListaAtletas );
 
+    printf("Lista de atletas por score:\n");
+    Atletas porscore = atl_ordenar_por_Score( ListaAtletas );
+    atl_print( porscore );
+    
+
     if( !ListaCSV ){
         ListaCSV = (Lcsv) malloc( sizeof( struct sLcsv ) );
         ListaCSV->next = NULL;

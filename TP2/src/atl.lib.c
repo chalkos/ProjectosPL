@@ -9,6 +9,15 @@ char* strdup(const char * s);
 
 Atletas ListaAtletas = NULL;
 
+Atletas atl_ordenar_por_Score(Atletas atletas){
+    Atletas res = NULL;
+    while( atletas ){
+        res = atl_insere_por_Score( res, atletas->atleta );
+        atletas = atletas->proximo;
+    }
+    return res;
+}
+
 Atleta atl_novo_atleta(char* id, char* nome){
     Atleta atleta = (Atleta) malloc( sizeof( struct sAtleta ) );
 
@@ -77,14 +86,9 @@ Atletas atl_insere_por_Score(Atletas atletas, Atleta atleta){
     }
 
     while( atletas ){
-        // actual == por inserir (ignorar)
-        if( atletas->atleta->score == atleta->score ){
-            atl_free_Atleta( atleta );
-            return original;
-        }
-        
         // actual <= por inserir < proximo
-        if( atletas->proximo && (atletas->proximo->atleta->score > atleta->score) ){
+        if( atletas->atleta->score == atleta->score || 
+                (atletas->proximo && (atletas->proximo->atleta->score > atleta->score)) ){
             Atletas newAtletas = (Atletas) malloc( sizeof( struct sAtletas ) );
             newAtletas->atleta = atleta;
             newAtletas->proximo = atletas->proximo;
@@ -98,7 +102,7 @@ Atletas atl_insere_por_Score(Atletas atletas, Atleta atleta){
             newAtletas->atleta = atleta;
             newAtletas->proximo = NULL;
             atletas->proximo = newAtletas;
-            return newAtletas;
+            return original;
         }
 
         atletas = atletas->proximo;
