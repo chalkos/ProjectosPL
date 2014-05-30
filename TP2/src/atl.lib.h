@@ -41,5 +41,6 @@ void atl_free_Atleta(Atleta atleta);
  * ***************/
 
 Atletas atl_ler_csv( Confs cfg, Linhas csv, Atletas atletas );
+Atletas atl_ler_tempos( Confs cfg, Linhas csv, Atletas atletas );
 
 #endif

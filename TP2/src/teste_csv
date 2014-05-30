@@ -2,5 +2,6 @@ ID;Nome;Tempo;Descrição;Extras
 UM001;Bruno;00:20:00;;
 UM004;Manuel;00:09:00;;
 UM002;Filipe;00:10:00;;
-UM001;André;00:30:00;;Este não deve aparecer por causa do ID
-UM003;Pedro;00:5:00;;
+UM003;Pedro;00:05:00;;
+UM005;Fabio;dnf;;
+UM006;Duarte;00:14:00;;

@@ -278,6 +278,8 @@ void csv_import_csv( Linhas dados ){
 
     atl_print( ListaAtletas );
 
+    atl_ler_tempos( gco_config, dados, ListaAtletas );
+
     printf("Lista de atletas por score:\n");
     Atletas porscore = atl_ordenar_por_Score( ListaAtletas );
     atl_print( porscore );

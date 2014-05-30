@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <limits.h>
 
 //fix
 char* strdup(const char * s);
@@ -77,8 +78,8 @@ Atletas atl_insere_por_Score(Atletas atletas, Atleta atleta){
     Atletas original = atletas;
 
     // ainda nao existem atletas ou
-    // o score do atleta é menor que o score do primeiro da lista
-    if( !atletas || (atletas && atletas->atleta->score > atleta->score) ){
+    // o score do atleta é maior que o score do primeiro da lista
+    if( !atletas || (atletas && atletas->atleta->score < atleta->score) ){
         Atletas newAtletas = (Atletas) malloc( sizeof( struct sAtletas ) );
         newAtletas->atleta = atleta;
         newAtletas->proximo = atletas;
@@ -86,9 +87,9 @@ Atletas atl_insere_por_Score(Atletas atletas, Atleta atleta){
     }
 
     while( atletas ){
-        // actual <= por inserir < proximo
+        // actual >= por inserir > proximo
         if( atletas->atleta->score == atleta->score || 
-                (atletas->proximo && (atletas->proximo->atleta->score > atleta->score)) ){
+                (atletas->proximo && (atletas->proximo->atleta->score < atleta->score)) ){
             Atletas newAtletas = (Atletas) malloc( sizeof( struct sAtletas ) );
             newAtletas->atleta = atleta;
             newAtletas->proximo = atletas->proximo;
@@ -143,6 +144,64 @@ void atl_free_Atleta(Atleta atleta){
     free( atleta );
 }
 
+Atletas atl_ler_tempos( Confs cfg, Linhas csv, Atletas atletas ){
+    Atletas atlOriginal = atletas;
+    int campoChave = cfg_get_Chave( cfg );
+    int campoTempo = cfg_get_Tempo( cfg );
+
+    Linha linha;
+    Atleta atleta;
+
+    char* idAtleta;
+    int tempoAtleta;
+
+    int melhorTempo = INT_MAX;
+
+    if( csv->flag == PScons_csv_Linhas )
+        csv = csv->u.d1.s2;
+
+    //obter os tempos (e o melhor tempo)
+    while( csv->flag == PScons_csv_Linhas ){
+        linha = csv->u.d1.s1;
+
+        idAtleta = csv_get_campo( linha, campoChave );
+        tempoAtleta = csv_tempo_to_int(
+                        csv_get_campo( linha, campoTempo ) );
+        if( tempoAtleta > 0 && tempoAtleta < melhorTempo )
+            melhorTempo = tempoAtleta;
+
+        if( tempoAtleta < 0 )
+            tempoAtleta = 0;
+
+        while( atletas ){
+            atleta = atletas->atleta;
+            
+            if( strcmp( atleta->ID, idAtleta ) == 0 ){
+                atleta->tempo_ultima_prova = tempoAtleta;
+                break;
+            }
+
+            atletas = atletas->proximo;
+        }
+        atletas = atlOriginal;
+        csv = csv->u.d1.s2;
+    }
+
+    if( melhorTempo == INT_MAX )
+        return atlOriginal;
+
+    // calcular os scores
+    atletas = atlOriginal;
+    while( atletas ){
+        atleta = atletas->atleta;
+        if( atleta->tempo_ultima_prova > 0 )
+            atleta->score += (int)(( melhorTempo / (float)atleta->tempo_ultima_prova ) * 100);
+        atleta->tempo_ultima_prova = 0;
+        atletas = atletas->proximo;
+    }
+    
+    return atlOriginal;
+}
 
 Atletas atl_ler_csv( Confs cfg, Linhas csv, Atletas atletas ){
     int campoChave = cfg_get_Chave( cfg );
