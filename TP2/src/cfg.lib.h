@@ -135,6 +135,10 @@ int cfg_get_Chave( Confs cfgs );
 int cfg_get_Nome( Confs cfgs );
 char* cfg_get_Titulo( Confs cfgs );
 
+// obtém um array de inteiros com os campos. terminado com -1
+int* cfg_get_Campos( Confs cfgs );
+int cfg_get_NCampos( Confs cfgs );
+
 // obtém um array de bytes que está a 1 nos campos que foram seleccionados
 char* cfg_Campos_seleccionado( Confs cfgs, int totalCampos );
 

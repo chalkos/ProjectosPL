@@ -7,6 +7,7 @@
  * Custom Function Implementations
  * -----------------------------------
  */
+
 // getters
 int cfg_get_Nprovas( Confs cfgs ){
     int res = 0;
@@ -86,6 +87,59 @@ char* cfg_get_Titulo( Confs cfgs ){
     
     return res;
 
+}
+
+int* cfg_get_Campos( Confs cfgs ){
+    int ncampos = cfg_get_NCampos( cfgs );
+
+    // obter o tal array, meter a imprimir os valores
+    int* res = (int*)malloc(sizeof(int)*(ncampos+1));
+    int i = 0;
+
+    Conf cfg;
+    Lcampos cmps;
+    
+    // obter o ultimo =campos=
+    while( cfgs->flag != PScons_cfg_Confs_NIL ){
+        cfg = cfgs->u.d1.s1;
+        if( cfg->flag == PScons_cfg_Conf_Campos )
+            cmps = cfg->u.d4.s1;
+        cfgs = cfgs->u.d1.s2;
+    }
+    
+    // contar o nr de campos
+    while( cmps->flag == PScons_cfg_Lcampos_Lcampos ){
+        res[i++] = cmps->u.d1.s2;
+        cmps = cmps->u.d1.s1;
+    }
+    res[i++] = cmps->u.d2.s1;
+    res[i] = -1;
+
+    return res;
+}
+
+int cfg_get_NCampos( Confs cfgs ){
+    int res = 0;
+
+    Conf cfg;
+    Lcampos cmps;
+    
+    // obter o ultimo =campos=
+    while( cfgs->flag != PScons_cfg_Confs_NIL ){
+        cfg = cfgs->u.d1.s1;
+        if( cfg->flag == PScons_cfg_Conf_Campos )
+            cmps = cfg->u.d4.s1;
+        cfgs = cfgs->u.d1.s2;
+    }
+    
+    // contar o nr de campos
+    while( cmps->flag == PScons_cfg_Lcampos_Lcampos ){
+        res++;
+        cmps = cmps->u.d1.s1;
+    }
+    res++;
+
+    return res;
 }
 
 // obtém um array de 0 e 1 consoante devem ser escritos no html ou não

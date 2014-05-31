@@ -19,8 +19,10 @@
 "=chave="   {BEGIN ler_numero; return CHAVE;}
 "=nome="    {BEGIN ler_numero; return NOME;}
 
-
-<ler_string>[^\n]+ {cfglval.cfg_str = strdup(cfgtext);
+<ler_string>[^\n]+ {if(*cfgtext == ' ')
+                        cfglval.cfg_str = strdup(cfgtext+1);
+                    else
+                        cfglval.cfg_str = strdup(cfgtext);
                     BEGIN 0;
                     return str;}
 <ler_numero>\$     return '$';
