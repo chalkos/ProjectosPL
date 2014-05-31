@@ -9,8 +9,10 @@ extern void csvset_in(FILE * in_str);
 
 extern void cfglex_destroy();
 
+extern void htm_print();
+
 void cmd_config(char* ficheiro){
-    printf("comando config (%s)\n", ficheiro);
+    printf("[DEBUG] comando config (%s)\n", ficheiro);
 
     FILE *cfgFile;
     if( !( cfgFile = fopen(ficheiro, "r") )){
@@ -32,12 +34,12 @@ void cmd_config(char* ficheiro){
 }
 
 void cmd_load(char* ficheiro){
-    printf("comando load (%s)\n", ficheiro);
+    printf("[DEBUG] comando load (%s)\n", ficheiro);
 }
 
 void cmd_import(char* ficheiro){
 
-    printf("comando import (%s)\n", ficheiro);
+    printf("[DEBUG] comando import (%s)\n", ficheiro);
 
     FILE *csvFile;
     if( !( csvFile = fopen(ficheiro, "r") )){
@@ -57,20 +59,21 @@ void cmd_import(char* ficheiro){
 }
 
 void cmd_print(){
-    printf("comando print\n");
+    printf("[DEBUG] comando print\n");
+    htm_print();
 }
 
 void cmd_save(char* ficheiro, int force){
-    printf("comando save(force:%d) (%s)\n", force, ficheiro);
+    printf("[DEBUG] comando save(force:%d) (%s)\n", force, ficheiro);
 }
 
 int cmd_quit(){
-    printf("comando quit\n");
+    printf("[DEBUG] comando quit\n");
     // se o ficheiro não tiver sido guardado recentemente,
     // avisar e dizer para guardar o ficheiro antes de sair
     // ou entao sair com quit!
     
-    // verificar se o ficheiro foi alterado recentemente
+    // verificar se o ficheiro foi guardado recentemente
     return 0; //nao pode sair
 
 

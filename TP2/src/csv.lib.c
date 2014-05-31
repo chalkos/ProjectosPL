@@ -111,7 +111,7 @@ int csv_tempo_to_int(char* str){
 char* csv_get_campo(Linha campos, int indice_campo){
     Campo campo = NULL;
     while( indice_campo > 1 ){
-        // se o indice_campo for >1 e ja estivermos no
+        // se o indice_campo for >0 e ja estivermos no
         // ultimo campo da linha, nao há mais campos
         if( campos->flag == PScons_csv_Linha_Fim )
             return NULL;
@@ -128,7 +128,7 @@ char* csv_get_campo(Linha campos, int indice_campo){
             campo = campos->u.d2.s1;
 
         if( campo->flag == PScons_csv_Campo )
-            return strdup(campo->u.d1.s1);
+            return campo->u.d1.s1;
         else
             return NULL;
     }

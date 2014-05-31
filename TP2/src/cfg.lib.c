@@ -110,12 +110,12 @@ char* cfg_Campos_seleccionado( Confs cfgs, int totalCampos ){
     
     // meter os indices que pertencem aos campos a 1
     while( cmps->flag == PScons_cfg_Lcampos_Lcampos ){
-        if( cmps->u.d1.s2 < totalCampos )
-            res[cmps->u.d1.s2] = 1;
+        if( cmps->u.d1.s2 <= totalCampos )
+            res[cmps->u.d1.s2-1] = 1;
         cmps = cmps->u.d1.s1;
     }
-    if( cmps->u.d2.s1 < totalCampos )
-        res[cmps->u.d2.s1] = 1;
+    if( cmps->u.d2.s1 <= totalCampos )
+        res[cmps->u.d2.s1-1] = 1;
 
     return res;
 }

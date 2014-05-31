@@ -119,7 +119,7 @@ int csv_Linhas_validate (Linhas lcsv);
 void csv_import_csv( Linhas dados );
 int csv_tempo_to_int(char* str);
 
-// indice_campo é 1-based
+// indice_campo começa em 1
 char* csv_get_campo(Linha campos, int indice_campo);
 
 /* -----------------------------------

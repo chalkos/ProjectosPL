@@ -13,3 +13,4 @@ gco
 *.o
 *.tab.[ch]
 lex.*.c
+index.html
