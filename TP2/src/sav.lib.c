@@ -4,8 +4,28 @@
 #include "cfg.lib.h"
 #include "csv.lib.h"
 
+// WR_INT( int )
+// escreve um inteiro no ficheiro
 #define WR_INT(NUM) fwrite(&(NUM), sizeof(int), 1, file)
+// WR_STR( char*, int )
+// escreve a string de tamanho L no ficheiro
 #define WR_STR(STR,L) fwrite((STR), sizeof(char), (L), file)
+
+// RD_INT( int* )
+// lê um inteiro do ficheiro
+#define RD_INT(NUM) \
+    do { \
+        NUM = (int*)malloc(sizeof(int)); \
+        fread(NUM, sizeof(int), 1, file); \
+    } while(0)
+// RD_STR( char*, int )
+// lê uma string de tamanho L do ficheiro
+#define RD_STR(STR,L) \
+    do { \
+        STR=(char*)malloc(sizeof(char)*((L)+1)); \
+        fread((STR), sizeof(char), (L), file); \
+        STR[L] = '\0'; \
+    } while(0)
 
 
 extern Confs gco_config;
@@ -139,6 +159,82 @@ void sav_save(FILE* file){
     fclose(file);
 }
 
-void sav_load(FILE* file){
-
+Lcampos sav_load_campos(FILE* file){
+    // isto tem que ser alterado para conseguir ler as cenas
 }
+
+Confs sav_load_confs(FILE* file, Confs proximo){
+    char* str = NULL;
+    int* num = NULL;
+    Confs confs = NULL;
+    Conf conf = NULL;
+    if( proximo->flag == PScons_cfg_Confs_NIL ){
+        RD_INT(num);
+        RD_STR(str,*num);
+        confs = cons_cfg_Confs(
+            cons_cfg_Conf_Titulo(str),
+            proximo);
+    }else{
+        conf = proximo->u.d1.s1;
+        switch( conf->flag ){
+            case PScons_cfg_Conf_Titulo:
+                RD_INT(num);
+                confs = cons_cfg_Confs(
+                    cons_cfg_Conf_Nprovas( *num ),
+                    proximo);
+                break;
+            case PScons_cfg_Conf_Nprovas:
+                RD_INT(num);
+                confs = cons_cfg_Confs(
+                    cons_cfg_Conf_Ntop( *num ),
+                    proximo);
+                break;
+            case PScons_cfg_Conf_Ntop:
+                RD_INT(num);
+                confs = cons_cfg_Confs(
+                    cons_cfg_Conf_Tempo( *num ),
+                    proximo);
+                break;
+            case PScons_cfg_Conf_Tempo:
+                RD_INT(num);
+                confs = cons_cfg_Confs(
+                    cons_cfg_Conf_Chave( *num ),
+                    proximo);
+                break;
+            case PScons_cfg_Conf_Chave:
+                RD_INT(num);
+                confs = cons_cfg_Confs(
+                    cons_cfg_Conf_Nome( *num ),
+                    proximo);
+                break;
+            case PScons_cfg_Conf_Nome:
+                return cons_cfg_Confs(
+                    cons_cfg_Conf_Campos( sav_load_campos(file) ),
+                    proximo);
+                break;
+        }
+    }
+
+
+    free(str);
+    free(num);
+    return sav_load_confs(file, confs);
+}
+
+void sav_load(FILE* file){
+    // no fim fazer isto, quando souber que está tudo bem
+    //free_cfg_Confs( gco_config);
+    //csv_free_ListaCSV( ListaCSV );
+    
+    char* str;
+    int* num;
+
+    Confs confsFinal = sav_load_confs(file, cons_cfg_Confs_NIL());
+}
+
+
+
+
+
+
+

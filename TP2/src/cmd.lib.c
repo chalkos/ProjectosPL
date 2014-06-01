@@ -37,6 +37,16 @@ void cmd_config(char* ficheiro){
 
 void cmd_load(char* ficheiro){
     printf("[DEBUG] comando load (%s)\n", ficheiro);
+
+    FILE *file;
+    if( !( file = fopen(ficheiro, "rb") )){
+        fprintf( stderr, "[ERRO] Não foi possível abrir o ficheiro %s. Abortar.\n", ficheiro);
+        return;
+    }
+    
+    sav_load( file );
+
+    fclose(file);
 }
 
 void cmd_import(char* ficheiro){
