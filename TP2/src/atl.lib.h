@@ -9,8 +9,14 @@
  * ***********/
 typedef struct sAtletas *Atletas;
 typedef struct sAtleta *Atleta;
+typedef struct sLInt *LInt;
 
 extern Atletas ListaAtletas;
+
+struct sLInt {
+    LInt proximo;
+    int num;
+};
 
 struct sAtletas{
     Atletas proximo;
@@ -20,11 +26,14 @@ struct sAtletas{
 struct sAtleta{
     char* ID;
     char* nome;
-    int score;
+    LInt scores;
     int tempo_ultima_prova;
 };
 
 Atleta atl_novo_atleta(char* id, char* nome);
+
+void atl_add_score(Atleta atleta, int score);
+int atl_get_score(Atleta atleta, int nTop);
 
 Atletas atl_ordenar_por_Score(Atletas atletas);
 Atletas atl_insere_por_ID(Atletas atletas, Atleta atleta);
@@ -38,6 +47,7 @@ void atl_free_Atletas(Atletas atletas);
 // usado para libertar a lista ordenada por score
 void atl_free_AtletasList(Atletas atletas);
 void atl_free_Atleta(Atleta atleta);
+void atl_free_Scores(LInt scores);
 
 
 /******************

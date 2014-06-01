@@ -9,13 +9,7 @@ char* strdup(const char * s);
 #include "atl.lib.h"
 
 Atletas ListaAtletas = NULL;
-
-void atl_free_AtletasList(Atletas atletas){
-    if( atletas ){
-        atl_free_AtletasList(atletas->proximo);
-        free(atletas);
-    }
-}
+extern Confs gco_config;
 
 Atletas atl_ordenar_por_Score(Atletas atletas){
     Atletas res = NULL;
@@ -32,9 +26,52 @@ Atleta atl_novo_atleta(char* id, char* nome){
     atleta->tempo_ultima_prova = 0;
     atleta->nome = strdup( nome );
     atleta->ID = strdup( id );
-    atleta->score = 0;
+    atleta->scores = NULL;
 
     return atleta;
+}
+
+void atl_add_score(Atleta atleta, int score){
+    // percorrer os scores para inserir ordenado descrescente
+    
+    // não existem scores ou o novo score é maior que o primeiro da lista
+    if( !atleta->scores || ( atleta->scores && atleta->scores->num < score)){
+        LInt novo = (LInt)malloc(sizeof(struct sLInt));
+        novo->num = score;
+        novo->proximo = atleta->scores;
+        atleta->scores = novo;
+        return;
+    }
+
+    // percorrer a lista até encontrar um lugar para o novo score
+    LInt scores = atleta->scores;
+    while( scores ){
+        // actual >= por inserir > proximo
+        // se tiver chegado ao ultimo elemento da lista
+        if( !scores->proximo || scores->num == score ||
+            (scores->proximo && (scores->proximo->num < score))){
+            LInt novo = (LInt)malloc(sizeof(struct sLInt));
+            novo->num = score;
+            novo->proximo = scores->proximo;
+            scores->proximo = novo;
+            return;
+        }
+        scores = scores->proximo;
+    }
+}
+
+int atl_get_score(Atleta atleta, int nTop){
+    // somatorio dos primeiros n
+    int res = 0;
+    LInt scores = atleta->scores;
+    while( scores ){
+        if( nTop <= 0 )
+            break;
+        res += scores->num;
+        scores = scores->proximo;
+        nTop--;
+    }
+    return res;
 }
 
 Atletas atl_insere_por_ID(Atletas atletas, Atleta atleta){
@@ -84,9 +121,12 @@ Atletas atl_insere_por_ID(Atletas atletas, Atleta atleta){
 Atletas atl_insere_por_Score(Atletas atletas, Atleta atleta){
     Atletas original = atletas;
 
+    int nTop = cfg_get_Ntop( gco_config );
+    
+
     // ainda nao existem atletas ou
     // o score do atleta é maior que o score do primeiro da lista
-    if( !atletas || (atletas && atletas->atleta->score < atleta->score) ){
+    if( !atletas || (atletas && atl_get_score(atletas->atleta, nTop) < atl_get_score(atleta, nTop)) ){
         Atletas newAtletas = (Atletas) malloc( sizeof( struct sAtletas ) );
         newAtletas->atleta = atleta;
         newAtletas->proximo = atletas;
@@ -95,20 +135,14 @@ Atletas atl_insere_por_Score(Atletas atletas, Atleta atleta){
 
     while( atletas ){
         // actual >= por inserir > proximo
-        if( atletas->atleta->score == atleta->score || 
-                (atletas->proximo && (atletas->proximo->atleta->score < atleta->score)) ){
+        // se tiver chegado ao ultimo elemento da lista
+        if( !atletas->proximo ||
+              atl_get_score(atletas->atleta, nTop) == atl_get_score(atleta, nTop) || 
+               (atletas->proximo && 
+                (atl_get_score(atletas->proximo->atleta, nTop) < atl_get_score(atleta, nTop))) ){
             Atletas newAtletas = (Atletas) malloc( sizeof( struct sAtletas ) );
             newAtletas->atleta = atleta;
             newAtletas->proximo = atletas->proximo;
-            atletas->proximo = newAtletas;
-            return original;
-        }
-        
-        // se tiver chegado ao ultimo elemento da lista
-        if( !atletas->proximo ){
-            Atletas newAtletas = (Atletas) malloc( sizeof( struct sAtletas ) );
-            newAtletas->atleta = atleta;
-            newAtletas->proximo = NULL;
             atletas->proximo = newAtletas;
             return original;
         }
@@ -129,7 +163,8 @@ void atl_print(Atletas atletas){
         if( !a )
             printf("[null] atleta sem dados\n");
         else
-            printf("[%s] %s (%d pts, %d segs)\n", a->ID, a->nome, a->score, a->tempo_ultima_prova);
+            printf("[%s] %s (%d pts, %d segs)\n", a->ID, a->nome,
+                atl_get_score(a, cfg_get_Ntop( gco_config )), a->tempo_ultima_prova);
         atletas = atletas->proximo;
     }
 }
@@ -143,12 +178,29 @@ void atl_free_Atletas(Atletas atletas){
     free( atletas );
 }
 
+void atl_free_AtletasList(Atletas atletas){
+    if( atletas ){
+        atl_free_AtletasList(atletas->proximo);
+        free(atletas);
+    }
+}
+
+
 void atl_free_Atleta(Atleta atleta){
     if( !atleta )
         return;
 
     free( atleta->nome );
+    atl_free_Scores( atleta->scores );
     free( atleta );
+}
+
+void atl_free_Scores(LInt scores){
+    if( !scores )
+        return;
+
+    atl_free_Scores(scores->proximo);
+    free(scores);
 }
 
 Atletas atl_ler_tempos( Confs cfg, Linhas csv, Atletas atletas ){
@@ -202,7 +254,7 @@ Atletas atl_ler_tempos( Confs cfg, Linhas csv, Atletas atletas ){
     while( atletas ){
         atleta = atletas->atleta;
         if( atleta->tempo_ultima_prova > 0 )
-            atleta->score += (int)(( melhorTempo / (float)atleta->tempo_ultima_prova ) * 100);
+            atl_add_score(atleta, (int)(( melhorTempo / (float)atleta->tempo_ultima_prova ) * 100));
         atleta->tempo_ultima_prova = 0;
         atletas = atletas->proximo;
     }

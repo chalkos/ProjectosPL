@@ -116,7 +116,7 @@ void htm_print_resultados(){
         atleta = atletas->atleta;
         
         fprintf(output, "<tr> <td>%s</td> <td>%s</td> <td>%d</td> </tr>",
-                atleta->ID, atleta->nome, atleta->score);
+                atleta->ID, atleta->nome, atl_get_score(atleta, cfg_get_Ntop(gco_config)));
 
         atletas = atletas->proximo;
     }
