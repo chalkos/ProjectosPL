@@ -15,3 +15,4 @@ gco
 lex.*.c
 index.html
 *.sav
+savestate/

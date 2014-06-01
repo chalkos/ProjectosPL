@@ -10,8 +10,8 @@ extern void csvset_in(FILE * in_str);
 extern void cfglex_destroy();
 
 extern void htm_print();
-extern void sav_save(FILE* file);
-extern void sav_load(FILE* file);
+extern void sav_save(char* nome, int force);
+extern void sav_load(char* nome);
 
 void cmd_config(char* ficheiro){
     printf("[DEBUG] comando config (%s)\n", ficheiro);
@@ -37,16 +37,7 @@ void cmd_config(char* ficheiro){
 
 void cmd_load(char* ficheiro){
     printf("[DEBUG] comando load (%s)\n", ficheiro);
-
-    FILE *file;
-    if( !( file = fopen(ficheiro, "rb") )){
-        fprintf( stderr, "[ERRO] Não foi possível abrir o ficheiro %s. Abortar.\n", ficheiro);
-        return;
-    }
-    
-    sav_load( file );
-
-    fclose(file);
+    sav_load( ficheiro );
 }
 
 void cmd_import(char* ficheiro){
@@ -77,22 +68,7 @@ void cmd_print(){
 
 void cmd_save(char* ficheiro, int force){
     printf("[DEBUG] comando save(force:%d) (%s)\n", force, ficheiro);
-
-    //always forced
-    FILE *file;
-    if( !force && ( file = fopen(ficheiro, "r") )){
-        fprintf( stderr, "[ERRO] O ficheiro %s já existe.\n", ficheiro);
-        fprintf( stderr, "[ERRO] Para forçar a gravação, utilize \"save!\". Abortar.\n");
-        fclose(file);
-        return;
-    }
-
-    if( !( file = fopen(ficheiro, "wb") )){
-        fprintf( stderr, "[ERRO] Não foi possível abrir o ficheiro %s para escrita. Abortar.\n", ficheiro);
-        return;
-    }
-
-    sav_save(file);
+    sav_save(ficheiro, force);
 }
 
 int cmd_quit(){

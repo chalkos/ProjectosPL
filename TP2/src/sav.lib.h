@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-void sav_save(FILE* file);
-void sav_load(FILE* file);
+void sav_save(char* nome, int force);
+void sav_load(char* nome);
 
 #endif

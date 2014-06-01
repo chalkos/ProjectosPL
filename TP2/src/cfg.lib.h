@@ -143,7 +143,7 @@ int cfg_get_NCampos( Confs cfgs );
 char* cfg_Campos_seleccionado( Confs cfgs, int totalCampos );
 
 /* -----------------------------------
- * Destructor Function Implementations
+ * Destructor Function Signatures
  * -----------------------------------
  */
 
