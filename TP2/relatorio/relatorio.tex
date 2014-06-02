@@ -854,10 +854,82 @@ int csvwrap(){
   return 1;
 }
 \end{lstlisting}
+\newpage
+\subsection{Tratamento da Informação do Atleta}
+
+Um dos requesitos necessários para o desenvolvimento da plataforma era o cálculo da pontuação dos atletas. 
+Assim, foram implementadas funções que permitem determinar os rankings necessários.
+\begin{lstlisting}[language=C, caption={Estrutura de um atleta.}]
+struct sLInt {
+    LInt proximo;
+    int num;
+};
+
+struct sAtletas{
+    Atletas proximo;
+    Atleta atleta;
+};
+
+struct sAtleta{
+    char* ID;
+    char* nome;
+    LInt scores;
+    int tempo_ultima_prova;
+};
+\end{lstlisting}
+
+\begin{lstlisting}[language=C, caption={Assinatura das funções.}]
+Atleta atl_novo_atleta(char* id, char* nome);
+
+void atl_add_score(Atleta atleta, int score);
+int atl_get_score(Atleta atleta, int nTop);
+
+Atletas atl_ordenar_por_Score(Atletas atletas);
+Atletas atl_insere_por_ID(Atletas atletas, Atleta atleta);
+Atletas atl_insere_por_Score(Atletas atletas, Atleta atleta);
+
+void atl_print(Atletas atletas);
+
+void atl_free_Atletas(Atletas atletas);
+
+// versao que nao liberta memoria dos atletas em si (apenas da lista)
+// usado para libertar a lista ordenada por score
+void atl_free_AtletasList(Atletas atletas);
+void atl_free_Atleta(Atleta atleta);
+void atl_free_Scores(LInt scores);
+
+
+/******************
+ * Ler dados dos atletas a partir do csv
+ * ***************/
+
+Atletas atl_ler_csv( Confs cfg, Linhas csv, Atletas atletas );
+Atletas atl_ler_tempos( Confs cfg, Linhas csv, Atletas atletas );
+
+#endif
+\end{lstlisting}
 
 \newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%HTML%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{HTML}
 
+Um dos resultados finais deste projeto é o de gerar uma página HTML com a pontuação de cada atleta ordenado por ordem decrescente de pontos de pontos. 
+
+\begin{lstlisting}[language=C, caption={Assinatura das funções.}]
+void htm_print_indice();
+void htm_print_provas();
+void htm_print_resultados();
+int htm_begin();
+void htm_end();
+\end{lstlisting}
+
+\newpage
+\section{Conclusão}
+
+\newpage
 \section{Anexos}
+
+\subsection{Makefile}
 
 \newpage
 
