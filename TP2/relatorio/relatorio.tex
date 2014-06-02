@@ -213,7 +213,9 @@ O ficheiro de configurações define o processamento a realizar: campos a extrai
 \subsubsection{Gramática para a Linguagem de Especificação de Configurações}
 
 A gramática a apresentar é a usada para o ficheiro de configuração. Assim sendo tem-se:
-\begin{lstlisting}[language=C, caption={Gramática para a linguagem de especificação de configurações.}]
+
+\begin{lstlisting}[language=C, caption={Gramática para a linguagem de especificação de
+ configurações.}]
 <ga>
   Confs -> cons_cfg_Confs(Conf Confs)
         |  cons_cfg_Confs_NIL()
@@ -295,7 +297,9 @@ struct sLcampos
 \end{lstlisting}
 
 Verifica-se aqui que cada \textit{struct} acima apresentada deriva de cada uma das produções que foram indicadas em na gramática abstrata.
+As produções que foram usadas para definir as produções da gramática abstrata são as que também foram usadas para definir as produções do yacc.
 \newpage
+
 \subsubsection{Assinatura das funções utilizadas}
 Aqui serão apresentadas as assinaturas das funções que foram utilizadas para nós dar suporte à implementação do nosso projecto.
 
@@ -348,6 +352,8 @@ char* cfg_Campos_seleccionado( Confs cfgs, int totalCampos );
 \end{lstlisting} 
 
 Embora já estejam os construtores definidos automaticamente era necessário criar novas funções para ser possível manusear a estrutura de dados. Deste modo, foram criadas funções que permitem ir "buscar" algum campo específico, ou fazer operações como de validação, imprimir, entre outras.
+
+Como vai ser necessário aceder à informação que existe, definimos as funções que nos permitem dar os valores que são os campos de configurações.
 
 \textbf{Nota:} Foi necessário desenvolver a função \texttt{Lcampos cfg\_Lcampos\_reverse( Lcampos l )}, uma vez que a gramática definida neste programa tem recursividade à esquerda e era necessário imprimir os valores pela ordem correta, daí a necessidade da criação desta função.
 
@@ -441,10 +447,16 @@ int yyerror( char* s ){
 \end{lstlisting} 
 
 Para o ficheiro de configuração o Yacc apanha os campos relativos à configuração do ficheiro. Cada uma das produções trata de um caso específico relativo aos campos. Assim, genericamente existe um campo e uma lista de campos, sendo necessário adicioná-lo à lista, daí exitir \texttt{\$\$ = cons\_cfg\_Lcampos\_Lcampos(\$1,\$3); }
+
+A informação que o yacc recebe vem do processamento que o flex faz do ficheiro de configuração que ao flex é passado.
+Quando a informação do flex é recebida pelo yacc, este apenas tem de a associar a uma das suas produções demodo a esta ser incluida na estrutura correta.
+
+
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%LEX-CONFIGUraÇÕES%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{LEX}
-\begin{lstlisting} 
+
+\begin{lstlisting}[language=C, caption={Flex utilizado para o tratamento do ficherio de configuração}] 
 %{
 #define YY_NO_INPUT
 #include <string.h>
@@ -495,7 +507,13 @@ Para o ficheiro de configuração o Yacc apanha os campos relativos à configura
 int cfgwrap(){
     return 1;
 }
-\end{lstlisting} 
+\end{lstlisting}
+
+A informação que o ficheiro flex recebe vem do ficheiro de configuração.
+Depois de reconhecermos os campos, este passam do flex para o yacc atrvés da estrtura que é interna no yacc.
+Por exemplo, quando estamos a usar \texttt{cfglval.cfg\_str}, siginfica que estamos a passar (neste caso) uma string ao campo cfg\_str da union onde depois o yacc vai adiciona-lo à estrutura própria.
+
+ 
 \newpage
 
 
@@ -508,11 +526,15 @@ A aplicação deverá ter um ambiente de consola com alguns comandos básicos:
 \item \textbf{Carregar resultado de prova}: o sistema carrega e processa um ficheiro CSV. Como resultado desta operação produz um ficheiro HTML com a pontuação de cada atleta, ordenado por ordem descente de pontos.
 \item \textbf{Calcular ranking}: em qualquer momento poderá ser invocada esta operação à qual o sistema responder com uma listagem em HTML do raking;
 \item \textbf{Gravar base de dados}: o sistema guarda em memória o estado da aplicação.
+\item \textbf{Imprimir}: que apresenta a informação através de uma página HMTL.
+\item \textbf{Save}: que guarda o estado atual do sistema.
 \item \textbf{Sair}: o sistema termina a aplicação, se o estado atual não tiver sido previamente gravado deverá lançar um atleta e pedir configuração para prosseguir.
 \end{itemize}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%GRAMÁTICA-CMD%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Especificação para a Linguagem de Comandos da Consola}
-A gramática apresentar é a usada para o funcionamento da aplicação em ambiente consola (CMD). Assim sendo tem-se:
+A gramática apresentar é a passada ao gabs para depois este gerar a estrutura usada para o funcionamento da aplicação em ambiente consola (CMD). Assim sendo tem-se:
 \begin{lstlisting}[language=C, caption={Gramática para a linguagem de especificação para a linguagem de comandos de consola.}]
 <ga>
   Cmds -> cons_Cmds(Cmd Cmds)
@@ -530,6 +552,9 @@ A gramática apresentar é a usada para o funcionamento da aplicação em ambien
       ;
 </ga>
 \end{lstlisting}
+
+Esta gramática é definida depois de termos analisado quais as produções que podemos ter quando estamos a tratar os comandos.
+
 \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%FUNÇÕES-CMD%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -566,7 +591,13 @@ int cmd_quit();
 
 #endif
 \end{lstlisting} 
+
+Neste caso vale apena referir que quando temos as funções \texttt{void cmd\_config(char* ficheiro)}, e \texttt{void cmd\_import(char* ficheiro);}  estas quando em execução recebem o parser do ficheiro que lhe está associado, isto é, se temos o cmd\_config op parse que é invocado é o parser responsável pelo ficheiro de configuração e o cmd\_import "chama" o parse que é responsável pelo ficheiro CSV.
+
+A função \texttt{void cmd\_print();} é a responsável por invocar a função que vai dar origem à página HTML pretendida.
+
 \newpage
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%YACC-CMD%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{YACC}
@@ -629,6 +660,76 @@ int yyerror( char* s ){
 
 Para o ficheiro de CMD tinhamos que ter o Yacc a apanhar os campos relativos aos comandos, para isso temos que cada produção trata um caso especifico relativo a esse campos.
 
+\subsubsection{LEX}
+\begin{lstlisting}[language=C, caption={LEX do ficheiro cmd.}]
+%{
+#define YY_NO_INPUT
+#include <string.h>
+#include "cmd.tab.h"
+#include "cmd.lib.h"
+%}
+%option nounput
+%x ficheiro
+%%
+"config " {BEGIN ficheiro; return CONFIG;}
+"c "      {BEGIN ficheiro; return CONFIG;}
+
+"load " {BEGIN ficheiro; return LOAD;}
+"l "    {BEGIN ficheiro; return LOAD;}
+
+"import " {BEGIN ficheiro; return IMPORT;}
+"i "      {BEGIN ficheiro; return IMPORT;}
+
+"print"  return PRINT;
+"p"      return PRINT;
+
+"save! " {BEGIN ficheiro; return FSAVE;}
+"s! "    {BEGIN ficheiro; return FSAVE;}
+"save "  {BEGIN ficheiro; return SAVE; }
+"s "     {BEGIN ficheiro; return SAVE; }
+
+"quit"   return QUIT;
+"q"      return QUIT;
+"quit!" return FQUIT;
+"q!"    return FQUIT;
+
+<<EOF>>  return FQUIT;
+
+[\n]+    { return '\n'; }
+
+<ficheiro>[^\n]+ { /* se houver erros, tentar um duplicate aqui */
+                   //cmdlval.cmd_ficheiro = strdup(cmdtext);
+                   cmdlval.cmd_ficheiro = cmdtext;
+                   BEGIN 0;
+                   return FICHEIRO;
+                 }
+<ficheiro>[\n]    { BEGIN 0;
+                    printf("Comando invalido6.\n%s", CMD_PROMPT);
+                    return '\n'; }
+
+ /** capturar comandos invalidos especiais **/
+[clis]\n          { printf("Comando invalido1.\n%s", CMD_PROMPT); }
+[^clipsq\n][^\n]* { printf("Comando invalido2.\n%s", CMD_PROMPT); }
+"q"[^\n]+         { printf("Comando invalido3.\n%s", CMD_PROMPT); }
+"p"[^\n]+         { printf("Comando invalido4.\n%s", CMD_PROMPT); }
+"config"[^ ]      { printf("Comando invalido5.\n%s", CMD_PROMPT); }
+
+. ;
+
+%%
+
+void cmd_lex_push( FILE* sav_file_import ){
+    cmdpush_buffer_state(cmd_create_buffer(sav_file_import, YY_BUF_SIZE));
+}
+
+void cmd_lex_pop(){
+    yypop_buffer_state();
+}
+
+int cmdwrap(){
+    return 1;
+}
+\end{lstlisting}
 
 \subsection{Especificação para os Ficheiros de Resultados}
 %%%%%%%%%%%%%%%%%%%%%%%%%%GRAMÁTICA-FICHEIROS-DE-RESULTADOS-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -931,6 +1032,129 @@ void htm_end();
 
 \subsection{Makefile}
 
+\begin{lstlisting}[language=C, caption={Makefile }]
+.PHONY: clean
+
+GDB=-Wall -g
+
+#----------------\
+#  Tokenizers    \
+#----------------\
+
+cmdtok : cmd.tok.c lex.cmd.o cmd.tab.o cmd.lib.o cmd.mockups.o
+	gcc $(GDB) -o $@ $^ -ll
+
+cfgtok : cfg.tok.c lex.cfg.o cfg.tab.o cfg.lib.o
+	gcc $(GDB) -o $@ $^ -ll
+
+csvtok : csv.tok.c lex.csv.o csv.tab.o csv.lib.o
+	gcc $(GDB) -o $@ $^ -ll
+
+#----------------\
+#  Gco           \
+#----------------\
+
+gco : gco.lib.c sav.lib.o htm.lib.o atl.lib.o cfg.lib.o lex.cfg.o cfg.tab.o cmd.lib.o lex.cmd.o cmd.tab.o csv.lib.o lex.csv.o csv.tab.o
+	gcc $(GDB) -o $@ $^
+	cp gco ../bin/gco
+
+htm.lib.o : htm.lib.c htm.lib.h cfg.lib.h csv.lib.h
+	gcc $(GDB) -c htm.lib.c
+
+atl.lib.o : atl.lib.c atl.lib.h cfg.lib.h csv.lib.h
+	gcc $(GDB) -c atl.lib.c
+
+sav.lib.o : sav.lib.c sav.lib.h
+	gcc $(GDB) -c sav.lib.c
+
+#----------------\
+#  Cfg           \
+#----------------\
+
+cfg : cfg.main.c cfg.lib.o lex.cfg.o cfg.tab.o
+	gcc $(GDB) -o $@ $^ -ll
+
+cfg.lib.o : cfg.lib.c cfg.lib.h
+	gcc $(GDB) -c cfg.lib.c
+
+cfg.tab.o : cfg.tab.h cfg.tab.c
+	gcc $(GDB) -c cfg.tab.c
+
+lex.cfg.o : lex.cfg.c cfg.tab.h cfg.lib.o
+	gcc $(GDB) -c lex.cfg.c -ll
+
+cfg.tab.c cfg.tab.h : cfg.y cfg.lib.o
+	yacc -d -pcfg -bcfg cfg.y
+
+lex.cfg.c : cfg.l
+	flex -Pcfg cfg.l
+
+#----------------\
+#  Cmd           \
+#----------------\
+
+cmd : cmd.main.c cmd.lib.o lex.cmd.o cmd.tab.o cmd.mockups.o
+	gcc $(GDB) -o $@ $^ -ll
+
+cmd.mockups.o : cmd.mockups.c cmd.mockups.h
+	gcc $(GDB) -c cmd.mockups.c
+
+cmd.lib.o : cmd.lib.c cmd.lib.h
+	gcc $(GDB) -c cmd.lib.c
+
+cmd.tab.o : cmd.tab.h cmd.tab.c
+	gcc $(GDB) -c cmd.tab.c
+
+lex.cmd.o : lex.cmd.c cmd.tab.h
+	gcc $(GDB) -c lex.cmd.c -ll
+
+cmd.tab.c cmd.tab.h : cmd.y cmd.lib.h
+	yacc -d -pcmd -bcmd cmd.y
+
+lex.cmd.c : cmd.l
+	flex -Pcmd cmd.l
+
+
+#----------------\
+#  CSV           \
+#----------------\
+
+csv : csv.main.c csv.lib.o lex.csv.o csv.tab.o
+	gcc $(GDB) -o $@ $^ -ll
+
+csv.lib.o : csv.lib.c csv.lib.h
+	gcc $(GDB) -c csv.lib.c
+
+csv.tab.o : csv.tab.h csv.tab.c
+	gcc $(GDB) -c csv.tab.c
+
+lex.csv.o : lex.csv.c csv.tab.h
+	gcc $(GDB) -c lex.csv.c -ll
+
+csv.tab.c csv.tab.h : csv.y csv.lib.h
+	yacc -d -pcsv -bcsv csv.y
+
+lex.csv.c : csv.l
+	flex -Pcsv csv.l
+#----------------\
+#  Extras        \
+#----------------\
+
+clean :
+	$(RM) gabs
+	$(RM) gco
+	$(RM) cmd
+	$(RM) cfg
+	$(RM) csv
+	$(RM) *.o
+	$(RM) *.tab.[ch]
+	$(RM) lex.*.c
+	$(RM) *tok
+
+gabs:
+	cd ./../gabs/ && $(MAKE) gabs && mv ./gabs ./../src/gabs
+
+\end{lstlisting}
 \newpage
 
 \section{Elementos do Grupo}
