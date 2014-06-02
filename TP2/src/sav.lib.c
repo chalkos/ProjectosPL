@@ -168,7 +168,6 @@ void sav_load(char* nome){
     // libertar coisas
     fclose(sav_file_import);
     free(realname);
-
 }
 
 
