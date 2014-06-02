@@ -123,7 +123,7 @@ int csv_tempo_to_int(char* str);
 char* csv_get_campo(Linha campos, int indice_campo);
 
 /* -----------------------------------
- * Destructor Function Implementations
+ * Destructor Function Signatures
  * -----------------------------------
  */
 

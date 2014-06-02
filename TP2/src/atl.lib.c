@@ -24,7 +24,10 @@ Atleta atl_novo_atleta(char* id, char* nome){
     Atleta atleta = (Atleta) malloc( sizeof( struct sAtleta ) );
 
     atleta->tempo_ultima_prova = 0;
-    atleta->nome = strdup( nome );
+    if( nome )
+        atleta->nome = strdup( nome );
+    else
+        atleta->nome = NULL;
     atleta->ID = strdup( id );
     atleta->scores = NULL;
 

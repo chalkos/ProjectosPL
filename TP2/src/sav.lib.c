@@ -7,6 +7,17 @@
 #include "sav.lib.h"
 #include "cfg.lib.h"
 #include "csv.lib.h"
+#include "cmd.lib.h"
+
+extern void cmd_lex_push(FILE* file );
+extern void cmd_lex_pop();
+
+extern int cmd_shouldQuitOnEOF;
+extern int cmdparse();
+extern void cmdset_in(FILE * in_str);
+
+int sav_has_changes = 0;
+int sav_loading = 0;
 
 /************************
  * Private Declarations
@@ -14,6 +25,8 @@
 #define BASE_DIR "./savestate/"
 
 void sav_cria_pasta();
+
+FILE* sav_file_import;
 
 /************************
  * Implementations
@@ -97,9 +110,6 @@ void sav_save(char* nome, int force){
     Campo campo;
     i = 0;
     while( csvs ){
-        // escrever o comando no ficheiro de comandos
-        fprintf( file, "i %s%d\n", realname, i );
-        
         // escrever o CSV
         linhas = csvs->csv;
         while( linhas->flag == PScons_csv_Linhas ){
@@ -124,25 +134,48 @@ void sav_save(char* nome, int force){
 
             linhas = linhas->u.d1.s2;
         }
-        
         i++;
         csvs = csvs->next;
     }
 
-
+    // escrever o comando no ficheiro de comandos
+    for(i=nCSVs-1; i>=0; i--)
+        fprintf( file, "i %s%d\n", realname, i );
 
 
     for(i=0; i<nCSVs; i++)
         fclose( fcsv[i] );
     fclose(file);
     free(realname);
+    sav_has_changes = 0;
 }
 
 void sav_load(char* nome){
+    // abrir o ficheiro para o batch import
+    char* realname = (char*)malloc( sizeof(char) * (strlen(nome) + strlen(BASE_DIR) + 1) );
+    strcpy( realname, BASE_DIR );
+    strcat( realname, nome );
+    sav_file_import = fopen(realname, "r");
+    if( !sav_file_import ){
+        free(realname);
+        fprintf(stderr, "[ERRO] Não foi possível ler o ficheiro de estado. Abortar.\n");
+        return;
+    }
     
+    sav_has_changes = 1;
+
+    // trocar o buffer para o ficheiro de batch import
+    cmd_lex_push( sav_file_import );
+    // ler cmds
+    sav_loading = 1;
+    cmdparse();
+    sav_loading = 0;
+    // trocar o buffer para o stdin
+    cmd_lex_pop();
+    // libertar coisas
+    fclose(sav_file_import);
+    free(realname);
 }
-
-
 
 
 

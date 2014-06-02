@@ -5,6 +5,8 @@
 
 #define CMD_PROMPT "> "
 
+extern int cmd_shouldQuitOnEOF;
+
 // carrega uma nova configuração
 void cmd_config(char* ficheiro);
 

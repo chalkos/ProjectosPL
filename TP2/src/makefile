@@ -21,6 +21,7 @@ csvtok : csv.tok.c lex.csv.o csv.tab.o csv.lib.o
 
 gco : gco.lib.c sav.lib.o htm.lib.o atl.lib.o cfg.lib.o lex.cfg.o cfg.tab.o cmd.lib.o lex.cmd.o cmd.tab.o csv.lib.o lex.csv.o csv.tab.o
 	gcc $(GDB) -o $@ $^
+	cp gco ../bin/gco
 
 htm.lib.o : htm.lib.c htm.lib.h cfg.lib.h csv.lib.h
 	gcc $(GDB) -c htm.lib.c

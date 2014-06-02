@@ -86,6 +86,9 @@ Campo  cons_csv_Campo_NIL()
 
 // retorna o tempo em segundos a partir de uma string de tempo
 int csv_tempo_to_int(char* str){
+    if( !str )
+        return -1;
+
     if( strlen(str) != 8 )
         return -1;
 
@@ -276,13 +279,13 @@ Linha csv_Linha_reverse( Linha l ){
 void csv_import_csv( Linhas dados ){
     ListaAtletas = atl_ler_csv( gco_config, dados, ListaAtletas);
 
-    atl_print( ListaAtletas );
+    //atl_print( ListaAtletas );
 
     atl_ler_tempos( gco_config, dados, ListaAtletas );
 
-    printf("Lista de atletas por score:\n");
-    Atletas porscore = atl_ordenar_por_Score( ListaAtletas );
-    atl_print( porscore );
+    //printf("Lista de atletas por score:\n");
+    //Atletas porscore = atl_ordenar_por_Score( ListaAtletas );
+    //atl_print( porscore );
     
 
     if( !ListaCSV ){
@@ -296,6 +299,19 @@ void csv_import_csv( Linhas dados ){
     nova->next = ListaCSV;
     nova->csv = dados;
     ListaCSV = nova;
+
+    Lcsv csvs = ListaCSV;
+    int ncsvs = 0;
+    int nprovas = cfg_get_Nprovas(gco_config);
+    while( csvs ){
+        ncsvs++;
+        csvs = csvs->next;
+    }
+
+    printf("Prova #%d (máximo definido: %d)\n", ncsvs, nprovas);
+
+    if( ncsvs > nprovas )
+        fprintf(stderr, "[WARNING] Excedido o número de provas definido na configuração.\n");
 }
 
 void csv_free_ListaCSV(Lcsv elem){
