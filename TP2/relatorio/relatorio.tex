@@ -4,6 +4,42 @@
 
 % hifenização e outras especificações para português
 \usepackage[portuguese]{babel}
+\usepackage{listings}
+% para ter imagens, depois define a directoria de imagens
+\usepackage{graphicx}
+\graphicspath{{./imagens/}}
+\usepackage[utf8]{inputenc}    
+
+\usepackage{listings}
+\usepackage{color}
+ 
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\usepackage{color}
+\usepackage{listings}
+\lstset{ %
+language=C++,                % choose the language of the code
+basicstyle=\footnotesize,       % the size of the fonts that are used for the code
+numbers=left,                   % where to put the line-numbers
+numberstyle=\footnotesize,      % the size of the fonts that are used for the line-numbers
+numberstyle=\tiny,
+stepnumber=1,                   % the step between two line-numbers. If it is 1 each line will be numbered
+numbersep=5pt,                  % how far the line-numbers are from the code
+keywordstyle=\color[rgb]{0,0,1},
+basicstyle=\tiny,
+commentstyle=\color[rgb]{0.133,0.545,0.133},
+stringstyle=\color[rgb]{0.627,0.126,0.941},
+showspaces=false,               % show spaces adding particular underscores
+showstringspaces=false,         % underline spaces within strings
+showtabs=false,                 % show tabs within strings adding particular underscores
+frame=single,           % adds a frame around the code
+tabsize=2,          % sets default tabsize to 2 spaces
+captionpos=b,           % sets the caption-position to bottom
+breaklines=true,        % sets automatic line breaking
+breakatwhitespace=false,    % sets if automatic breaks should only happen at whitespace
+escapeinside={\%*}{*)}          % if you want to add a comment within your code
+}
 
 % hiperligações
 \usepackage{hyperref}
@@ -33,9 +69,6 @@
 
 % escrever algoritmos
 \usepackage[algoruled]{algorithm2e}
-
-% mais cores predefinidas
-\usepackage[usenames,dvipsnames]{color}
 
 % definir comandos especiais
 \newcommand\doubleplus{+\kern-1.3ex+\kern0.8ex} %
@@ -85,7 +118,7 @@
 A Orientação é um desporto que tem como objetivo percorrer uma determinada distância, onde o atleta tem de obrigatoriamente passar pelos pontos que estão indicados no mapa que lhe é atribuído.
 
 Neste contexto temos a gestão de campeonatos de orientação onde é necessário saber a informação das provas que são efetuadas, os participantes envolvidos e os tempos que cada um obteve de modo a serem obtidas as classificações necessárias.
-O objetivo principal é a leitura de ficheiros onde estes tem um configuração definida pelo ficheiro de configuração e depois a leitura do CSV com a informação dos jogadores e mais tarde o geramento de um página HTML onde é apresentada a informação tratada.
+O objetivo principal é a leitura de ficheiros onde estes tem uma configuração definida pelo ficheiro de configuração e depois a leitura do CSV com a informação dos jogadores e mais tarde o geramento de um página HTML onde é apresentada a informação tratada.
 
 Para a implementação foi necessário a construção de gramáticas independentes de contexto, implementação de parses para cada ficheiro que necessário, e a utilização do lex e yacc para retirar a informação necessária.
 
@@ -104,7 +137,7 @@ Gramática Independentes de contexto é uma gramática formal onde são definida
 
 \subsection{Gestão de Campeonatos de Orientação }
 
-Neste segundo trabalho de Processamento de Linguagens foi-no proposto a seleção de um projeto entre vários propostos. Após uma análise e chegada a uma concordância, o nosso grupo optou por escolher o tema de Gestão de Campeonato de Orientação.
+Neste segundo trabalho de Processamento de Linguagens foi-nos proposto a seleção de um projeto entre vários propostos. Após uma análise e chegada a uma concordância, o nosso grupo optou por escolher o tema de Gestão de Campeonato de Orientação.
 
 Com este enunciado tem-se que existem várias operações que ocorrem em simultâneo, pois existe os ficheiros:
 \begin{itemize}
@@ -158,18 +191,18 @@ A informação para tal é lida de um ficheiro de configuração onde nele são 
 
 \newpage
 
-\subsection{Desenvolvimento do Programa}
+\section{Desenvolvimento do Programa}
 Como este projeto implica muito o tratamento de de diferentes aspetos, foi decidido estruturar-se o projeto consoante as  funções que cada ficheiro implica.
 
-\subsubsection{Estrutura de Dados}
+\subsection{Estrutura de Dados}
 Para a criação das estruturas de dados, foi usado a ferramenta \textit{gabs} disponibilizada pelo professor que cria a estrutura e os seus construtores quando é executada com uma gramática abstrata com argumento.
 
 De modo a utiliza-se a ferramenta era necessário a criação de uma gramática abstrata que depois iria ser passada aos gabs.
 
 Abaixo será apresentado um exemplo da implementação, no entanto em \ref{sec:Anexos} Anexos  puderam ser consultadas as restantes gramáticas abstratas.
 
-A gramática a apresentar é a suada para o ficheiro de configuração. Assim sendo tem-se:
-\begin{verbatim}
+A gramática a apresentar é a usada para o ficheiro de configuração. Assim sendo tem-se:
+\begin{lstlisting}[language=C, caption={Gramática Abstrata Para o Ficheiro de configuração}]
 <ga>
   Confs -> cons_cfg_Confs(Conf Confs)
         |  cons_cfg_Confs_NIL()
@@ -179,18 +212,20 @@ A gramática a apresentar é a suada para o ficheiro de configuração. Assim se
        |  cons_cfg_Conf_Nprovas(INT)
        |  cons_cfg_Conf_Ntop(INT)
        |  cons_cfg_Conf_Campos(Lcampos)
-       |  cons_cfg_Conf_Score(INT)
+       |  cons_cfg_Conf_Tempo(INT)
+       |  cons_cfg_Conf_Chave(INT)
+       |  cons_cfg_Conf_Nome(INT)
        ;
 
   Lcampos -> cons_cfg_Lcampos_Lcampos(Lcampos INT)
           |  cons_cfg_Lcampos_Campo(INT)
           ;
 </ga>
-\end{verbatim}
+\end{lstlisting}
 
-A estrutura que é gerada é:
-\begin{verbatim}
+A estrutura que é gerada para o armazenamento dos campos que a gramática abstrata definiu, é divida consoante o nível em que estamos, isto é, nós começamos por ter a estrtura que vai abragir mais campos, neste caso o total de configurações, depois temos o que é um configuração e por último a estrutura que vai guardar um para uma configuração.
 
+\begin{lstlisting}[language=C, caption={Estrutura de dados para armazenar as configurações}]
 struct sConfs 
 { int flag;
   union {  
@@ -203,8 +238,11 @@ struct sConfs
 
   } u;
 };
+\end{lstlisting}
 
+\newpage
 
+\begin{lstlisting}[language=C, caption={Estrutura de dados que armazena uma configuração }]
 struct sConf 
 { int flag;
   union {  
@@ -226,8 +264,9 @@ struct sConf
 
   } u;
 };
+\end{lstlisting}
 
-
+\begin{lstlisting}[language=C, caption={Estrtutura de dados que armazena os campos de um configuração}]
 struct sLcampos 
 { int flag;
   union {  
@@ -241,9 +280,162 @@ struct sLcampos
 
   } u;
 };
-\end{verbatim}
+\end{lstlisting}
 
 Onde se tem que cada struct acima apresentada deriva de cada uma das produções que foram indicadas em na gramática abstrata.
+
+
+\subsection{Asinatura das Funções Utilizadas}
+Vamos agora apresentar as assinaturas das funções que foram utilizadas para nós dar suporte à implementação do nosso projecto.
+
+Quando falamos das funções temos: 
+\begin{lstlisting}[language=C, caption={Construtores do Fihceiro de Configuração}]
+/* -----------------------------------
+ * Constructor Function Signatures
+ * -----------------------------------
+ */
+
+Confs  cons_cfg_Confs( Conf a1, Confs a2);
+Confs  cons_cfg_Confs_NIL();
+
+Conf  cons_cfg_Conf_Titulo( char * a1);
+Conf  cons_cfg_Conf_Nprovas( int a1);
+Conf  cons_cfg_Conf_Ntop( int a1);
+Conf  cons_cfg_Conf_Campos( Lcampos a1);
+Conf  cons_cfg_Conf_Tempo( int a1);
+Conf  cons_cfg_Conf_Chave( int a1);
+Conf  cons_cfg_Conf_Nome( int a1);
+
+Lcampos  cons_cfg_Lcampos_Lcampos( Lcampos a1, int a2);
+Lcampos  cons_cfg_Lcampos_Campo( int a1);
+\end{lstlisting} 
+
+Os construtores da nossa aplicação são criados automaticamente, isto é, nós ao passamos a nossa gramática abstrata ao gabs, esta não só cria as estrutura de dados mas também todos os construtores necessários para a criação da mesma.
+
+\begin{lstlisting}[language=C, caption={Funções de Fihceiro de Configuração}]
+/* -----------------------------------
+ * Custom Function Signatures
+ * -----------------------------------
+ */
+
+void cfg_Confs_print( Confs cfgs );
+int cfg_Confs_validate( Confs cfgs );
+Lcampos cfg_Lcampos_reverse( Lcampos l );
+
+// getters
+int cfg_get_Nprovas( Confs cfgs );
+int cfg_get_Ntop( Confs cfgs );
+int cfg_get_Tempo( Confs cfgs );
+int cfg_get_Chave( Confs cfgs );
+int cfg_get_Nome( Confs cfgs );
+char* cfg_get_Titulo( Confs cfgs );
+
+// obtem um array de inteiros com os campos. terminado com -1
+int* cfg_get_Campos( Confs cfgs );
+int cfg_get_NCampos( Confs cfgs );
+
+// obtem um array de bytes que esta a 1 nos campos que foram seleccionados
+char* cfg_Campos_seleccionado( Confs cfgs, int totalCampos );
+\end{lstlisting} 
+
+Muito embora nós tenhamos os construtores definidos automáticamente era necessário criar as nossa próprias funções para podermos manusear a estrtura de dados, então temos funções que nos premitem ir "buscar" algum campo campo em causa, ou fazer operações como de validação, imprimir entre outras.
+
+\textbf{Nota:} Nós temos a função \texttt{Lcampos cfg\_Lcampos\_reverse( Lcampos l )}, porque a nossa gramática como tem a recursividade à esquerdae para no final podermos imprmir os valore pela ordem certa usamos a função que executa essa operação.
+
+
+\begin{lstlisting}[language=C, caption={Funções de Libertação de Memória}]
+/* -----------------------------------
+ * Destructor Function Signatures
+ * -----------------------------------
+ */
+
+void free_cfg_Lcampos( Lcampos campos );
+void free_cfg_Conf( Conf cfg );
+void free_cfg_Confs( Confs cfgs );
+\end{lstlisting} 
+
+Nós implementamos a funções de libertação de memória para garantirmos que toda a memória que inicialmente foi feita o malloc existe um free, garantindo assim que a nossa aplicação não tem qualquer tipo de memory leek.
+
+\newpage
+\subsection{YACC}
+
+Nós no ficheiro do \textit{YACC} temos que para cada produção que seja "apanhada" é chamada a função correpondente para  tratar o caso apanhado.
+
+\begin{lstlisting}[language=C, caption={YACC do ficheiro de Configuração}]
+%token TITULO NPROVAS NTOP CAMPOS TEMPO CHAVE NOME str num
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include "cfg.lib.h"
+
+#define YYERROR_VERBOSE
+
+extern unsigned int cfglineno;
+extern int cfglex (void);
+extern int gco_set_Config(Confs cfg);
+extern void cfglex_destroy();
+%}
+%union{
+    char* cfg_str;
+    int cfg_num;
+    
+    Confs cfg_confs;
+    Conf cfg_conf;
+    Lcampos cfg_campos;
+}
+%type <cfg_str> str Titulo
+%type <cfg_num> num Nprovas Ntop Tempo Campo Chave Nome
+%start Z
+
+%type <cfg_confs> Z Configuracoes
+%type <cfg_conf> Configuracao
+%type <cfg_campos> Lcampos Campos
+%%
+Z : Configuracoes '$' { $$ = $1;
+                        cfglex_destroy();
+                        if( gco_set_Config($$) == 0 )
+                            YYACCEPT;
+                        YYABORT; };
+
+Configuracoes : Configuracao '\n' Configuracoes {$$ = cons_cfg_Confs($1,$3);}
+              | { $$ = cons_cfg_Confs_NIL(); }
+              ;
+
+Configuracao : Titulo  { $$ = cons_cfg_Conf_Titulo($1); }
+             | Nprovas { $$ = cons_cfg_Conf_Nprovas($1); }
+             | Ntop    { $$ = cons_cfg_Conf_Ntop($1); }
+             | Tempo { $$ = cons_cfg_Conf_Tempo($1); }
+             | Campos  { $$ = cons_cfg_Conf_Campos($1); }
+             | Chave { $$ = cons_cfg_Conf_Chave($1); }
+             | Nome { $$ = cons_cfg_Conf_Nome($1); }
+             ;
+
+Titulo  : TITULO str     { $$ = $2; };
+Nprovas : NPROVAS num    { $$ = $2; };
+Ntop    : NTOP num       { $$ = $2; };
+Campos  : CAMPOS Lcampos { $$ = cfg_Lcampos_reverse( $2 ); }
+Tempo   : TEMPO '$' num  { $$ = $3; };
+Chave   : CHAVE '$' num  { $$ = $3; };
+Nome    : NOME '$' num   { $$ = $3; };
+
+
+Lcampos : Lcampos ';' Campo { $$ = cons_cfg_Lcampos_Lcampos($1,$3); }
+        | Campo             { $$ = cons_cfg_Lcampos_Campo($1); }
+        ;
+
+Campo : '$' num { $$ = $2; };
+
+%%
+int yyerror( char* s ){
+    fprintf(stderr, "Line %d: %s\n", cfglineno, s);
+    return 0;
+}
+\end{lstlisting} 
+
+Para o ficheiro de configuração tinhamos que ter o yacc a apanhar os campos relativos à configuração , para isso temos que cada produção trata um caso especifico relativo a esse campos. Podemos ter então que numa situação temos um campo  e uma lista de campos, temos que adicioná-lo a lista dai termos \texttt{\$\$ = cons\_cfg\_Lcampos\_Lcampos(\$1,\$3); }
+
+
+
 
 \newpage
 
@@ -251,21 +443,69 @@ Onde se tem que cada struct acima apresentada deriva de cada uma das produções
 \label{sec:Anexos}
 \subsection{Gramáticas Abstratas}
 \subsubsection{Gramática Abstrata Ficheiro Configuração}
-\begin{verbatim}
+\begin{lstlisting}[language=C++, caption={Gramática Abstrata do Ficheiro de Configuração}]
+<ga>
+  Confs -> cons_cfg_Confs(Conf Confs)
+        |  cons_cfg_Confs_NIL()
+        ;
 
-\end{verbatim}
+  Conf -> cons_cfg_Conf_Titulo(STR)
+       |  cons_cfg_Conf_Nprovas(INT)
+       |  cons_cfg_Conf_Ntop(INT)
+       |  cons_cfg_Conf_Campos(Lcampos)
+       |  cons_cfg_Conf_Tempo(INT)
+       |  cons_cfg_Conf_Chave(INT)
+       |  cons_cfg_Conf_Nome(INT)
+       ;
+
+  Lcampos -> cons_cfg_Lcampos_Lcampos(Lcampos INT)
+          |  cons_cfg_Lcampos_Campo(INT)
+          ;
+</ga>
+\end{lstlisting}
 
 \subsubsection{Gramática Abstrata Ficheiro Comandos}
-\begin{verbatim}
+\begin{lstlisting}[language=C++, caption={Gramática Abstrata do Ficheiro de Comandos}]
+<ga>
+  Cmds -> cons_Cmds(Cmd Cmds)
+       |  cons_Cmds_NIL()
+       ;
 
-\end{verbatim}
+  Cmd -> cons_Cmd_Config(STR)
+      |  cons_Cmd_Load(STR)
+      |  cons_Cmd_Import(STR)
+      |  cons_Cmd_Save(STR)
+      |  cons_Cmd_FSave(STR)
+      |  cons_Cmd_Print()
+      |  cons_Cmd_Quit()
+      |  cons_Cmd_FQuit()
+      ;
+</ga>
+\end{lstlisting}
 
 \subsubsection{Gramática Abstrata Ficheiro CSV}
-\begin{verbatim}
+\begin{lstlisting}[language=C++, caption={Gramática Abstrata do Ficheiro CSV}]
+<ga>
+  
+  Linhas -> cons_csv_Linhas(Linha Linhas)
+          | cons_csv_Linhas_NIL()
+          ;
 
-\end{verbatim}
+  Linha -> cons_csv_Linha(Linha Campo)
+        | cons_csv_Linha_Fim(Campo)
+        ;
 
-\subsection{Estruturas de Dados}
+  Campo -> cons_csv_Campo(STR)
+        | cons_csv_Campo_NIL()
+        ;
+
+
+ </ga>
+
+\end{lstlisting}
+
+\subsection{Assinatura das Funções}
+
 \newpage
 \section{Elementos do Grupo}
 \begin{figure}[h!]
