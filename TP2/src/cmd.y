@@ -7,6 +7,7 @@
 
 extern int cmdlex (void);
 extern void cmdlex_destroy();
+extern void sav_load_done();
 %}
 %union{ char* cmd_ficheiro; }
 %type <cmd_ficheiro> FICHEIRO
@@ -26,14 +27,10 @@ Comando : Config
         ;
 
 Config : CONFIG FICHEIRO { cmd_config($2); printf(CMD_PROMPT); };
-       | CONFIG
 
-Load : LOAD FICHEIRO { cmd_load($2); printf(CMD_PROMPT); };
-     | LOAD
+Load : LOAD FICHEIRO { cmd_load($2); };
 
-Import : IMPORT FICHEIRO { cmd_import($2); printf(CMD_PROMPT); }
-       | IMPORT
-       ;
+Import : IMPORT FICHEIRO { cmd_import($2); printf(CMD_PROMPT); };
 
 Save : SAVE FICHEIRO { cmd_save($2, 0); printf(CMD_PROMPT); }
      | FSAVE FICHEIRO { cmd_save($2, 1); printf(CMD_PROMPT); }
@@ -44,12 +41,11 @@ Save : SAVE FICHEIRO { cmd_save($2, 0); printf(CMD_PROMPT); }
 Print : PRINT { cmd_print(); printf(CMD_PROMPT); };
 
 Quit : QUIT  { if(cmd_quit()){
-                    cmdlex_destroy();
                     YYACCEPT;
                }else{
                     printf(CMD_PROMPT);
                }}
-     | FQUIT { cmdlex_destroy(); YYACCEPT; }
+     | FQUIT { YYACCEPT;}
      ;
 
 %%

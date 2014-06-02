@@ -13,6 +13,8 @@ extern void htm_print();
 extern void sav_save(char* nome, int force);
 extern void sav_load(char* nome);
 
+int cmd_shouldQuitOnEOF = 1;
+
 void cmd_config(char* ficheiro){
     printf("[DEBUG] comando config (%s)\n", ficheiro);
 

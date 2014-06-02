@@ -54,6 +54,17 @@
 
 %%
 
+void cmd_lex_push( FILE* sav_file_import ){
+    cmdpush_buffer_state(cmd_create_buffer(sav_file_import, YY_BUF_SIZE));
+}
+
+void cmd_lex_pop(){
+    yypop_buffer_state();
+}
+
 int cmdwrap(){
     return 1;
 }
+
+
+

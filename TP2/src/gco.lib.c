@@ -15,6 +15,7 @@
 int gco_set_Config(Confs cfg);
 
 extern int cmdparse();
+extern void cmdlex_destroy();
 extern int cfgparse();
 extern void csvlex_destroy();
 extern void cfglex_destroy();
@@ -64,6 +65,7 @@ int main(int argc, char* argv[]){
     fclose(configFile);
 
     // free memory
+    cmdlex_destroy();
     free_cfg_Confs( gco_config );
     csv_free_ListaCSV( ListaCSV );
     printf("\n:)\n");
