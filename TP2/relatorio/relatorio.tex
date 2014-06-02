@@ -826,57 +826,46 @@ Quando falamos das funções temos:
  * -----------------------------------
  */
 
-Confs  cons_cfg_Confs( Conf a1, Confs a2);
-Confs  cons_cfg_Confs_NIL();
+Linhas  cons_csv_Linhas( Linha a1, Linhas a2);
+Linhas  cons_csv_Linhas_NIL();
 
-Conf  cons_cfg_Conf_Titulo( char * a1);
-Conf  cons_cfg_Conf_Nprovas( int a1);
-Conf  cons_cfg_Conf_Ntop( int a1);
-Conf  cons_cfg_Conf_Campos( Lcampos a1);
-Conf  cons_cfg_Conf_Tempo( int a1);
-Conf  cons_cfg_Conf_Chave( int a1);
-Conf  cons_cfg_Conf_Nome( int a1);
+Linha  cons_csv_Linha( Linha a1, Campo a2);
+Linha  cons_csv_Linha_Fim( Campo a1);
 
-Lcampos  cons_cfg_Lcampos_Lcampos( Lcampos a1, int a2);
-Lcampos  cons_cfg_Lcampos_Campo( int a1);
+Campo  cons_csv_Campo( char * a1);
+Campo  cons_csv_Campo_NIL();
+
 
 /* -----------------------------------
  * Custom Function Signatures
  * -----------------------------------
  */
+void csv_print( Linhas csv );
+Linha csv_Linha_reverse( Linha l );
+int csv_Linhas_validate (Linhas lcsv);
 
-void cfg_Confs_print( Confs cfgs );
-int cfg_Confs_validate( Confs cfgs );
-Lcampos cfg_Lcampos_reverse( Lcampos l );
+void csv_import_csv( Linhas dados );
+int csv_tempo_to_int(char* str);
 
-// getters
-int cfg_get_Nprovas( Confs cfgs );
-int cfg_get_Ntop( Confs cfgs );
-int cfg_get_Tempo( Confs cfgs );
-int cfg_get_Chave( Confs cfgs );
-int cfg_get_Nome( Confs cfgs );
-char* cfg_get_Titulo( Confs cfgs );
-
-// obtem um array de inteiros com os campos. terminado com -1
-int* cfg_get_Campos( Confs cfgs );
-int cfg_get_NCampos( Confs cfgs );
-
-// obtem um array de bytes que esta a 1 nos campos que foram seleccionados
-char* cfg_Campos_seleccionado( Confs cfgs, int totalCampos );
+// indice_campo comeca em 1
+char* csv_get_campo(Linha campos, int indice_campo);
 
 /* -----------------------------------
  * Destructor Function Signatures
  * -----------------------------------
  */
 
-void free_cfg_Lcampos( Lcampos campos );
-void free_cfg_Conf( Conf cfg );
-void free_cfg_Confs( Confs cfgs );
+void csv_free_ListaCSV(Lcsv elem);
 
-#endif
+void free_csv_Campo (Campo cmp);
+void free_csv_Linha (Linha l);
+void free_csv_Linhas (Linhas lcsv);
+
 \end{lstlisting} 
 
-Nesta seção temos que as assinaturas das funções que são usadas tanto para fazer a inicialização 
+Nesta seção temos que as assinaturas das funções que são usadas tanto para fazer a inicialização das estrutura de dados (criadas pelo gabs), mas funções definidas por nós próprios de modo a podermos efectuar operações sobre as mesmas.
+
+Para além das funções que quando a aplicação terminam são responsáveis por fazer a libertação de toda a memória que foi utilizada, temos a função \texttt{Linha csv\_Linha\_reverse( Linha l );} que é utilizada quando estamos a imprimir da maneira que os campos foram lidos. Esta função é necessaŕia devido ao fato de nós temos definido a nossa gramática como sendo de recursividade àm esquerda.
 
 \newpage
 
@@ -943,6 +932,11 @@ int yyerror( char* s ){
     return 0;
 }
 \end{lstlisting}
+
+A informação que o yacc recebe vem do processamento que o flex faz do ficheiro de configuração que ao flex é passado.
+Quando a informação do flex é recebida pelo yacc, este apenas tem de a associar a uma das suas produções demodo a esta ser incluida na estrutura correta.
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%LEX-FICHEIROS-DE-RESULTADOS-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{LEX}
 
@@ -969,11 +963,29 @@ int csvwrap(){
   return 1;
 }
 \end{lstlisting}
+
+O flex relativo ao parsing do fihceiro CSV é relativamente simples, isto deve-se ao fato de nós temos definidos que todos os campo do ficheiro são strings, assim sendo o único tratamento que temos aqui e ver onde acaba cada string, o tratamento dos \\n, do separamento de cada campo e por fim o EOF.
+
+Com esta implementação temos que é o yacc que decide como é que vai tratar cada campo que recebe do lex.
+ 
 \newpage
 \subsection{Tratamento da Informação do Atleta}
 
 Um dos requesitos necessários para o desenvolvimento da plataforma era o cálculo da pontuação dos atletas. 
-Assim, foram implementadas funções que permitem determinar os rankings necessários.
+
+Uma vez que exitem atletas foi necessaŕio a criação de uma estrutura que nos permitesse guardar a informação base de um atleta.
+Entenda-se por informação base:
+\begin{itemize}
+\item ID - identificador de atleta;
+\item nome - nome do atleta;
+\item score - lista de ponto obtidos em cada prova;
+\item tempo\_ultima\_prova - tempo que o atleta obteve na ultima prova decorrida.
+\end{itemize}
+
+Para além de termos a informação de um atleta tivemos também de acrescentar uma estrutura que nos premitisse guarda todos os atltetas que participam numa prova.
+
+Assim sendo as estrturas a que chegamos foram as seguintes:
+
 \begin{lstlisting}[language=C, caption={Estrutura de um atleta.}]
 struct sLInt {
     LInt proximo;
@@ -1024,11 +1036,14 @@ Atletas atl_ler_tempos( Confs cfg, Linhas csv, Atletas atletas );
 #endif
 \end{lstlisting}
 
+O tratamento da informação serve para podermos analisar e processar os rakings das pontuações dos atletas, isto é, um dos requisitos que tinhamos a necessidade processar os tempos obtidos por cada jogador de modo a podermos mais tarde no HTML criar rankings de provas, atletas, etc.
+
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%HTML%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{HTML}
 
-Um dos resultados finais deste projeto é o de gerar uma página HTML com a pontuação de cada atleta ordenado por ordem decrescente de pontos de pontos. 
+Um dos resultados finais deste projeto é o de gerar uma página HTML que permita ser mais uma vertente de apresentação do resulatdos obtidos.
+
 
 \begin{lstlisting}[language=C, caption={Assinatura das funções.}]
 void htm_print_indice();
@@ -1037,6 +1052,10 @@ void htm_print_resultados();
 int htm_begin();
 void htm_end();
 \end{lstlisting}
+
+Como a criação de um ficheiro HTML necesita de um cuidado especial temos que começar a definir o HTMl por parte.
+A nossa apresentação do HTML parte por termo um indice para os rakings que podemos ter ao longo da página, seguindo então pelos respectivos rankings.
+
 
 \newpage
 \section{Conclusão}
