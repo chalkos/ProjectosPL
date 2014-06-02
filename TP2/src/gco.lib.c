@@ -23,12 +23,13 @@ extern void cfglex_destroy();
 extern void cfgset_in(FILE * in_str);
 
 Confs gco_config = NULL;
+extern int sav_has_changes;
 
 /************************
  * Funções
  ***********************/
 int main(int argc, char* argv[]){
-
+    
     // ler o nome do ficheiro de configuração
     // usar o primeiro argumento do ficheiro
     // ou usar o DEFAULT_CONFIG_NAME caso não existam argumentos

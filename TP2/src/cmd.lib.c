@@ -13,7 +13,7 @@ extern void htm_print();
 extern void sav_save(char* nome, int force);
 extern void sav_load(char* nome);
 
-int cmd_shouldQuitOnEOF = 1;
+extern int sav_has_changes;
 
 void cmd_config(char* ficheiro){
     printf("[DEBUG] comando config (%s)\n", ficheiro);
@@ -61,6 +61,7 @@ void cmd_import(char* ficheiro){
         return;
     }
     fclose(csvFile);
+    sav_has_changes = 1;
 }
 
 void cmd_print(){
@@ -80,8 +81,10 @@ int cmd_quit(){
     // ou entao sair com quit!
     
     // verificar se o ficheiro foi guardado recentemente
-    return 0; //nao pode sair
-
+    if( sav_has_changes ){
+        printf("[ERRO] Existem alterações não guardadas.\n[ERRO] Guarde as alterações ou use quit!\n");
+        return 0; //nao pode sair
+    }
 
     return 1; //pode sair
 }

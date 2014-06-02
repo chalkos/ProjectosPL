@@ -16,6 +16,9 @@ extern int cmd_shouldQuitOnEOF;
 extern int cmdparse();
 extern void cmdset_in(FILE * in_str);
 
+int sav_has_changes = 0;
+int sav_loading = 0;
+
 /************************
  * Private Declarations
  ***********************/
@@ -144,6 +147,7 @@ void sav_save(char* nome, int force){
         fclose( fcsv[i] );
     fclose(file);
     free(realname);
+    sav_has_changes = 0;
 }
 
 void sav_load(char* nome){
@@ -157,12 +161,15 @@ void sav_load(char* nome){
         fprintf(stderr, "[ERRO] Não foi possível ler o ficheiro de estado. Abortar.\n");
         return;
     }
+    
+    sav_has_changes = 1;
 
     // trocar o buffer para o ficheiro de batch import
     cmd_lex_push( sav_file_import );
     // ler cmds
-    if( cmdparse() != 0 )
-        printf(CMD_PROMPT);
+    sav_loading = 1;
+    cmdparse();
+    sav_loading = 0;
     // trocar o buffer para o stdin
     cmd_lex_pop();
     // libertar coisas
