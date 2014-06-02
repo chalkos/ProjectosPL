@@ -86,6 +86,9 @@ Campo  cons_csv_Campo_NIL()
 
 // retorna o tempo em segundos a partir de uma string de tempo
 int csv_tempo_to_int(char* str){
+    if( !str )
+        return -1;
+
     if( strlen(str) != 8 )
         return -1;
 
