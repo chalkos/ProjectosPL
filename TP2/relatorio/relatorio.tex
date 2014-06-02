@@ -61,7 +61,7 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 % definir o cabeçalho e rodapé
 \usepackage{fancyhdr}
 \pagestyle{fancy}
-\fancyhead[L]{\small{Gestão de Campeonatos de Orientação}}
+\fancyhead[L]{\small{\textbf{Gestão de Campeonatos de Orientação}}}
 \fancyhead[R]{\small{Processamento de Linguagens}}
 
 % ter enumerações alinhadas
@@ -105,7 +105,7 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 
 \begin{abstract}
 
-  O presente trabalho foi desenvolvido no âmbito da Unidade Curricular de Processamento de Linguagens e tem como principal objetivo o aumento da experiência na Linguagem Imperativa C, a capacidade de escrever gramáticas independentes de contexto que satisfaçam a condição de LR(), a utilização de compiladores como o lex/yacc e o desenvolvimento de processadores de linguagem. Ao longo deste relatório iremos explicar as estruturas de dados que foram implementadas para o desenvolvimento deste trabalho, bem como todas as decisões que foram tomadas.
+  O presente trabalho foi desenvolvido no âmbito da Unidade Curricular de Processamento de Linguagens e tem como principal objetivo o aumento da experiência na Linguagem Imperativa C, a capacidade de escrever Gramáticas Independentes de Contexto que satisfaçam a condição de LR(), a utilização de compiladores como o Lex/Yacc e o desenvolvimento de Processadores de Linguagem. De entre os variados temas, Gestão de Campeonatos de Orientação foi o tema escolhido pelo nosso grupo, para o desenvolvimento deste segundo trabalho prático. Ao longo deste relatório iremos explicar as Estruturas de Dados que foram implementadas para o desenvolvimento deste trabalho, bem como todas as decisões que foram tomadas ao longo do desenvolvimento deste projeto. 
 
 \end{abstract}
 \newpage
@@ -115,10 +115,12 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 
 \newpage
 \section{Introdução}
+
 A Orientação é um desporto que tem como objetivo percorrer uma determinada distância, onde o atleta tem de obrigatoriamente passar pelos pontos que estão indicados no mapa que lhe é atribuído.
 
-Neste contexto temos a gestão de campeonatos de orientação onde é necessário saber a informação das provas que são efetuadas, os participantes envolvidos e os tempos que cada um obteve de modo a serem obtidas as classificações necessárias.
-O objetivo principal é a leitura de ficheiros onde estes tem uma configuração definida pelo ficheiro de configuração e depois a leitura do CSV com a informação dos jogadores e mais tarde o geramento de um página HTML onde é apresentada a informação tratada.
+Neste contexto, o foco deste projeto passa pela gestão de campeonatos de orientação onde é necessário saber a informação das provas que são efetuadas, os participantes envolvidos e os tempos que cada atleta obteve, de modo a serem obtidas as classificações necessárias.
+
+Um objetivo principal do projeto é a leitura de ficheiros onde estes tem uma configuração definida pelo ficheiro de configuração, depois a leitura do CSV com a informação dos jogadores e mais tarde o geramento de um página HTML onde é apresentada a informação tratada.
 
 Para a implementação foi necessário a construção de gramáticas independentes de contexto, implementação de parses para cada ficheiro que necessário, e a utilização do lex e yacc para retirar a informação necessária.
 
@@ -132,20 +134,19 @@ Flex é uma ferramenta para gerar automaticamente analisadores léxicos, isto é
 
 Yacc é utilizado para sistemas operacionais Unix, onde o seu principal objetivo e gerar analisadores sintáticos. No entanto o yacc tem de ser utilizado em conjunto com o lex, pois o yacc não consegue ler a partir de uma entrada de dados, daí a utilização  do lex para que este gere os tokens que mais tarde são usados pelo yacc para o processamento.
 
-Gramática Independentes de contexto é uma gramática formal onde são definidas regras de produção da 
+Gramática Independente de Contexto é uma gramática formal onde são definidas regras de produção da 
  V $\rightarrow$ W onde V é um símbolo não terminal e w um conjunto de símbolos terminais ou variáveis (W no entanto também pode ser nulo).
 
-\subsection{Gestão de Campeonatos de Orientação }
+\subsection{Gestão de Campeonatos de Orientação}
 
-Neste segundo trabalho de Processamento de Linguagens foi-nos proposto a seleção de um projeto entre vários propostos. Após uma análise e chegada a uma concordância, o nosso grupo optou por escolher o tema de Gestão de Campeonato de Orientação.
+Neste segundo trabalho de Processamento de Linguagens foi proposto a seleção de um projeto entre vários propostos. Após uma análise e chegada a uma concordância, o nosso grupo optou por escolher o tema de Gestão de Campeonato de Orientação.
 
-Com este enunciado tem-se que existem várias operações que ocorrem em simultâneo, pois existe os ficheiros:
+Com este enunciado existem várias operações que ocorrem em simultâneo, e por isso existem vários ficheiros, como:
 \begin{itemize}
 \item Ficheiro de Resultados é um ficheiro CSV, onde são guardados os resultados obtidos em cada prova.
 
-\item Ficheiro de Configuração é um ficheiro que vai definir o processamento a realizar, isto é quais as provas e os campos que vão ser tratados
+\item Ficheiro de Configuração é um ficheiro que vai definir o processamento a realizar, isto é quais as provas e os campos que vão ser tratados.
 \end{itemize}
-
 
 \subsection{Enunciado}
 
@@ -159,19 +160,18 @@ De uma maneira geral, para este trabalho pretende-se desenvolver os seguintes po
 \item Adicionar as ações semânticas necessárias,
 \end{itemize}
 
-
 \subsection{Descrição do Problema}
 
-Utilizando o flex, yac e gramáticas independentes de contexto era necessário a desenvolvimento de uma aplicação, que permita o tratamento de ficheiros e gere o HTML como os resultados pretendidos.
+Utilizando o flex, yac e gramáticas independentes de contexto era necessário a desenvolvimento de uma aplicação, que permita o tratar ficheiros específicos e gere o HTML como os resultados pretendidos.
 
-No entanto existem requisitos consoante ao funcionamento da aplicação. Esta deve possuir um ambiente de consola e implementar os seguintes comandos:
+No entanto existem outros requisitos que permitem o bom funcionamento da aplicação. Deste modo, a aplicação deve possuir um ambiente de consola e implementar os seguintes comandos:
 \begin{itemize}
-\item Carregar configuração - Permite carregar o ficheiro de configuração;
-\item Carregar base de dados - Carregar um ficheiro de dados previamente guardado;
-\item Carregar resultado de prova - Carregar o ficheiro de resultados;
-\item Calcular Ranking - Permnite calcular o ranking de pontuação dos atletas;
-\item Gravar base de dados - Guardar a informação que existem na memória num ficheiro;
-\item Sar -  Termina a aplicação.
+\item \textbf{Carregar configuração} - Permite carregar o ficheiro de configuração;
+\item \textbf{Carregar base de dados} - Carregar um ficheiro de dados previamente guardado;
+\item \textbf{Carregar resultado de prova} - Carregar o ficheiro de resultados;
+\item \textbf{Calcular Ranking} - Permite calcular o ranking de pontuação dos atletas;
+\item \textbf{Gravar base de dados} - Guardar a informação que existem na memória num ficheiro;
+\item \textbf{Sair} - Termina a aplicação.
 \end{itemize}
 
 É a partir daqui que os ficheiro de resultados e configuração são lidos e depois as operações são executadas. 
@@ -179,30 +179,41 @@ No entanto existem requisitos consoante ao funcionamento da aplicação. Esta de
 Antes de ser criado o HTML a aplicação tem de ser configurada.
 A informação para tal é lida de um ficheiro de configuração onde nele são definidos os campos:
 \begin{itemize}
-\item Titulo - Titulo da prova em causa;
-\item nporvas - nº de provas a realizar;
-\item N - Indicados do topN ;
-\item campos - Ordem dos campos quando no CSV;
-\item score - Pontuação obtida;
+\item \textbf{Titulo} - Titulo da prova em causa;
+\item \textbf{nporvas} - Nº de provas a realizar;
+\item \textbf{N} - Indicados do topN ;
+\item \textbf{campos} - Ordem dos campos quando no CSV;
+\item \textbf{score} - Pontuação obtida.
 \end{itemize}
-
-
-
 
 \newpage
 
 \section{Desenvolvimento do Programa}
-Como este projeto implica muito o tratamento de de diferentes aspetos, foi decidido estruturar-se o projeto consoante as  funções que cada ficheiro implica.
+Um dos pressupostos da implementação deste projeto é o tratamento de diferente tipo de informação, foi decidido estruturar-se o projeto consoante as funções que cada ficheiro implica.
+[INSERIR IMAGEM DOS FICHEIROS]
 
-\subsection{Estrutura de Dados}
-Para a criação das estruturas de dados, foi usado a ferramenta \textit{gabs} disponibilizada pelo professor que cria a estrutura e os seus construtores quando é executada com uma gramática abstrata com argumento.
+O desenvolvimento deste projeto passa assim a desenvolver três gramáticas independentes de contexto distintas: 
+\begin{itemize}
+\item Gramática para a linguagem de comandos da consola; 
+\item Gramática para a linguagem de configurações;
+\item Grámatica para ficheiros de resultados. 
+\end{itemize}
 
-De modo a utiliza-se a ferramenta era necessário a criação de uma gramática abstrata que depois iria ser passada aos gabs.
+Para a criação das estruturas de dados foi usada a ferramenta \textit{gabs} disponibilizada pelo professor que cria a estrutura e os seus construtores quando é executada com uma gramática abstrata como argumento.
 
-Abaixo será apresentado um exemplo da implementação, no entanto em \ref{sec:Anexos} Anexos  puderam ser consultadas as restantes gramáticas abstratas.
+De modo a utiliza-se esta ferramenta era necessário, primeiramente, a criação de uma gramática abstrata. Por isso, uma das primeiras etapas deste projeto foi desenvolver a especificação de cada uma gramáticas independentes do contexto. 
+
+Em cada uma das subsecções seguintes, será apresentada cada uma das gramáticas desenvolvidas, bem como a sua estrutura de dados implementada, as assinaturas das funções em C e os seus construtores.
+
+\subsection{Especificação de Configurações da Aplicação}
+O ficheiro de configurações define o processamento a realizar: campos a extrair para o resultado final, o número de provas que pontuam, o número de melhores resultados que serão contabilizados para a classificação, os campos que irão aparecer na página de resultado.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%GRAMÁTICA-CONFIGUraÇÕES%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Gramática para a Linguagem de Especificação de Configurações}
 
 A gramática a apresentar é a usada para o ficheiro de configuração. Assim sendo tem-se:
-\begin{lstlisting}[language=C, caption={Gramática Abstrata Para o Ficheiro de configuração}]
+\begin{lstlisting}[language=C, caption={Gramática para a linguagem de especificação de configurações.}]
 <ga>
   Confs -> cons_cfg_Confs(Conf Confs)
         |  cons_cfg_Confs_NIL()
@@ -223,9 +234,12 @@ A gramática a apresentar é a usada para o ficheiro de configuração. Assim se
 </ga>
 \end{lstlisting}
 
-A estrutura que é gerada para o armazenamento dos campos que a gramática abstrata definiu, é divida consoante o nível em que estamos, isto é, nós começamos por ter a estrtura que vai abragir mais campos, neste caso o total de configurações, depois temos o que é um configuração e por último a estrutura que vai guardar um para uma configuração.
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%ESTRUTURAS-CONFIGUraÇÕES%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Estrutura de Dados da Especificação de Configurações}
+A estrutura que é gerada para o armazenamento dos campos que a gramática abstrata definiu, é divida consoante o nível em que se esta. Assim, começa-se pela estrutura que vai abragir mais campos, neste caso o total de configurações, depois pela configuração, e, por último, a estrutura que vai guardar um campo para uma configuração.
 
-\begin{lstlisting}[language=C, caption={Estrutura de dados para armazenar as configurações}]
+\begin{lstlisting}[language=C, caption={Estrutura de dados para armazenar as configurações.}]
 struct sConfs 
 { int flag;
   union {  
@@ -240,9 +254,7 @@ struct sConfs
 };
 \end{lstlisting}
 
-\newpage
-
-\begin{lstlisting}[language=C, caption={Estrutura de dados que armazena uma configuração }]
+\begin{lstlisting}[language=C, caption={Estrutura de dados que armazena uma configuração.}]
 struct sConf 
 { int flag;
   union {  
@@ -266,7 +278,7 @@ struct sConf
 };
 \end{lstlisting}
 
-\begin{lstlisting}[language=C, caption={Estrtutura de dados que armazena os campos de um configuração}]
+\begin{lstlisting}[language=C, caption={Estrututura de dados que armazena os campos de um configuração.}]
 struct sLcampos 
 { int flag;
   union {  
@@ -282,14 +294,12 @@ struct sLcampos
 };
 \end{lstlisting}
 
-Onde se tem que cada struct acima apresentada deriva de cada uma das produções que foram indicadas em na gramática abstrata.
+Verifica-se aqui que cada \textit{struct} acima apresentada deriva de cada uma das produções que foram indicadas em na gramática abstrata.
+\newpage
+\subsubsection{Assinatura das funções utilizadas}
+Aqui serão apresentadas as assinaturas das funções que foram utilizadas para nós dar suporte à implementação do nosso projecto.
 
-
-\subsection{Asinatura das Funções Utilizadas}
-Vamos agora apresentar as assinaturas das funções que foram utilizadas para nós dar suporte à implementação do nosso projecto.
-
-Quando falamos das funções temos: 
-\begin{lstlisting}[language=C, caption={Construtores do Fihceiro de Configuração}]
+\begin{lstlisting}[language=C, caption={Construtores do ficheiro de configuração.}]
 /* -----------------------------------
  * Constructor Function Signatures
  * -----------------------------------
@@ -310,14 +320,13 @@ Lcampos  cons_cfg_Lcampos_Lcampos( Lcampos a1, int a2);
 Lcampos  cons_cfg_Lcampos_Campo( int a1);
 \end{lstlisting} 
 
-Os construtores da nossa aplicação são criados automaticamente, isto é, nós ao passamos a nossa gramática abstrata ao gabs, esta não só cria as estrutura de dados mas também todos os construtores necessários para a criação da mesma.
+Os construtores da aplicação são criados automaticamente, isto é, é passado ao \textit{gabs} a gramática abstrata criada. Esta ferramenta para além de criar as estrutura de dados, cria também todos os construtores necessários para a criação da mesma.
 
-\begin{lstlisting}[language=C, caption={Funções de Fihceiro de Configuração}]
+\begin{lstlisting}[language=C, caption={Funções do ficheiro de configuração.}]
 /* -----------------------------------
  * Custom Function Signatures
  * -----------------------------------
  */
-
 void cfg_Confs_print( Confs cfgs );
 int cfg_Confs_validate( Confs cfgs );
 Lcampos cfg_Lcampos_reverse( Lcampos l );
@@ -334,16 +343,15 @@ char* cfg_get_Titulo( Confs cfgs );
 int* cfg_get_Campos( Confs cfgs );
 int cfg_get_NCampos( Confs cfgs );
 
-// obtem um array de bytes que esta a 1 nos campos que foram seleccionados
+// obtem um array de bytes que esta a 1 nos campos que foram selecionados
 char* cfg_Campos_seleccionado( Confs cfgs, int totalCampos );
 \end{lstlisting} 
 
-Muito embora nós tenhamos os construtores definidos automáticamente era necessário criar as nossa próprias funções para podermos manusear a estrtura de dados, então temos funções que nos premitem ir "buscar" algum campo campo em causa, ou fazer operações como de validação, imprimir entre outras.
+Embora já estejam os construtores definidos automaticamente era necessário criar novas funções para ser possível manusear a estrutura de dados. Deste modo, foram criadas funções que permitem ir "buscar" algum campo específico, ou fazer operações como de validação, imprimir, entre outras.
 
-\textbf{Nota:} Nós temos a função \texttt{Lcampos cfg\_Lcampos\_reverse( Lcampos l )}, porque a nossa gramática como tem a recursividade à esquerdae para no final podermos imprmir os valore pela ordem certa usamos a função que executa essa operação.
+\textbf{Nota:} Foi necessário desenvolver a função \texttt{Lcampos cfg\_Lcampos\_reverse( Lcampos l )}, uma vez que a gramática definida neste programa tem recursividade à esquerda e era necessário imprimir os valores pela ordem correta, daí a necessidade da criação desta função.
 
-
-\begin{lstlisting}[language=C, caption={Funções de Libertação de Memória}]
+\begin{lstlisting}[language=C, caption={Funções de libertação de memória.}]
 /* -----------------------------------
  * Destructor Function Signatures
  * -----------------------------------
@@ -354,14 +362,14 @@ void free_cfg_Conf( Conf cfg );
 void free_cfg_Confs( Confs cfgs );
 \end{lstlisting} 
 
-Nós implementamos a funções de libertação de memória para garantirmos que toda a memória que inicialmente foi feita o malloc existe um free, garantindo assim que a nossa aplicação não tem qualquer tipo de memory leek.
+Foi implementando a funções de libertação de memória para garantir que toda a memória, que inicialmente foi feita, o malloc, existe um free, garantindo assim que a aplicaçãos não tem qualquer tipo de memory leek.
 
 \newpage
-\subsection{YACC}
+%%%%%%%%%%%%%%%%%%%%%%%%%%YACC-CONFIGUraÇÕES%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{YACC}
+No ficheiro do \textit{YACC} existe, para cada produção, que seja "apanhada", uma função correspondente para tratar o caso apanhado.
 
-Nós no ficheiro do \textit{YACC} temos que para cada produção que seja "apanhada" é chamada a função correpondente para  tratar o caso apanhado.
-
-\begin{lstlisting}[language=C, caption={YACC do ficheiro de Configuração}]
+\begin{lstlisting}[language=C, caption={YACC do ficheiro de configuração.}]
 %token TITULO NPROVAS NTOP CAMPOS TEMPO CHAVE NOME str num
 %{
 #include <stdio.h>
@@ -432,40 +440,80 @@ int yyerror( char* s ){
 }
 \end{lstlisting} 
 
-Para o ficheiro de configuração tinhamos que ter o yacc a apanhar os campos relativos à configuração , para isso temos que cada produção trata um caso especifico relativo a esse campos. Podemos ter então que numa situação temos um campo  e uma lista de campos, temos que adicioná-lo a lista dai termos \texttt{\$\$ = cons\_cfg\_Lcampos\_Lcampos(\$1,\$3); }
+Para o ficheiro de configuração o Yacc apanha os campos relativos à configuração do ficheiro. Cada uma das produções trata de um caso específico relativo aos campos. Assim, genericamente existe um campo e uma lista de campos, sendo necessário adicioná-lo à lista, daí exitir \texttt{\$\$ = cons\_cfg\_Lcampos\_Lcampos(\$1,\$3); }
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%LEX-CONFIGUraÇÕES%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{LEX}
+\begin{lstlisting} 
+%{
+#define YY_NO_INPUT
+#include <string.h>
+#include "cfg.lib.h"
+#include "cfg.tab.h"
+%}
+%option nounput
+%option yylineno
+%x ler_string
+%x ler_numero
+%x ler_tempo
+%x campos
+%%
+"=titulo="  {BEGIN ler_string; return TITULO;}
+"=nprovas=" {BEGIN ler_numero; return NPROVAS;}
+"=ntop="    {BEGIN ler_numero; return NTOP;}
+"=campos="  {BEGIN campos;     return CAMPOS;}
+"=tempo="   {BEGIN ler_numero; return TEMPO;}
+"=chave="   {BEGIN ler_numero; return CHAVE;}
+"=nome="    {BEGIN ler_numero; return NOME;}
 
+<ler_string>[^\n]+ {if(*cfgtext == ' ')
+                        cfglval.cfg_str = strdup(cfgtext+1);
+                    else
+                        cfglval.cfg_str = strdup(cfgtext);
+                    BEGIN 0;
+                    return str;}
+<ler_numero>\$     return '$';
+<ler_numero>[0-9]+ {cfglval.cfg_num = atoi(cfgtext);
+                    BEGIN 0;
+                    return num;}
 
+<campos>[0-9]+ { cfglval.cfg_num = atoi(cfgtext);
+                 return num;}
+<campos>\$     { return '$'; }
+<campos>\;     { return ';'; }
+<campos>\n     { BEGIN 0; return '\n'; }
 
+<*><<EOF>>  return '$';
 
+[\n]+       return '\n';
+
+<*>[ \t] ;
+<*>.     { /*printf("flex: %c (%d)\n", *cfgtext, *cfgtext);*/ }
+
+%%
+
+int cfgwrap(){
+    return 1;
+}
+\end{lstlisting} 
 \newpage
 
-\section{Anexos}
-\label{sec:Anexos}
-\subsection{Gramáticas Abstratas}
-\subsubsection{Gramática Abstrata Ficheiro Configuração}
-\begin{lstlisting}[language=C++, caption={Gramática Abstrata do Ficheiro de Configuração}]
-<ga>
-  Confs -> cons_cfg_Confs(Conf Confs)
-        |  cons_cfg_Confs_NIL()
-        ;
 
-  Conf -> cons_cfg_Conf_Titulo(STR)
-       |  cons_cfg_Conf_Nprovas(INT)
-       |  cons_cfg_Conf_Ntop(INT)
-       |  cons_cfg_Conf_Campos(Lcampos)
-       |  cons_cfg_Conf_Tempo(INT)
-       |  cons_cfg_Conf_Chave(INT)
-       |  cons_cfg_Conf_Nome(INT)
-       ;
-
-  Lcampos -> cons_cfg_Lcampos_Lcampos(Lcampos INT)
-          |  cons_cfg_Lcampos_Campo(INT)
-          ;
-</ga>
-\end{lstlisting}
-
-\subsubsection{Gramática Abstrata Ficheiro Comandos}
-\begin{lstlisting}[language=C++, caption={Gramática Abstrata do Ficheiro de Comandos}]
+%%%%%%%%%%%%%%%%%%%%%%%%%%CMD%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Especificação para a Linguagem de Comandos da Consola}
+A aplicação deverá ter um ambiente de consola com alguns comandos básicos:
+\begin{itemize}
+\item \textbf{Carregar configuração}: o sistema inicializa-se sempre com esta operação. Esta operação está sempre disponível para ser possível alterar a configuração.
+\item \textbf{Carregar base de dados}: o sistema carrega para memória o estado de um torneio previamente gravado.
+\item \textbf{Carregar resultado de prova}: o sistema carrega e processa um ficheiro CSV. Como resultado desta operação produz um ficheiro HTML com a pontuação de cada atleta, ordenado por ordem descente de pontos.
+\item \textbf{Calcular ranking}: em qualquer momento poderá ser invocada esta operação à qual o sistema responder com uma listagem em HTML do raking;
+\item \textbf{Gravar base de dados}: o sistema guarda em memória o estado da aplicação.
+\item \textbf{Sair}: o sistema termina a aplicação, se o estado atual não tiver sido previamente gravado deverá lançar um atleta e pedir configuração para prosseguir.
+\end{itemize}
+%%%%%%%%%%%%%%%%%%%%%%%%%%GRAMÁTICA-CMD%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Especificação para a Linguagem de Comandos da Consola}
+A gramática apresentar é a usada para o funcionamento da aplicação em ambiente consola (CMD). Assim sendo tem-se:
+\begin{lstlisting}[language=C, caption={Gramática para a linguagem de especificação para a linguagem de comandos de consola.}]
 <ga>
   Cmds -> cons_Cmds(Cmd Cmds)
        |  cons_Cmds_NIL()
@@ -482,9 +530,112 @@ Para o ficheiro de configuração tinhamos que ter o yacc a apanhar os campos re
       ;
 </ga>
 \end{lstlisting}
+\newpage
 
-\subsubsection{Gramática Abstrata Ficheiro CSV}
-\begin{lstlisting}[language=C++, caption={Gramática Abstrata do Ficheiro CSV}]
+%%%%%%%%%%%%%%%%%%%%%%%%%%FUNÇÕES-CMD%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assinatura das funções utilizadas}
+Vamos agora apresentar as assinaturas das funções que foram utilizadas para nós dar suporte à implementação do nosso projecto, nesta fase.
+
+Quando falamos das funções temos: 
+\begin{lstlisting}[language=C, caption={Construtores do ficheiro de consola.}]
+.h do cmd
+#ifndef __CMD_LIB_H
+#define __CMD_LIB_H
+
+#include <stdlib.h>
+
+#define CMD_PROMPT "> "
+
+// carrega uma nova configuracao
+void cmd_config(char* ficheiro);
+
+// carrega o estado da aplicacao
+void cmd_load(char* ficheiro);
+
+// importa um CSV
+void cmd_import(char* ficheiro);
+
+// escreve o html com os dados existentes
+void cmd_print();
+
+// guarda o estado da aplicacao
+void cmd_save(char* ficheiro, int force);
+
+// sair da aplicacao
+int cmd_quit();
+
+#endif
+\end{lstlisting} 
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%YACC-CMD%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{YACC}
+
+No ficheiro do \textit{YACC} cada produção que seja "apanhada" é chamada a função correpondente para tratar a operação que foi capturada.
+
+\begin{lstlisting}[language=C, caption={YACC do ficheiro cmd.}]
+extern int cmdlex (void);
+extern void cmdlex_destroy();
+%}
+%union{ char* cmd_ficheiro; }
+%type <cmd_ficheiro> FICHEIRO
+%start Comandos
+%%
+Comandos : Comando '\n' Comandos
+         | 
+         ;
+Comando : Config
+        | Load
+        | Import
+        | Print
+        | Save
+        | Quit
+        | {/*| error  { printf("Comando invalido2.\n%s", CMD_PROMPT); yyclearin; yyerrok; }*/}
+        ;
+
+Config : CONFIG FICHEIRO { cmd_config($2); printf(CMD_PROMPT); };
+       | CONFIG
+
+Load : LOAD FICHEIRO { cmd_load($2); printf(CMD_PROMPT); };
+     | LOAD
+
+Import : IMPORT FICHEIRO { cmd_import($2); printf(CMD_PROMPT); }
+       | IMPORT
+       ;
+
+Save : SAVE FICHEIRO { cmd_save($2, 0); printf(CMD_PROMPT); }
+     | FSAVE FICHEIRO { cmd_save($2, 1); printf(CMD_PROMPT); }
+     | SAVE
+     | FSAVE
+     ;
+
+Print : PRINT { cmd_print(); printf(CMD_PROMPT); };
+
+Quit : QUIT  { if(cmd_quit()){
+                    cmdlex_destroy();
+                    YYACCEPT;
+               }else{
+                    printf(CMD_PROMPT);
+               }}
+     | FQUIT { cmdlex_destroy(); YYACCEPT; }
+     ;
+
+%%
+int yyerror( char* s ){
+    //fprintf(stderr, "%s", s);
+    return 0;
+}
+\end{lstlisting} 
+
+Para o ficheiro de CMD tinhamos que ter o Yacc a apanhar os campos relativos aos comandos, para isso temos que cada produção trata um caso especifico relativo a esse campos.
+
+
+\subsection{Especificação para os Ficheiros de Resultados}
+%%%%%%%%%%%%%%%%%%%%%%%%%%GRAMÁTICA-FICHEIROS-DE-RESULTADOS-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Gramática Especificação para os Ficheiros de Resultados}
+
+A gramática a apresentar é a usada para o ficheiros de resultados. Assim sendo tem-se:
+\begin{lstlisting}[language=C, caption={Gramática para a linguagem de especificação para os ficheiros de resultados.}]
 <ga>
   
   Linhas -> cons_csv_Linhas(Linha Linhas)
@@ -498,15 +649,218 @@ Para o ficheiro de configuração tinhamos que ter o yacc a apanhar os campos re
   Campo -> cons_csv_Campo(STR)
         | cons_csv_Campo_NIL()
         ;
-
-
  </ga>
+\end{lstlisting}
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%ESTRUTURA DE DADOS -FICHEIROS-DE-RESULTADOS-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Estrutura de Dados da Espeficicação dos Ficheiros de Resultados}
+
+A estrutura que é gerada para o armazenamento dos campos que a gramática abstrata definiu, é divida consoante o nível em que estamos, isto é, nós começamos por ter a estrtura que vai abragir mais campos, neste caso o total de configurações, depois temos o que é um configuração e por último a estrutura que vai guardar um para uma configuração.
+
+\begin{lstlisting}[language=C, caption={Estrutura de dados para armazenar a especificação dos ficheiros de resultados.}]
+
+/* --- Linhas ---*/
+struct sLinhas 
+{ int flag;
+  union {  
+    struct {
+        Linha s1;
+        Linhas s2;
+      } d1;
+    struct {
+      } d2;
+
+  } u;
+};
+
+/* --- Linha ---*/
+struct sLinha 
+{ int flag;
+  union {  
+    struct {
+        Linha s1;
+        Campo s2;
+      } d1;
+    struct {
+        Campo s1;
+      } d2;
+
+  } u;
+};
+
+/* --- Campo ---*/
+struct sCampo 
+{ int flag;
+  union {  
+    struct {
+        char * s1;
+      } d1;
+    struct {
+      } d2;
+
+  } u;
+};
 
 \end{lstlisting}
 
-\subsection{Assinatura das Funções}
+\subsubsection{Assinatura das funções utilizadas}
+Vamos agora apresentar as assinaturas das funções que foram utilizadas para nós dar suporte à implementação do nosso projecto, nesta fase.
+
+Quando falamos das funções temos: 
+\begin{lstlisting}[language=C, caption={Construtores do ficheiro de resultados.}]
+
+/* -----------------------------------
+ * Constructor Function Signatures
+ * -----------------------------------
+ */
+
+Confs  cons_cfg_Confs( Conf a1, Confs a2);
+Confs  cons_cfg_Confs_NIL();
+
+Conf  cons_cfg_Conf_Titulo( char * a1);
+Conf  cons_cfg_Conf_Nprovas( int a1);
+Conf  cons_cfg_Conf_Ntop( int a1);
+Conf  cons_cfg_Conf_Campos( Lcampos a1);
+Conf  cons_cfg_Conf_Tempo( int a1);
+Conf  cons_cfg_Conf_Chave( int a1);
+Conf  cons_cfg_Conf_Nome( int a1);
+
+Lcampos  cons_cfg_Lcampos_Lcampos( Lcampos a1, int a2);
+Lcampos  cons_cfg_Lcampos_Campo( int a1);
+
+/* -----------------------------------
+ * Custom Function Signatures
+ * -----------------------------------
+ */
+
+void cfg_Confs_print( Confs cfgs );
+int cfg_Confs_validate( Confs cfgs );
+Lcampos cfg_Lcampos_reverse( Lcampos l );
+
+// getters
+int cfg_get_Nprovas( Confs cfgs );
+int cfg_get_Ntop( Confs cfgs );
+int cfg_get_Tempo( Confs cfgs );
+int cfg_get_Chave( Confs cfgs );
+int cfg_get_Nome( Confs cfgs );
+char* cfg_get_Titulo( Confs cfgs );
+
+// obtem um array de inteiros com os campos. terminado com -1
+int* cfg_get_Campos( Confs cfgs );
+int cfg_get_NCampos( Confs cfgs );
+
+// obtem um array de bytes que esta a 1 nos campos que foram seleccionados
+char* cfg_Campos_seleccionado( Confs cfgs, int totalCampos );
+
+/* -----------------------------------
+ * Destructor Function Signatures
+ * -----------------------------------
+ */
+
+void free_cfg_Lcampos( Lcampos campos );
+void free_cfg_Conf( Conf cfg );
+void free_cfg_Confs( Confs cfgs );
+
+#endif
+\end{lstlisting} 
+\newpage
+
+\subsubsection{YACC}
+%%%%%%%%%%%%%%%%%%%%%%%%%%YACC-FICHEIROS-DE-RESULTADOS-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+No ficheiro do \textit{YACC} cada produção que seja "apanhada" é chamada a função correpondente para tratar o caso apanhado.
+
+\begin{lstlisting}[language=C, caption={YACC do ficheiro de resultados.}]
+
+%token str
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include "csv.lib.h"
+
+#define YYERROR_VERBOSE
+
+extern unsigned int csvlineno;
+extern int csvlex (void);
+extern void csvlex_destroy();
+%}
+%union{
+  char * csv_str;
+  
+  Linhas csv_Linhas;
+  Linha  csv_Linha;
+  Campo  csv_Campo;
+
+} 
+
+%type<csv_str> str
+%type<csv_Campo> Campo
+%type<csv_Linhas> X Linhascsv
+%type<csv_Linha> Linha
+%start X
+
+%%
+X : Linhascsv '$' { $$ = $1; 
+                    csvlex_destroy();
+                    if( csv_Linhas_validate($$) ){
+                        csv_import_csv($$);
+                        YYACCEPT;
+                    }else{
+                        YYABORT;
+                    }
+                  };
+
+Linhascsv : Linha '\n' Linhascsv {$1 = csv_Linha_reverse($1);
+                                  $$ = cons_csv_Linhas ($1,$3);}
+          | {$$ = cons_csv_Linhas_NIL();}
+          ;
+
+Linha : Linha ';' Campo {$$ = cons_csv_Linha ($1,$3);}
+      | Campo {$$ = cons_csv_Linha_Fim ($1);}
+      ;
+
+Campo : str {$$ = cons_csv_Campo ($1);}
+      | {$$ = cons_csv_Campo_NIL();}
+      ;
+
+%%
+int yyerror( char* s ){
+    fprintf(stderr, "Line %d: %s\n", csvlineno, s);
+    return 0;
+}
+\end{lstlisting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%LEX-FICHEIROS-DE-RESULTADOS-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{LEX}
+
+\begin{lstlisting}
+%{
+#define YY_NO_INPUT
+#include <string.h>
+#include "csv.lib.h"
+#include "csv.tab.h"
+%}
+%option yylineno
+%option nounput
+
+%%
+[^\n\;]+ {csvlval.csv_str = strdup(csvtext);
+         return str;}
+\n+     {return '\n';}
+\;      {return ';';}
+<<EOF>> {return '$';}
+
+
+%%
+int csvwrap(){
+  return 1;
+}
+\end{lstlisting}
 
 \newpage
+
+\section{Anexos}
+
+\newpage
+
 \section{Elementos do Grupo}
 \begin{figure}[h!]
 \centering
@@ -526,6 +880,7 @@ Para o ficheiro de configuração tinhamos que ter o yacc a apanhar os campos re
   \caption{Vanessa Campos}
 \end{subfigure}%
 \end{figure}
+
 
 
 \end{document}
