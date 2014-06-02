@@ -8,15 +8,21 @@
 %option yylineno
 %x ler_string
 %x ler_numero
+%x ler_tempo
 %x campos
 %%
 "=titulo="  {BEGIN ler_string; return TITULO;}
 "=nprovas=" {BEGIN ler_numero; return NPROVAS;}
 "=ntop="    {BEGIN ler_numero; return NTOP;}
 "=campos="  {BEGIN campos;     return CAMPOS;}
-"=score="   {BEGIN ler_numero; return SCORE;}
+"=tempo="   {BEGIN ler_numero; return TEMPO;}
+"=chave="   {BEGIN ler_numero; return CHAVE;}
+"=nome="    {BEGIN ler_numero; return NOME;}
 
-<ler_string>[^\n]+ {cfglval.cfg_str = strdup(cfgtext);
+<ler_string>[^\n]+ {if(*cfgtext == ' ')
+                        cfglval.cfg_str = strdup(cfgtext+1);
+                    else
+                        cfglval.cfg_str = strdup(cfgtext);
                     BEGIN 0;
                     return str;}
 <ler_numero>\$     return '$';
