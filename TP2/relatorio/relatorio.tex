@@ -120,7 +120,7 @@ A Orientação é um desporto que tem como objetivo percorrer uma determinada di
 
 Neste contexto, o foco deste projeto passa pela gestão de campeonatos de orientação onde é necessário saber a informação das provas que são efetuadas, os participantes envolvidos e os tempos que cada atleta obteve, de modo a serem obtidas as classificações necessárias.
 
-Um objetivo principal do projeto é a leitura de ficheiros onde estes tem uma configuração definida pelo ficheiro de configuração, depois a leitura do CSV com a informação dos jogadores e mais tarde o geramento de um página HTML onde é apresentada a informação tratada.
+outro objetivo principal do projeto é a leitura de ficheiros onde estes tem uma configuração definida pelo ficheiro de configuração, depois a leitura do CSV com a informação dos jogadores e mais tarde o geramento de um página HTML onde é apresentada a informação tratada.
 
 Para a implementação foi necessário a construção de gramáticas independentes de contexto, implementação de parses para cada ficheiro que necessário, e a utilização do lex e yacc para retirar a informação necessária.
 
@@ -658,9 +658,10 @@ int yyerror( char* s ){
 }
 \end{lstlisting} 
 
-Para o ficheiro de CMD tinhamos que ter o Yacc a apanhar os campos relativos aos comandos, para isso temos que cada produção trata um caso especifico relativo a esse campos.
+No yacc no caso dos comandos varia do yacc do ficheiro de configuração, porque neste muito embora estejamos a na mesma a receber os dados do flex, mas o tratamento que o yacc lhe faz é diferente, isto vem pelo fato de um produção neste caso desencadeia uma ação, isto é, quando temos por exemplo o \textit{PRINT} temos que quando esta produção é apanhada, temos de a função \texttt{cmd\_print}, que vai imprimir a informação relativa aos jogadores para uma página HTML.
 
 \subsubsection{LEX}
+
 \begin{lstlisting}[language=C, caption={LEX do ficheiro cmd.}]
 %{
 #define YY_NO_INPUT
@@ -731,11 +732,17 @@ int cmdwrap(){
 }
 \end{lstlisting}
 
+O flex neste caso esta associado ao input que é produzido pelo utilizador, isto é, no caso do cmd não estamos a trabalhar com a nossa própria consola.
+
+Devido ao fato de termos a nossa própria consola isso implica, termos o parsing que reconhece os comandos que estão a ser introduzidos, para depois esse comandos são passados ao yacc que vai determinar que função é desencadeada como esse comando.
+
 \subsection{Especificação para os Ficheiros de Resultados}
 %%%%%%%%%%%%%%%%%%%%%%%%%%GRAMÁTICA-FICHEIROS-DE-RESULTADOS-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \subsubsection{Gramática Especificação para os Ficheiros de Resultados}
 
-A gramática a apresentar é a usada para o ficheiros de resultados. Assim sendo tem-se:
+A gramática a apresentar é a gramática abstrata que vai ser usada para gerar a estrtura de representação intermédia para o ficheiro de resultados.
+
 \begin{lstlisting}[language=C, caption={Gramática para a linguagem de especificação para os ficheiros de resultados.}]
 <ga>
   
@@ -752,11 +759,15 @@ A gramática a apresentar é a usada para o ficheiros de resultados. Assim sendo
         ;
  </ga>
 \end{lstlisting}
+
+As produções que podemos encontrar na gramática abstrata veem da definição de produções que nós achamos que fossem importantes para tratar a informação que pode ser encontrada num ficheiro de resultados.
+
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%ESTRUTURA DE DADOS -FICHEIROS-DE-RESULTADOS-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Estrutura de Dados da Espeficicação dos Ficheiros de Resultados}
 
-A estrutura que é gerada para o armazenamento dos campos que a gramática abstrata definiu, é divida consoante o nível em que estamos, isto é, nós começamos por ter a estrtura que vai abragir mais campos, neste caso o total de configurações, depois temos o que é um configuração e por último a estrutura que vai guardar um para uma configuração.
+A estrutura que é gerada para o armazenamento dos campos que a gramática abstrata definiu, é divida consoante o nível em que estamos, isto é, nós começamos por ter a estrtura que vai abragir mais campos, neste caso o total de linhas que constituem o fihceiro, depois temos o que é as linhas
+ e por último a estrutura que vai guardar um para uma campo.
 
 \begin{lstlisting}[language=C, caption={Estrutura de dados para armazenar a especificação dos ficheiros de resultados.}]
 
@@ -864,6 +875,9 @@ void free_cfg_Confs( Confs cfgs );
 
 #endif
 \end{lstlisting} 
+
+Nesta seção temos que as assinaturas das funções que são usadas tanto para fazer a inicialização 
+
 \newpage
 
 \subsubsection{YACC}
