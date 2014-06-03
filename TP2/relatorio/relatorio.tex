@@ -105,7 +105,7 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 
 \begin{abstract}
 
-  O presente trabalho foi desenvolvido no âmbito da Unidade Curricular de Processamento de Linguagens e tem como principal objetivo o aumento da experiência na Linguagem Imperativa C, a capacidade de escrever Gramáticas Independentes de Contexto que satisfaçam a condição de LR(), a utilização de compiladores como o Lex/Yacc e o desenvolvimento de Processadores de Linguagem. De entre os variados temas, Gestão de Campeonatos de Orientação foi o tema escolhido pelo nosso grupo, para o desenvolvimento deste segundo trabalho prático. Ao longo deste relatório iremos explicar as Estruturas de Dados que foram implementadas para o desenvolvimento deste trabalho, bem como todas as decisões que foram tomadas ao longo do desenvolvimento deste projeto. 
+  O presente trabalho foi desenvolvido no âmbito da unidade curricular de Processamento de Linguagens e tem como principal objetivo o aumento da experiência na linguagem imperativa \textit{C}, a capacidade de escrever gramáticas independentes de contexto que satisfaçam a condição de LR(), a utilização de compiladores como o \textit{Lex}/\textit{Yacc} e o desenvolvimento de processadores de linguagem. De entre os variados temas, Gestão de Campeonatos de Orientação foi o tema escolhido pelo nosso grupo, para o desenvolvimento deste segundo trabalho prático. Ao longo deste relatório iremos explicar as estruturas de dados que foram implementadas para o desenvolvimento deste trabalho, bem como todas as decisões que foram tomadas ao longo do desenvolvimento deste projeto. 
 
 \end{abstract}
 \newpage
@@ -120,9 +120,9 @@ A Orientação é um desporto que tem como objetivo percorrer uma determinada di
 
 Neste contexto, o foco deste projeto passa pela gestão de campeonatos de orientação onde é necessário saber a informação das provas que são efetuadas, os participantes envolvidos e os tempos que cada atleta obteve, de modo a serem obtidas as classificações necessárias.
 
-outro objetivo principal do projeto é a leitura de ficheiros onde estes tem uma configuração definida pelo ficheiro de configuração, depois a leitura do CSV com a informação dos jogadores e mais tarde o geramento de um página HTML onde é apresentada a informação tratada.
+Outro objetivo principal do projeto é a leitura de ficheiros. Estes tem uma configuração definida pelo ficheiro de configuração, depois a leitura do \textit{CSV} com a informação dos jogadores e mais tarde o geramento de um página \textit{HTML} onde é apresentada a informação tratada.
 
-Para a implementação foi necessário a construção de gramáticas independentes de contexto, implementação de parses para cada ficheiro que necessário, e a utilização do lex e yacc para retirar a informação necessária.
+Para a implementação foi necessário a construção de gramáticas independentes de contexto, implementação de parsers para cada ficheiro. A utilização do \textit{Lex} e \textit{Yacc} foi necessária para retirar a informação relevante.
 
 
 \newpage
@@ -130,9 +130,9 @@ Para a implementação foi necessário a construção de gramáticas independent
 
 \subsection{Contextualização do Problema}
 
-Flex é uma ferramenta para gerar automaticamente analisadores léxicos, isto é, programas que reconhecem padrões léxicos num texto. O Flex é uma evolução da ferramenta Lex, mas com a caraterística de ser mais rápido que este (Fast Lex).
+\textit{Flex} é uma ferramenta para gerar automaticamente analisadores léxicos, isto é, programas que reconhecem padrões léxicos num texto. O \textit{Flex} é uma evolução da ferramenta \textit{Lex}, mas com a caraterística de ser mais rápido que este (\textit{Fast Lex}).
 
-Yacc é utilizado para sistemas operacionais Unix, onde o seu principal objetivo e gerar analisadores sintáticos. No entanto o yacc tem de ser utilizado em conjunto com o lex, pois o yacc não consegue ler a partir de uma entrada de dados, daí a utilização  do lex para que este gere os tokens que mais tarde são usados pelo yacc para o processamento.
+\textit{Yacc} é utilizado para sistemas operacionais \textit{Unix}, onde o seu principal objetivo e gerar analisadores sintáticos. No entanto o \textit{Yacc} tem de ser utilizado em conjunto com o \textit{Lex}, pois o \textit{Yacc} não consegue ler a partir de uma entrada de dados, daí a utilização do \textit{Lex} para que este gere os tokens que mais tarde são usados pelo \textit{Yacc} para o processamento.
 
 Gramática Independente de Contexto é uma gramática formal onde são definidas regras de produção da 
  V $\rightarrow$ W onde V é um símbolo não terminal e w um conjunto de símbolos terminais ou variáveis (W no entanto também pode ser nulo).
@@ -141,11 +141,11 @@ Gramática Independente de Contexto é uma gramática formal onde são definidas
 
 Neste segundo trabalho de Processamento de Linguagens foi proposto a seleção de um projeto entre vários propostos. Após uma análise e chegada a uma concordância, o nosso grupo optou por escolher o tema de Gestão de Campeonato de Orientação.
 
-Com este enunciado existem várias operações que ocorrem em simultâneo, e por isso existem vários ficheiros, como:
+Este enunciado exige que sejam feitas várias operações que ocorrem em simultâneo, e por isso existem vários ficheiros, como:
 \begin{itemize}
-\item Ficheiro de Resultados é um ficheiro CSV, onde são guardados os resultados obtidos em cada prova.
+\item Ficheiro de Resultados: ficheiro CSV, onde são guardados os resultados obtidos em cada prova.
 
-\item Ficheiro de Configuração é um ficheiro que vai definir o processamento a realizar, isto é quais as provas e os campos que vão ser tratados.
+\item Ficheiro de Configuração: ficheiro que vai definir o processamento a realizar, isto é quais as provas e os campos que vão ser tratados.
 \end{itemize}
 
 \subsection{Enunciado}
@@ -154,65 +154,65 @@ De uma maneira geral, para este trabalho pretende-se desenvolver os seguintes po
 
 \begin{itemize}
 \item Especificação de uma gramática para a linguagem de comandos da consola;
-\item Especificação de uma gramática para a linguagem de especificação de connfigurações;
+\item Especificação de uma gramática para a linguagem de especificação de configurações;
 \item Especificação de uma gramática para os ficheiros de resultados;
-\item Desenvolver os respetivos parses;
-\item Adicionar as ações semânticas necessárias,
+\item Desenvolver os respetivos parsers;
+\item Adicionar as ações semânticas necessárias.
 \end{itemize}
 
 \subsection{Descrição do Problema}
 
-Utilizando o flex, yac e gramáticas independentes de contexto era necessário a desenvolvimento de uma aplicação, que permita o tratar ficheiros específicos e gere o HTML como os resultados pretendidos.
+A utilização do \textit{Flex}, \textit{Yacc} e gramáticas independentes de contexto era necessária para o desenvolvimento da aplicação, de forma a permitir o tratamento de ficheiros específicos e para gerar o \textit{HTML}, como os resultados pretendidos.
 
-No entanto existem outros requisitos que permitem o bom funcionamento da aplicação. Deste modo, a aplicação deve possuir um ambiente de consola e implementar os seguintes comandos:
+No entanto, existem outros requisitos que permitem o bom funcionamento da aplicação. A aplicação deve possuir um ambiente de consola e implementar os seguintes comandos:
 \begin{itemize}
-\item \textbf{Carregar configuração} - Permite carregar o ficheiro de configuração;
-\item \textbf{Carregar base de dados} - Carregar um ficheiro de dados previamente guardado;
-\item \textbf{Carregar resultado de prova} - Carregar o ficheiro de resultados;
-\item \textbf{Calcular Ranking} - Permite calcular o ranking de pontuação dos atletas;
-\item \textbf{Gravar base de dados} - Guardar a informação que existem na memória num ficheiro;
-\item \textbf{Sair} - Termina a aplicação.
+\item \textbf{Carregar configuração}: permite carregar o ficheiro de configuração;
+\item \textbf{Carregar base de dados}: carregar um ficheiro de dados previamente guardado;
+\item \textbf{Carregar resultado de prova}: carregar o ficheiro de resultados;
+\item \textbf{Calcular Ranking}: permite calcular o ranking de pontuação dos atletas;
+\item \textbf{Gravar base de dados}: guardar a informação que existem na memória num ficheiro;
+\item \textbf{Sair}: termina a aplicação.
 \end{itemize}
 
 É a partir daqui que os ficheiro de resultados e configuração são lidos e depois as operações são executadas. 
 
-Antes de ser criado o HTML a aplicação tem de ser configurada.
-A informação para tal é lida de um ficheiro de configuração onde nele são definidos os campos:
+Antes de ser criado o \textit{HTML} a aplicação tem de ser configurada. Para isso a informação é lida de um ficheiro de configuração estão definidos os campos:
 \begin{itemize}
-\item \textbf{Titulo} - Titulo da prova em causa;
-\item \textbf{nporvas} - Nº de provas a realizar;
-\item \textbf{N} - Indicados do topN ;
-\item \textbf{campos} - Ordem dos campos quando no CSV;
-\item \textbf{score} - Pontuação obtida.
+\item \textbf{Titulo}: título da prova em causa;
+\item \textbf{nporvas}: nº de provas a realizar;
+\item \textbf{N}: indicados do topN;
+\item \textbf{campos}: ordem dos campos quando no CSV;
+\item \textbf{score}: pontuação obtida.
 \end{itemize}
 
 \newpage
 
 \section{Desenvolvimento do Programa}
-Um dos pressupostos da implementação deste projeto é o tratamento de diferente tipo de informação, foi decidido estruturar-se o projeto consoante as funções que cada ficheiro implica.
+Um dos pressupostos da implementação deste projeto é o tratamento de diferentes tipos de informação, foi decidido estruturar-se o projeto consoante as funções que cada ficheiro implica.
 [INSERIR IMAGEM DOS FICHEIROS]
 
-O desenvolvimento deste projeto passa assim a desenvolver três gramáticas independentes de contexto distintas: 
+O desenvolvimento deste projeto passa assim por desenvolver três gramáticas independentes de contexto distintas: 
 \begin{itemize}
 \item Gramática para a linguagem de comandos da consola; 
 \item Gramática para a linguagem de configurações;
 \item Grámatica para ficheiros de resultados. 
 \end{itemize}
 
-Para a criação das estruturas de dados foi usada a ferramenta \textit{gabs} disponibilizada pelo professor que cria a estrutura e os seus construtores quando é executada com uma gramática abstrata como argumento.
+Para a criação das estruturas de dados foi usada a ferramenta \textit{gabs}, disponibilizada pelo professor, que cria a estrutura e os seus construtores, quando é executada com uma gramática abstrata como argumento.
 
-De modo a utiliza-se esta ferramenta era necessário, primeiramente, a criação de uma gramática abstrata. Por isso, uma das primeiras etapas deste projeto foi desenvolver a especificação de cada uma gramáticas independentes do contexto. 
+De modo a utiliza-se esta ferramenta era necessário, primeiramente, a criação de uma gramática abstrata. Por isso, uma das primeiras etapas deste projeto foi desenvolver a especificação de cada uma gramáticas independentes do contexto, acima referidas. 
 
-Em cada uma das subsecções seguintes, será apresentada cada uma das gramáticas desenvolvidas, bem como a sua estrutura de dados implementada, as assinaturas das funções em C e os seus construtores.
+Em cada uma das subsecções seguintes, será apresentada cada uma das gramáticas desenvolvidas, a estrutura de dados implementada, as assinaturas das funções em C e os seus construtores.
 
-\subsection{Especificação de Configurações da Aplicação}
-O ficheiro de configurações define o processamento a realizar: campos a extrair para o resultado final, o número de provas que pontuam, o número de melhores resultados que serão contabilizados para a classificação, os campos que irão aparecer na página de resultado.
+\subsection{Especificação da Linguagem de Configurações da Aplicação}
+
+O ficheiro de configurações define o processamento a realizar: campos a extrair para o resultado final da aplicação, o número de provas que pontuam, o número de melhores resultados que serão contabilizados para a classificação, os campos que irão aparecer na página de resultado.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%GRAMÁTICA-CONFIGUraÇÕES%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsubsection{Gramática para a Linguagem de Especificação de Configurações}
 
-A gramática a apresentar é a usada para o ficheiro de configuração. Assim sendo tem-se:
+A gramática a apresentar é a usada para especificar o ficheiro de configuração. Assim sendo tem-se a seguinte gramática:
 
 \begin{lstlisting}[language=C, caption={Gramática para a linguagem de especificação de
  configurações.}]
@@ -239,7 +239,7 @@ A gramática a apresentar é a usada para o ficheiro de configuração. Assim se
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%ESTRUTURAS-CONFIGUraÇÕES%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Estrutura de Dados da Especificação de Configurações}
-A estrutura que é gerada para o armazenamento dos campos que a gramática abstrata definiu, é divida consoante o nível em que se esta. Assim, começa-se pela estrutura que vai abragir mais campos, neste caso o total de configurações, depois pela configuração, e, por último, a estrutura que vai guardar um campo para uma configuração.
+A estrutura que é gerada para o armazenamento dos campos que a gramática abstrata definiu, é divida consoante o nível em que se está. Assim, começa-se pela estrutura que vai abrangir mais campos, que neste caso corresponde ao total de configurações, depois pela configuração, e, por último, a estrutura que vai guardar um campo para uma configuração.
 
 \begin{lstlisting}[language=C, caption={Estrutura de dados para armazenar as configurações.}]
 struct sConfs 
@@ -280,7 +280,7 @@ struct sConf
 };
 \end{lstlisting}
 
-\begin{lstlisting}[language=C, caption={Estrututura de dados que armazena os campos de um configuração.}]
+\begin{lstlisting}[language=C, caption={Estrututura de dados que armazena os campos de uma configuração.}]
 struct sLcampos 
 { int flag;
   union {  
@@ -296,12 +296,12 @@ struct sLcampos
 };
 \end{lstlisting}
 
-Verifica-se aqui que cada \textit{struct} acima apresentada deriva de cada uma das produções que foram indicadas em na gramática abstrata.
-As produções que foram usadas para definir as produções da gramática abstrata são as que também foram usadas para definir as produções do yacc.
+Verifica-se aqui que cada \textit{struct} acima apresentada deriva de cada uma das produções que foram indicadas na gramática abstrata.
+As produções que foram usadas para definir as produções da gramática abstrata são as que também foram usadas para definir as produções do \textit{Yacc}.
 \newpage
 
 \subsubsection{Assinatura das funções utilizadas}
-Aqui serão apresentadas as assinaturas das funções que foram utilizadas para nós dar suporte à implementação do nosso projecto.
+Aqui serão apresentadas as assinaturas das funções que foram utilizadas para dar suporte à implementação do projeto desenvolvido.
 
 \begin{lstlisting}[language=C, caption={Construtores do ficheiro de configuração.}]
 /* -----------------------------------
@@ -351,7 +351,7 @@ int cfg_get_NCampos( Confs cfgs );
 char* cfg_Campos_seleccionado( Confs cfgs, int totalCampos );
 \end{lstlisting} 
 
-Embora já estejam os construtores definidos automaticamente era necessário criar novas funções para ser possível manusear a estrutura de dados. Deste modo, foram criadas funções que permitem ir "buscar" algum campo específico, ou fazer operações como de validação, imprimir, entre outras.
+Embora já estejam os construtores definidos automaticamente foi necessário criar novas funções para ser possível manusear a estrutura de dados. Deste modo, foram criadas funções que permitem ir "buscar" algum campo específico, ou fazer operações como de validação, imprimir, entre outras.
 
 Como vai ser necessário aceder à informação que existe, definimos as funções que nos permitem dar os valores que são os campos de configurações.
 
@@ -368,7 +368,7 @@ void free_cfg_Conf( Conf cfg );
 void free_cfg_Confs( Confs cfgs );
 \end{lstlisting} 
 
-Foi implementando a funções de libertação de memória para garantir que toda a memória, que inicialmente foi feita, o malloc, existe um free, garantindo assim que a aplicaçãos não tem qualquer tipo de memory leek.
+Foram implementandas funções de libertação de memória para garantir que toda a memória, que inicialmente foi feita, para o malloc, existe um free, garantindo assim que a aplicaçãos não tem qualquer tipo de memory leek.
 
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%YACC-CONFIGUraÇÕES%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -446,15 +446,14 @@ int yyerror( char* s ){
 }
 \end{lstlisting} 
 
-Para o ficheiro de configuração o Yacc apanha os campos relativos à configuração do ficheiro. Cada uma das produções trata de um caso específico relativo aos campos. Assim, genericamente existe um campo e uma lista de campos, sendo necessário adicioná-lo à lista, daí exitir \texttt{\$\$ = cons\_cfg\_Lcampos\_Lcampos(\$1,\$3); }
+Para o ficheiro de configuração o \textit{Yacc} apanha os campos relativos à configuração do ficheiro. Cada uma das produções trata de um caso específico relativo aos campos. Assim, genericamente existe um campo e uma lista de campos, sendo necessário adicioná-lo à lista, daí exitir \texttt{\$\$ = cons\_cfg\_Lcampos\_Lcampos(\$1,\$3); }
 
-A informação que o yacc recebe vem do processamento que o flex faz do ficheiro de configuração que ao flex é passado.
-Quando a informação do flex é recebida pelo yacc, este apenas tem de a associar a uma das suas produções demodo a esta ser incluida na estrutura correta.
-
+A informação que o \textit{Yacc} recebe vem do processamento que o flex faz do ficheiro de configuração que ao \textit{Flex} é passado.
+Quando a informação do flex é recebida pelo \textit{Yacc}, este apenas tem de associar a uma das suas produções de modo a que se incluída na estrutura correta.
 
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%LEX-CONFIGUraÇÕES%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{LEX}
+\subsubsection{\textit{LEX}}
 
 \begin{lstlisting}[language=C, caption={Flex utilizado para o tratamento do ficherio de configuração}] 
 %{
@@ -509,13 +508,10 @@ int cfgwrap(){
 }
 \end{lstlisting}
 
-A informação que o ficheiro flex recebe vem do ficheiro de configuração.
-Depois de reconhecermos os campos, este passam do flex para o yacc atrvés da estrtura que é interna no yacc.
-Por exemplo, quando estamos a usar \texttt{cfglval.cfg\_str}, siginfica que estamos a passar (neste caso) uma string ao campo cfg\_str da union onde depois o yacc vai adiciona-lo à estrutura própria.
-
- 
+A informação que o ficheiro \textit{Flex} recebe é proveniente do ficheiro de configuração.
+Depois de reconhecermos os campos, este passam do \textit{Flex} para o \textit{Yacc} através da estrutura que é interna no \textit{Yacc}.
+Por exemplo, quando se utiliza a função \texttt{cfglval.cfg\_str}, siginfica que se está a passar (neste caso) uma string ao campo cfg\_str da union, onde posteriormente o \textit{Yacc} irá adicioná-lo à sua estrutura.
 \newpage
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%CMD%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Especificação para a Linguagem de Comandos da Consola}
@@ -523,10 +519,10 @@ A aplicação deverá ter um ambiente de consola com alguns comandos básicos:
 \begin{itemize}
 \item \textbf{Carregar configuração}: o sistema inicializa-se sempre com esta operação. Esta operação está sempre disponível para ser possível alterar a configuração.
 \item \textbf{Carregar base de dados}: o sistema carrega para memória o estado de um torneio previamente gravado.
-\item \textbf{Carregar resultado de prova}: o sistema carrega e processa um ficheiro CSV. Como resultado desta operação produz um ficheiro HTML com a pontuação de cada atleta, ordenado por ordem descente de pontos.
-\item \textbf{Calcular ranking}: em qualquer momento poderá ser invocada esta operação à qual o sistema responder com uma listagem em HTML do raking;
+\item \textbf{Carregar resultado de prova}: o sistema carrega e processa um ficheiro CSV. Como resultado desta operação produz um ficheiro \textit{HTML} com a pontuação de cada atleta, ordenado por ordem descente de pontos.
+\item \textbf{Calcular ranking}: em qualquer momento poderá ser invocada esta operação à qual o sistema responder com uma listagem em \textit{HTML} do raking.
 \item \textbf{Gravar base de dados}: o sistema guarda em memória o estado da aplicação.
-\item \textbf{Imprimir}: que apresenta a informação através de uma página HMTL.
+\item \textbf{Imprimir}: que apresenta a informação através de uma página \textit{HTML}.
 \item \textbf{Save}: que guarda o estado atual do sistema.
 \item \textbf{Sair}: o sistema termina a aplicação, se o estado atual não tiver sido previamente gravado deverá lançar um atleta e pedir configuração para prosseguir.
 \end{itemize}
@@ -592,17 +588,17 @@ int cmd_quit();
 #endif
 \end{lstlisting} 
 
-Neste caso vale apena referir que quando temos as funções \texttt{void cmd\_config(char* ficheiro)}, e \texttt{void cmd\_import(char* ficheiro);}  estas quando em execução recebem o parser do ficheiro que lhe está associado, isto é, se temos o cmd\_config op parse que é invocado é o parser responsável pelo ficheiro de configuração e o cmd\_import "chama" o parse que é responsável pelo ficheiro CSV.
+Neste caso é importante referir que quando são executadas funções \texttt{void cmd\_config(char* ficheiro)}, e \texttt{void cmd\_import(char* ficheiro);} estas recebem o parser do ficheiro que lhe está associado. Se tivermos o cmd\_config op parser que é invocado é o parser responsável pelo ficheiro de configuração e o cmd\_import "chama" o parser que é responsável pelo ficheiro CSV.
 
-A função \texttt{void cmd\_print();} é a responsável por invocar a função que vai dar origem à página HTML pretendida.
+A função \texttt{void cmd\_print();} é responsável por invocar a função que vai dar origem à página \textit{HTML} pretendida.
 
 \newpage
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%YACC-CMD%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{YACC}
+\subsubsection{\textit{Yacc}}
 
-No ficheiro do \textit{YACC} cada produção que seja "apanhada" é chamada a função correpondente para tratar a operação que foi capturada.
+No ficheiro do \textit{Yacc} cada produção que seja "apanhada" é chamada à função correpondente para tratar da operação que foi capturada.
 
 \begin{lstlisting}[language=C, caption={YACC do ficheiro cmd.}]
 extern int cmdlex (void);
@@ -658,9 +654,9 @@ int yyerror( char* s ){
 }
 \end{lstlisting} 
 
-No yacc no caso dos comandos varia do yacc do ficheiro de configuração, porque neste muito embora estejamos a na mesma a receber os dados do flex, mas o tratamento que o yacc lhe faz é diferente, isto vem pelo fato de um produção neste caso desencadeia uma ação, isto é, quando temos por exemplo o \textit{PRINT} temos que quando esta produção é apanhada, temos de a função \texttt{cmd\_print}, que vai imprimir a informação relativa aos jogadores para uma página HTML.
+No \textit{Yacc} no caso dos comandos variarem do \textit{Yacc} do ficheiro de configuração, porque neste caso e embora estejamos a receber os dados do \textit{Flex}, e embora o tratamento que o \textit{Yacc} lhe faz é diferente, isto vem pelo facto de uma produção neste caso desencadeia uma ação, isto é, quando temos por exemplo o \textit{PRINT} temos que quando esta produção é apanhada, temos de a função \texttt{cmd\_print}, que vai imprimir a informação relativa aos jogadores para uma página \textit{HTML}.
 
-\subsubsection{LEX}
+\subsubsection{\textit{LEX}}
 
 \begin{lstlisting}[language=C, caption={LEX do ficheiro cmd.}]
 %{
@@ -732,16 +728,16 @@ int cmdwrap(){
 }
 \end{lstlisting}
 
-O flex neste caso esta associado ao input que é produzido pelo utilizador, isto é, no caso do cmd não estamos a trabalhar com a nossa própria consola.
+O \textit{Flex} neste caso está associado ao input que é produzido pelo utilizador, isto é, no caso do cmd não estamos a trabalhar com a nossa própria consola.
 
-Devido ao fato de termos a nossa própria consola isso implica, termos o parsing que reconhece os comandos que estão a ser introduzidos, para depois esse comandos são passados ao yacc que vai determinar que função é desencadeada como esse comando.
+Devido ao facto de termos a nossa própria consola isso implica, termos o parsing que reconhece os comandos que estão a ser introduzidos, para depois esse comandos são passados ao \textit{Yacc} que vai determinar que função é desencadeada como esse comando.
 
 \subsection{Especificação para os Ficheiros de Resultados}
 %%%%%%%%%%%%%%%%%%%%%%%%%%GRAMÁTICA-FICHEIROS-DE-RESULTADOS-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsubsection{Gramática Especificação para os Ficheiros de Resultados}
 
-A gramática a apresentar é a gramática abstrata que vai ser usada para gerar a estrtura de representação intermédia para o ficheiro de resultados.
+A gramática a apresentar é a gramática abstrata que vai ser usada para gerar a estrutura de representação intermédia para o ficheiro de resultados.
 
 \begin{lstlisting}[language=C, caption={Gramática para a linguagem de especificação para os ficheiros de resultados.}]
 <ga>
@@ -760,14 +756,13 @@ A gramática a apresentar é a gramática abstrata que vai ser usada para gerar 
  </ga>
 \end{lstlisting}
 
-As produções que podemos encontrar na gramática abstrata veem da definição de produções que nós achamos que fossem importantes para tratar a informação que pode ser encontrada num ficheiro de resultados.
+As produções que se podem encontrar na gramática abstrata são provenientes da definição de produções a que achamos que fossem importantes para tratar a informação que pode ser encontrada num ficheiro de resultados.
 
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%ESTRUTURA DE DADOS -FICHEIROS-DE-RESULTADOS-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Estrutura de Dados da Espeficicação dos Ficheiros de Resultados}
 
-A estrutura que é gerada para o armazenamento dos campos que a gramática abstrata definiu, é divida consoante o nível em que estamos, isto é, nós começamos por ter a estrtura que vai abragir mais campos, neste caso o total de linhas que constituem o fihceiro, depois temos o que é as linhas
- e por último a estrutura que vai guardar um para uma campo.
+A estrutura que é gerada para o armazenamento dos campos que a gramática abstrata definiu, é divida consoante o nível em que estamos, isto é, se começarmos por ter a estrutura que vai abragir mais campos, neste caso o total de linhas que constituem o ficheiro, depois temos o que é as linhas e por último a estrutura que vai guardar um para uma campo.
 
 \begin{lstlisting}[language=C, caption={Estrutura de dados para armazenar a especificação dos ficheiros de resultados.}]
 
@@ -816,9 +811,8 @@ struct sCampo
 \end{lstlisting}
 
 \subsubsection{Assinatura das funções utilizadas}
-Vamos agora apresentar as assinaturas das funções que foram utilizadas para nós dar suporte à implementação do nosso projecto, nesta fase.
+Nesta sessção serão apresentadas as assinaturas das funções que foram utilizadas para dar suporte à implementação do projecto.
 
-Quando falamos das funções temos: 
 \begin{lstlisting}[language=C, caption={Construtores do ficheiro de resultados.}]
 
 /* -----------------------------------
@@ -863,15 +857,15 @@ void free_csv_Linhas (Linhas lcsv);
 
 \end{lstlisting} 
 
-Nesta seção temos que as assinaturas das funções que são usadas tanto para fazer a inicialização das estrutura de dados (criadas pelo gabs), mas funções definidas por nós próprios de modo a podermos efectuar operações sobre as mesmas.
+Nesta secção é apresentadas as assinaturas das funções que são usadas, tanto para fazer a inicialização das estrutura de dados (criadas pelo gabs), quer como as funções definidas por nós próprios, de modo a ser possível efectuar operações sobre as mesmas.
 
-Para além das funções que quando a aplicação terminam são responsáveis por fazer a libertação de toda a memória que foi utilizada, temos a função \texttt{Linha csv\_Linha\_reverse( Linha l );} que é utilizada quando estamos a imprimir da maneira que os campos foram lidos. Esta função é necessaŕia devido ao fato de nós temos definido a nossa gramática como sendo de recursividade àm esquerda.
+Para além das funções que são responsáveis por fazer a libertação de toda a memória que foi utilizada, temos a função \texttt{Linha csv\_Linha\_reverse( Linha l );} que é utilizada quando é necessário imprimir a forma como os campos foram lidos. Esta função é necessária devido ao facto de se ter definido uma gramática com recursividade à esquerda.
 
 \newpage
 
 \subsubsection{YACC}
 %%%%%%%%%%%%%%%%%%%%%%%%%%YACC-FICHEIROS-DE-RESULTADOS-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-No ficheiro do \textit{YACC} cada produção que seja "apanhada" é chamada a função correpondente para tratar o caso apanhado.
+No ficheiro do \textit{YACC} cada produção que seja "apanhada" é chamada a função correspondente para tratar o caso apanhado.
 
 \begin{lstlisting}[language=C, caption={YACC do ficheiro de resultados.}]
 
@@ -893,7 +887,6 @@ extern void csvlex_destroy();
   Linhas csv_Linhas;
   Linha  csv_Linha;
   Campo  csv_Campo;
-
 } 
 
 %type<csv_str> str
@@ -933,9 +926,8 @@ int yyerror( char* s ){
 }
 \end{lstlisting}
 
-A informação que o yacc recebe vem do processamento que o flex faz do ficheiro de configuração que ao flex é passado.
-Quando a informação do flex é recebida pelo yacc, este apenas tem de a associar a uma das suas produções demodo a esta ser incluida na estrutura correta.
-
+A informação que o \textit{Yacc} recebe vem do processamento que o \textit{Flex} faz do ficheiro de configuração que é passado ao \textit{Flex}.
+Quando a informação do \textit{Flex} é recebida pelo \textit{Yacc}, este apenas tem de a associar a uma das suas produções de modo a ser incluída na estrutura correta.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%LEX-FICHEIROS-DE-RESULTADOS-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{LEX}
@@ -964,27 +956,28 @@ int csvwrap(){
 }
 \end{lstlisting}
 
-O flex relativo ao parsing do fihceiro CSV é relativamente simples, isto deve-se ao fato de nós temos definidos que todos os campo do ficheiro são strings, assim sendo o único tratamento que temos aqui e ver onde acaba cada string, o tratamento dos \\n, do separamento de cada campo e por fim o EOF.
+O \textit{Flex} relativo ao parsing do fihceiro CSV é relativamente simples, isto deve-se ao facto de se ter definido que todos os campos do ficheiro são strings, assim sendo o único tratamento que é necessário fazer aqui e o de ver onde acaba cada string, o tratamento dos \\n, a forma de separação de cada campo e por fim o EOF.
 
-Com esta implementação temos que é o yacc que decide como é que vai tratar cada campo que recebe do lex.
+Com esta implementação temos que é o \textit{Yacc} que decide o modo como se irá tratar cada campo que recebe do \textit{Lex}.
  
 \newpage
 \subsection{Tratamento da Informação do Atleta}
 
 Um dos requesitos necessários para o desenvolvimento da plataforma era o cálculo da pontuação dos atletas. 
 
-Uma vez que exitem atletas foi necessaŕio a criação de uma estrutura que nos permitesse guardar a informação base de um atleta.
-Entenda-se por informação base:
+Uma vez que exitem vários atletas foi necessário a criação de uma estrutura que nos permitesse guardar a informação de cada uma dos atletas que participam na Orientação.
+
+Essa estrutura é então composto por:
 \begin{itemize}
-\item ID - identificador de atleta;
-\item nome - nome do atleta;
-\item score - lista de ponto obtidos em cada prova;
-\item tempo\_ultima\_prova - tempo que o atleta obteve na ultima prova decorrida.
+\item \textit{ID}: identificador de atleta;
+\item \textit{nome}: nome do atleta;
+\item \textit{score}: lista de ponto obtidos em cada prova;
+\item \textit{tempo\_ultima\_prova}: tempo que o atleta obteve na ultima prova decorrida.
 \end{itemize}
 
-Para além de termos a informação de um atleta tivemos também de acrescentar uma estrutura que nos premitisse guarda todos os atltetas que participam numa prova.
+Para além de termos a informação do atleta foi necessário implementar também uma estrutura que nos premitisse guardar todos os atletas que participam numa prova.
 
-Assim sendo as estrturas a que chegamos foram as seguintes:
+Assim sendo as estrturas implementadas foram as seguintes:
 
 \begin{lstlisting}[language=C, caption={Estrutura de um atleta.}]
 struct sLInt {
@@ -1036,13 +1029,13 @@ Atletas atl_ler_tempos( Confs cfg, Linhas csv, Atletas atletas );
 #endif
 \end{lstlisting}
 
-O tratamento da informação serve para podermos analisar e processar os rakings das pontuações dos atletas, isto é, um dos requisitos que tinhamos a necessidade processar os tempos obtidos por cada jogador de modo a podermos mais tarde no HTML criar rankings de provas, atletas, etc.
+O tratamento desta informação serve para se poder analisar e processar os rakings das pontuações dos atletas. Deste modo, um dos requisitos necessários para processar foi os tempos obtidos por cada jogador de forma a que mais tarde, fosse possível criar no \textit{HTML} rankings de provas, atletas, etc.
 
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%HTML%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{HTML}
 
-Um dos resultados finais deste projeto é o de gerar uma página HTML que permita ser mais uma vertente de apresentação do resulatdos obtidos.
+Um dos resultados finais deste projeto é gerar uma página \textit{HTML} que permita evidenciar o raking das provas e é mais uma forma de apresentação do resulatdos obtidos.
 
 
 \begin{lstlisting}[language=C, caption={Assinatura das funções.}]
@@ -1053,12 +1046,15 @@ int htm_begin();
 void htm_end();
 \end{lstlisting}
 
-Como a criação de um ficheiro HTML necesita de um cuidado especial temos que começar a definir o HTMl por parte.
-A nossa apresentação do HTML parte por termo um indice para os rakings que podemos ter ao longo da página, seguindo então pelos respectivos rankings.
-
+Como a criação de um ficheiro \textit{HTML} era necessário ter um cuidado especial e foi preciso definir o \textit{HTMl} por partes.
+Assim, a apresentação do \textit{HTML} parte por ter um índice para os rakings que poderá ser visível ao longo da página, seguindo, então, pelos respectivos rankings.
 
 \newpage
 \section{Conclusão}
+
+Após concluir todo o desenvolvimento deste segundo projeto, de Processamento de Linguagens, é fácil fazer um balanço de todo este percurso. Para além de ter sido um desafio implementar um programa de processamento de Gestão de Campeonatos de Orientação, que se aplica à vida real, foi também aliciante concluir o trabalho e todas as etapas que foram propostas.
+Ao longo do desenvolvimento do projeto o grupo desenvolveu competências em diversas ferramentas como \textit{C}, \textit{HTML}, \textit{Flex}, \textit{Yacc}, gramáticas independentes do contexto, que serão uma mais valia para o mercado de trabalho e para a vida profissional. 
+
 
 \newpage
 \section{Anexos}
