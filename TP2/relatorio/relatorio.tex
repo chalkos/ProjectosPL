@@ -119,7 +119,7 @@ A Orientação é um desporto que tem como objetivo percorrer uma determinada di
 
 Neste contexto, o foco deste projeto passa pela gestão de campeonatos de orientação onde é necessário saber a informação das provas que são efetuadas, os participantes envolvidos e os tempos que cada atleta obteve, de modo a serem obtidas as classificações necessárias.
 
-Outro objetivo principal do projeto é a leitura de ficheiros. Estes tem uma configuração definida pelo ficheiro de configuração, depois a leitura do CSV com a informação dos jogadores para mais tarde o gerar uma página HTML onde é apresentada a informação tratada.
+Outro objetivo principal deste projeto é a leitura de ficheiros, estes têm uma configuração definida pelo ficheiro de configuração. O ficheiro CSV contém a informação dos jogadores, esta informação será necessária para gerar a página HTML final com a informação tratada.
 
 Para a implementação foi necessário a construção de gramáticas independentes de contexto, implementação de parsers para cada ficheiro. A utilização do \textsf{lex} e \textsf{yacc} foi necessária para retirar a informação relevante.
 
@@ -131,14 +131,13 @@ Para a implementação foi necessário a construção de gramáticas independent
 
 \textsf{Flex} é uma ferramenta para gerar automaticamente analisadores léxicos, isto é, programas que reconhecem padrões léxicos num texto. O \textsf{flex} é uma evolução da ferramenta \textsf{lex}, mas com a caraterística de ser mais rápido que este (\textsf{Fast lex}).
 
-\textsf{Yacc} é utilizado para sistemas operacionais \textsf{Unix}, onde o seu principal objetivo e gerar analisadores sintáticos. No entanto o \textsf{yacc} tem de ser utilizado em conjunto com o \textsf{lex}, pois o \textsf{yacc} não consegue ler a partir de uma entrada de dados, daí a utilização do \textsf{lex} para que este gere os tokens que mais tarde são usados pelo \textsf{yacc} para o processamento.
+\textsf{Yacc} é utilizado para sistemas operacionais \textsf{Unix}, no qual o seu principal objetivo é gerar analisadores sintáticos. No entanto, o \textsf{yacc} tem de ser utilizado em conjunto com o \textsf{lex}, pois o \textsf{yacc} não consegue ler a partir de uma entrada de dados, daí é necessário a utilização do \textsf{lex} para que este consiga gerar os tokens, que mais tarde serão usados pelo \textsf{yacc} para o processamento dos dados.
 
-Gramática Independente de Contexto é uma gramática formal onde são definidas regras de produção da 
- V $\rightarrow$ W onde V é um símbolo não terminal e w um conjunto de símbolos terminais ou variáveis (W no entanto também pode ser nulo).
+Gramática Independente de Contexto é uma gramática formal onde são definidas regras de produção da V $\rightarrow$ W onde V é um símbolo não terminal e W um conjunto de símbolos terminais ou variáveis (W no entanto também pode ser nulo).
 
 \subsection{Gestão de Campeonatos de Orientação}
 
-Neste segundo trabalho de Processamento de Linguagens foi proposto a seleção de um projeto entre vários propostos. Após uma análise e chegada a uma concordância, o nosso grupo optou por escolher o tema de Gestão de Campeonato de Orientação.
+Neste segundo trabalho de Processamento de Linguagens foi proposto a seleção de um projeto entre vários propostos. Após uma análise, e chegada a uma concordância, o grupo optou por escolher o tema de Gestão de Campeonato de Orientação.
 
 Este enunciado exige que sejam feitas várias operações que ocorrem em simultâneo, e por isso existem vários ficheiros, como:
 \begin{itemize}
@@ -161,7 +160,7 @@ De uma maneira geral, para este trabalho pretende-se desenvolver os seguintes po
 
 \subsection{Descrição do Problema}
 
-A utilização do \textsf{flex}, \textsf{yacc} e gramáticas independentes de contexto era necessária para o desenvolvimento da aplicação, de forma a permitir o tratamento de ficheiros específicos e para gerar o HTML, como os resultados pretendidos.
+A utilização do \textsf{flex}, \textsf{yacc} e gramáticas independentes de contexto era necessária para o desenvolvimento da aplicação de forma a permitir o tratamento de ficheiros específicos e para gerar o HTML, como os resultados pretendidos.
 
 No entanto, existem outros requisitos que permitem o bom funcionamento da aplicação. A aplicação deve possuir um ambiente de consola e implementar os seguintes comandos:
 \begin{itemize}
@@ -173,9 +172,9 @@ No entanto, existem outros requisitos que permitem o bom funcionamento da aplica
 \item \textbf{Sair}: termina a aplicação.
 \end{itemize}
 
-É a partir daqui que os ficheiro de resultados e configuração são lidos e depois as operações são executadas. 
+É a partir daqui que os ficheiro de resultados e o de configuração são lidos e só depois as operações são executadas. 
 
-Antes de ser criado o HTML a aplicação tem de ser configurada. Para isso a informação é lida de um ficheiro de configuração estão definidos os campos:
+Antes de ser criado o HTML a aplicação tem de ser configurada. Para isso a informação é lida de um ficheiro de configuração onde estão definidos os campos:
 \begin{itemize}
 \item \textbf{Titulo}: título da prova em causa;
 \item \textbf{nporvas}: nº de provas a realizar;
