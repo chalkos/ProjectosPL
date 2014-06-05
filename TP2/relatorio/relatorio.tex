@@ -45,6 +45,10 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 \usepackage{hyperref}
 \hypersetup{colorlinks=true, urlcolor=blue, linkcolor=black}
 
+% checkmarks
+\usepackage{tikz}
+\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
+
 % escrever acentos e coisas do género sem que o latex se desoriente
 \usepackage[utf8]{inputenc}
 
@@ -105,7 +109,7 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 
 \begin{abstract}
 
-  O presente trabalho foi desenvolvido no âmbito da unidade curricular de Processamento de Linguagens e tem como principal objetivo o aumento da experiência na linguagem imperativa \textsf{C}, a capacidade de escrever gramáticas independentes de contexto que satisfaçam a condição de LR(), a utilização de compiladores como o \textsf{lex}/\textsf{yacc} e o desenvolvimento de processadores de linguagem. De entre os variados temas, Gestão de Campeonatos de Orientação foi o tema escolhido pelo nosso grupo, para o desenvolvimento deste segundo trabalho prático. Ao longo deste relatório iremos explicar as estruturas de dados que foram implementadas para o desenvolvimento deste trabalho, bem como todas as decisões que foram tomadas ao longo deste projeto. 
+  O presente trabalho foi desenvolvido no âmbito da unidade curricular de Processamento de Linguagens e tem como principal objetivo o aumento da capacidade de escrever gramáticas independentes de contexto que satisfaçam a condição de LR(), a utilização de ferramentas como o \emph{flex} e \emph{yacc} e o desenvolvimento de processadores de linguagens. De entre os vários temas, Gestão de Campeonatos de Orientação foi o tema escolhido pelo nosso grupo para este trabalho prático. Ao longo deste relatório iremos apresentar os principais aspetos do funcionamento da aplicação e explicar as estruturas de dados que foram implementadas para o desenvolvimento deste trabalho, bem como todas as decisões que foram tomadas ao longo deste projeto.
 
 \end{abstract}
 \newpage
@@ -119,15 +123,9 @@ A Orientação é um desporto que tem como objetivo percorrer uma determinada di
 
 Neste contexto, o foco deste projeto passa pela gestão de campeonatos de orientação onde é necessário saber a informação das provas que são efetuadas, os participantes envolvidos e os tempos que cada atleta obteve, de modo a serem obtidas as classificações necessárias.
 
-Outro objetivo principal deste projeto é a leitura de ficheiros, estes têm uma configuração definida pelo ficheiro de configuração. O ficheiro CSV contém a informação dos jogadores, esta informação será necessária para gerar a página HTML final com a informação tratada.
+A informação das provas é fornecida através de ficheiros CSV e é depois processada de acordo com as regras definidas num ficheiro de configurações. A pedido do utilizador, é gerado um relatório em formato HTML.
 
-Para a implementação foi necessário a construção de gramáticas independentes de contexto, implementação de parsers para cada ficheiro. A utilização do \textsf{lex} e \textsf{yacc} foi necessária para retirar a informação relevante.
-
-
-\newpage
-\section{Desenvolvimento}
-
-\subsection{Contextualização do Problema}
+\subsection{Contextualização técnica}
 
 \textsf{Flex} é uma ferramenta para gerar automaticamente analisadores léxicos, isto é, programas que reconhecem padrões léxicos num texto. O \textsf{flex} é uma evolução da ferramenta \textsf{lex}, mas com a caraterística de ser mais rápido que este (\textsf{Fast lex}).
 
@@ -135,16 +133,9 @@ Para a implementação foi necessário a construção de gramáticas independent
 
 Gramática Independente de Contexto é uma gramática formal onde são definidas regras de produção da V $\rightarrow$ W onde V é um símbolo não terminal e W um conjunto de símbolos terminais ou variáveis (W no entanto também pode ser nulo).
 
-\subsection{Gestão de Campeonatos de Orientação}
+\textsf{Gabs} é uma ferramenta que gera as estruturas de dados e respetivos construtores para permitir armazenar os dados recolhidos durante o \emph{parsing}. O \textsf{Gabs} gera estas informações a partir da especificação da gramática abstrata. Mais informações no \href{https://github.com/jcramalho/GABS---Intermediate-Representation-Generator-for-Small-Compilers/}{repositório do projeto} (https://github.com/jcramalho/ GABS-{-}-Intermediate-Representation-Generator-for-Small-Compilers/).
 
-Neste segundo trabalho de Processamento de Linguagens foi proposto a seleção de um projeto entre vários propostos. Após uma análise, e chegada a uma concordância, o grupo optou por escolher o tema de Gestão de Campeonato de Orientação.
-
-Este enunciado exige que sejam feitas várias operações que ocorrem em simultâneo, e por isso existem vários ficheiros, como:
-\begin{itemize}
-\item Ficheiro de Resultados: ficheiro CSV, onde são guardados os resultados obtidos em cada prova.
-
-\item Ficheiro de Configuração: ficheiro que vai definir o processamento a realizar, isto é quais as provas e os campos que vão ser tratados.
-\end{itemize}
+Gramática Abstrata é uma gramática simplificada onde apenas constam os símbolos não terminais e os símbolos terminais variáveis.
 
 \subsection{Enunciado}
 
@@ -158,61 +149,218 @@ De uma maneira geral, para este trabalho pretende-se desenvolver os seguintes po
 \item Adicionar as ações semânticas necessárias.
 \end{itemize}
 
-\subsection{Descrição do Problema}
+\newpage
+\section{Desenvolvimento}
 
-A utilização do \textsf{flex}, \textsf{yacc} e gramáticas independentes de contexto era necessária para o desenvolvimento da aplicação de forma a permitir o tratamento de ficheiros específicos e para gerar o HTML, como os resultados pretendidos.
+\subsection{Funcionamento do Programa}
 
-No entanto, existem outros requisitos que permitem o bom funcionamento da aplicação. A aplicação deve possuir um ambiente de consola e implementar os seguintes comandos:
-\begin{itemize}
-\item \textbf{Carregar configuração}: permite carregar o ficheiro de configuração;
-\item \textbf{Carregar base de dados}: carregar um ficheiro de dados previamente guardado;
-\item \textbf{Carregar resultado de prova}: carregar o ficheiro de resultados;
-\item \textbf{Calcular Ranking}: permite calcular o ranking de pontuação dos atletas;
-\item \textbf{Gravar base de dados}: guardar a informação que existem na memória num ficheiro;
-\item \textbf{Sair}: termina a aplicação.
-\end{itemize}
+Para compilar a aplicação deve-se correr o comando \texttt{make gco} na directoria \texttt{$<$project-root$>$/src}. A aplicação é então copiada para a pasta \texttt{$<$project-root$>$/bin}, de onde se deve iniciar a aplicação com \texttt{./gco}.
 
-É a partir daqui que os ficheiro de resultados e o de configuração são lidos e só depois as operações são executadas. 
+A aplicação aceita um argumento. Este argumento é o nome da primeira configuração que deve ser carregada. Se não forem fornecidos argumentos, a aplicação tentará carregar o ficheiro \texttt{default.cfg}. Caso o carregamento da configuração inicial não tenha sucesso a aplicação termina.
 
-Antes de ser criado o HTML a aplicação tem de ser configurada. Para isso a informação é lida de um ficheiro de configuração onde estão definidos os campos seguintes:
-\begin{itemize}
-\item \textbf{Titulo}: título da prova em causa;
-\item \textbf{nporvas}: nº de provas a realizar;
-\item \textbf{N}: indicados do topN;
-\item \textbf{campos}: ordem dos campos quando no CSV;
-\item \textbf{score}: pontuação obtida.
-\end{itemize}
+Depois de iniciada, a aplicação possui um ambiente de consola onde se podem usar os seguinte comandos:
+\begin{description}
+\item[\begin{tabular}{l}
+config {[$<$ficheiro$>$]}\\
+c {[$<$ficheiro$>$]}\\
+\end{tabular}] \hfill \\
+	Carregar um ficheiro de configuração.
+	
+\item[\begin{tabular}{l}
+import $<$ficheiro\_csv$>$\\
+i $<$ficheiro\_csv$>$\\
+\end{tabular}] \hfill \\
+	Carregar o ficheiro da prova em formato CSV.
+	
+\item[\begin{tabular}{l}
+save {[$<$estado$>$]}\\
+s {[$<$estado$>$]}\\
+\end{tabular}] \hfill \\
+	Guarda o estado da aplicação com o nome de estado especificado. Se o estado já existir o comando não tem efeito.
+	
+\item[\begin{tabular}{l}
+save! {[$<$estado$>$]}\\
+s! {[$<$estado$>$]}\\
+\end{tabular}] \hfill \\
+	Guarda o estado da aplicação com o nome de estado especificado, se o estado já existir é sobrescrito.
+	
+\item[\begin{tabular}{l}
+load $<$estado$>$\\
+l $<$estado$>$\\
+\end{tabular}] \hfill \\
+	Carregar o estado da aplicação que foi previamente guardado.
+	
+\item[\begin{tabular}{l}
+print\\
+p\\
+\end{tabular}] \hfill \\
+	Criar o ficheiro \texttt{index.html} com os resultados das provas em memória.
+	
+\item[\begin{tabular}{l}
+quit\\
+q\\
+\end{tabular}] \hfill \\
+	Termina a aplicação. Se o estado da aplicação não tiver sido guardado recentemente o comando não tem efeito.
+	
+\item[\begin{tabular}{l}
+quit!\\
+q!\\
+\end{tabular}] \hfill \\
+	Termina a aplicação, descartando quaisquer alterações não guardadas ao estado da aplicação.
+\end{description}
 
 \newpage
+No ficheiro de configuração devem constar as seguintes informações, todas obrigatórias, uma por linha no formato \texttt{chave valor}.
 
-\section{Desenvolvimento do Programa}
-Um dos pressupostos da implementação deste projeto é o tratamento de diferentes tipos de informação, foi decidido estruturar-se o projeto consoante as funções que cada ficheiro implica.
-[INSERIR IMAGEM DOS FICHEIROS]
+\begin{description}
+\item[=titulo=] \hfill \\
+	O nome do campeonato.
+\item[=nprovas=] \hfill \\
+	O número de provas previstas para o campeonato. Ao importar um número de provas superior a este número, é mostrado um alerta.
+\item[=ntop=] \hfill \\
+	O número de melhores pontuações que serão consideradas para a classificação final dos atletas.
+\item[=campos=] \hfill \\
+	A lista de posições (com início em 1) das colunas que constarão no relatório HTML. A especificação de cada posição deve começar com \texttt{'\$'} seguido do número da posição e as várias posições devem ser separadas por \texttt{';'}\\
+	Por exemplo: \texttt{"\$1;\$5;\$6"} indica que devem ser selecionadas a primeira, quinta e sexta colunas.
+\item[=tempo=] \hfill \\
+	Indicação da coluna onde se pode obter o tempo que o atleta demorou a concluir o percurso. Deve respeitar o mesmo formato da especificação de um campo na lista de campos, isto é, \texttt{'\$'} seguido da posição da coluna.\\
+	Os tempos devem estar no formato \texttt{HH:MM:SS}. Todos os valores que não estejam neste formato são assumidos como a desclassificação do atleta (\emph{DNF} ou \emph{Did Not Finish}).
+\item[=chave=] \hfill \\
+	Indicação da coluna onde se pode obter um identificador único do atleta nas provas do campeonato. Deve respeitar o mesmo formato da especificação de um campo na lista de campos, isto é, \texttt{'\$'} seguido da posição da coluna.
+\item[=nome=] \hfill \\
+	Indicação da coluna onde se pode obter o nome do atleta. Deve respeitar o mesmo formato da especificação de um campo na lista de campos, isto é, \texttt{'\$'} seguido da posição da coluna.
+\end{description}
 
-O desenvolvimento deste projeto passa assim por desenvolver três gramáticas independentes de contexto distintas: 
+O ficheiro CSV é um ficheiro que representa uma tabela com os resultados de uma prova, onde cada linha representa o desempenho de um atleta e cada coluna um campo. Os campos são separados por \texttt{';'}. Existe uma forte restrição na escrita dos ficheiros CSV para assegurar o bom funcionamento da aplicação: todas as linhas têm de ter um número de campos igual ao número de campos da primeira linha. Existem outras propriedades que devem ser asseguradas, por exemplo, que a coluna designada como chave realmente identifica de forma única um atleta, caso contrário as informações de vários atletas são fundidas e ignoradas dependendo da ordem em que são lidas pela aplicação.
+
+\newpage
+\subsection{Organização do Programa}
+
+Para concretizar o projeto, foram desenvolvidos 3 \emph{parsers}:
 \begin{itemize}
-\item Gramática para a linguagem de configurações;
-\item Gramática para a linguagem de comandos da consola; 
-\item Grámatica para ficheiros de resultados. 
+\item Parser de ficheiros de configurações;
+\item Parser de ficheiros de comandos;
+\item Parser de ficheiros de prova.
 \end{itemize}
 
-Para a criação das estruturas de dados foi usada a ferramenta \textsf{gabs}, disponibilizada pelo professor, que cria a estrutura e os seus construtores, quando executada com uma gramática abstrata como argumento.
+Dividimos também a aplicação por módulos. Alguns módulos contêm analisadores léxicos e sintáticos, outros são apenas conjuntos de estruturas de dados e funções que estão de algum modo relacionadas. Os módulos presentes no projeto são:
+\begin{description}
+\item[atl (Atleta)] \hfill \\
+	Representação e manipulação dos dados de um atleta;
+	
+\item[cfg (Configurações)] \hfill \\
+	Parser de configurações, representação interna e manipulação dos dados de configuração da aplicação;
 
-De modo a utiliza-se esta ferramenta era necessário, primeiramente, a criação de uma gramática abstrata. Por isso, uma das primeiras etapas deste projeto foi desenvolver a especificação de cada uma gramáticas independentes do contexto, acima referidas. 
+\item[cmd (Comando)] \hfill \\
+	Parser de comandos e encaminhamento das várias tarefas para os respetivos módulos;
 
-Em cada uma das subsecções seguintes, será apresentada cada uma das gramáticas desenvolvidas, a estrutura de dados implementada, as assinaturas das funções em \textsf{C} e os seus construtores.
+\item[csv (CSV)] \hfill \\
+	Parser de ficheiros CSV, representação interna e manipulação dos dados de uma prova;
 
+\item[gco (Gestão de Campeonatos de Orientação)] \hfill \\
+	Inicia a aplicação e trata dos preparativos antes de entrar no modo de linha de comandos;
+	
+\item[htm (HTML)] \hfill \\
+	Escrever o ficheiro \texttt{index.html} com os resultados do campeonato;
+	
+\item[sav (Savestate)] \hfill \\
+	Contém funções para guardar e carregar o estado da aplicação.
+\end{description}
+
+\newpage
+Foi feito um esforço por manter os ficheiros organizados. Nem todos os módulos possuem ficheiros de todos os tipos, por exemplo, alguns não precisam de analisar ficheiros e por isso não têm ficheiros para uso do \emph{flex} e \emph{yacc}. Os nomes dos ficheiros seguem a seguinte organização (onde @ é o nome do módulo):
+
+\begin{description}
+\item[\begin{tabular}{l}
+@.lib.h\\
+@.lib.c\\
+\end{tabular}] \hfill \\
+	Estruturas de dados e funções para manipular os dados do módulo. Nos módulos que contêm \emph{parsers} estes ficheiros começaram por ser apenas as funções e estruturas de dados geradas pelo \emph{GABS}, sendo depois adicionadas mais funcionalidade a estes dois ficheiros;
+	
+\item[\begin{tabular}{l}
+@.ga\\
+\end{tabular}] \hfill \\
+	Representação da gramática abstrata necessária para usar o \emph{GABS};
+	
+\item[\begin{tabular}{l}
+@.y\\
+\end{tabular}] \hfill \\
+	Regras do analisador sintático, a serem interpretadas pelo \emph{yacc};
+	
+\item[\begin{tabular}{l}
+@.l\\
+\end{tabular}] \hfill \\
+	Regras do analisador léxico, a serem interpretadas pelo \emph{flex};
+
+\item[\begin{tabular}{l}
+@.tab.h\\
+@.tab.c\\
+\end{tabular}] \hfill \\
+	{[gerado por compilação, intermédio]} Ficheiros da análise sintática, gerados pelo \texttt{yacc} a partir do ficheiro \texttt{@.y};
+
+\item[\begin{tabular}{l}
+lex.@.c\\
+\end{tabular}] \hfill \\
+	{[gerado por compilação, intermédio]} Ficheiros da análise léxica, gerados pelo \texttt{flex} a partir do ficheiro \texttt{@.l};
+
+\item[\begin{tabular}{l}
+gco\\
+\end{tabular}] \hfill \\
+	{[gerado por compilação, binário]} Programa final que reúne as funcionalidades de todos os módulos;
+
+\item[ ------------------ Obsoletos ------------------ ]
+
+\item[\begin{tabular}{l}
+@.main.c\\
+\end{tabular}] \hfill \\
+	{[obsoleto]} Ficheiro utilizado para testes numa fase inicial do projeto em que os módulos não tinham muitas dependências entre si;
+
+\item[\begin{tabular}{l}
+@.mockups.c\\
+\end{tabular}] \hfill \\
+	{[obsoleto]} Utilizado para criar funções cuja existência era requerida. Foram utilizados numa fase do projeto em que já existiam algumas dependências entre os vários módulos com o objetivo de permitir testar módulos individualmente;
+
+\item[\begin{tabular}{l}
+@ (excepto gco)\\
+\end{tabular}] \hfill \\
+	{[gerado por compilação, binário, obsoleto]} Programas que faziam análise léxica e sintática e tinham algumas ações semânticas associadas, utilizavam o ficheiro \texttt{@.main.c};
+
+\item[\begin{tabular}{l}
+@.tok.c\\
+\end{tabular}] \hfill \\
+	{[obsoleto]} Ficheiro utilizado para gerar o tokenizer. Utilizado para testes numa fase inicial do projeto em que os módulos não tinham muitas dependências entre si;
+
+\item[\begin{tabular}{l}
+@tok\\
+\end{tabular}] \hfill \\
+	{[gerado por compilação, binário, obsoleto]} Programas que apenas mostravam os tokens reconhecidos (tokenizer).
+\end{description}
+
+Os ficheiros marcados como obsoletos foram necessários ao longo do desenvolvimento da aplicação, mas não são necessários na fase final do projeto. Assim sendo deixaram de ser atualizados à medida que iam perdendo utilidade e não é assegurado o seu correto funcionamento. O objetivo da sua inclusão na fase final do projeto é apenas referir a sua utilidade.
+
+Apresenta-se agora uma tabela onde se mostra claramente que ficheiros compõem cada módulo (excluindo itens obsoletos e obtidos por compilação):\\
+
+\begin{table}[!h]
+\caption{Ficheiros constituintes dos módulos}
+\centering
+\begin{tabular}{  c   c  c  c  c  c  }
+	             & \texttt{@.lib.h} & \texttt{@.lib.c} & \texttt{@.ga} & \texttt{@.y} & \texttt{@.l} \\ \hline
+	\texttt{atl} &    \checkmark    &    \checkmark    &               &              &              \\ \hline
+	\texttt{cfg} &    \checkmark    &    \checkmark    &   \checkmark  &  \checkmark  &  \checkmark  \\ \hline
+	\texttt{cmd} &    \checkmark    &    \checkmark    &               &  \checkmark  &  \checkmark  \\ \hline
+	\texttt{csv} &    \checkmark    &    \checkmark    &   \checkmark  &  \checkmark  &  \checkmark  \\ \hline
+	\texttt{gco} &                  &    \checkmark    &               &              &              \\ \hline
+	\texttt{htm} &    \checkmark    &    \checkmark    &               &              &              \\ \hline
+	\texttt{sav} &    \checkmark    &    \checkmark    &               &              &              \\ \hline
+\end{tabular}
+\end{table}
+
+\newpage
 \subsection{Especificação da Linguagem de Configurações da Aplicação}
 
-O ficheiro de configurações define o processamento a realizar: campos a extrair para o resultado final da aplicação, o número de provas que pontuam, o número de melhores resultados que serão contabilizados para a classificação, os campos que irão aparecer na página de resultado.
-\newpage
-%%%%%%%%%%%%%%%%%%%%%%%%%%GRAMÁTICA-CONFIGUraÇÕES%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Gramática Abstrata}
 
-\subsubsection{Gramática para a Linguagem de Especificação de Configurações}
-
-A gramática a apresentar é a usada para especificar o ficheiro de configuração. Assim sendo tem-se a seguinte gramática:
-
-\begin{lstlisting}[language=C, caption={Gramática para a linguagem de especificação de configurações.}]
+\begin{lstlisting}[language=C, caption={Gramática abstrata utilizada pelo \emph{GABS}}]
 <ga>
   Confs -> cons_cfg_Confs(Conf Confs)
         |  cons_cfg_Confs_NIL()
@@ -519,24 +667,6 @@ A aplicação desenvolvida possui um ambiente de consola com alguns comandos bá
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%GRAMÁTICA-CMD%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Especificação para a Linguagem de Comandos da Consola}
-A gramática que especifica a linguagem de comandos da consola é a passada ao \textsf{gabs} para depois ser gerada a estrutura usada para o funcionamento da aplicação em ambiente consola (CMD). Assim sendo tem-se:
-\begin{lstlisting}[language=C, caption={Gramática para a linguagem de especificação para a linguagem de comandos de consola.}]
-<ga>
-  Cmds -> cons_Cmds(Cmd Cmds)
-       |  cons_Cmds_NIL()
-       ;
-
-  Cmd -> cons_Cmd_Config(STR)
-      |  cons_Cmd_Load(STR)
-      |  cons_Cmd_Import(STR)
-      |  cons_Cmd_Save(STR)
-      |  cons_Cmd_FSave(STR)
-      |  cons_Cmd_Print()
-      |  cons_Cmd_Quit()
-      |  cons_Cmd_FQuit()
-      ;
-</ga>
-\end{lstlisting}
 
 Esta gramática é definida depois de se ter analisado as produções que se podem ter quando estamos a tratar os comandos.
 
