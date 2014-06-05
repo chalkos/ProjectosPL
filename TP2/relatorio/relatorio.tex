@@ -40,6 +40,52 @@ breaklines=true,        % sets automatic line breaking
 breakatwhitespace=false,    % sets if automatic breaks should only happen at whitespace
 escapeinside={\%*}{*)}          % if you want to add a comment within your code
 }
+%%                                                       -*- LaTeX -*-
+%% Language definition of Yacc/Bison for listings package
+%%
+
+%% Yacc
+\lstdefinelanguage[]{Yacc}%
+  {otherkeywords=%
+    {\%left,
+      \%nonassoc,\%prec,\%right,
+      \%start,\%token,\%type,\%union,
+      \%\%,\%\{,\%\},|,:,
+      \$\$,\$1,\$2,\$3,\$4,\$5,\$6,\$7,\$8,\$9
+    },%
+    keywords={\%seeREADME},%
+    morecomment=[n]{/*}{*/},%
+    morestring=[b]{"},%
+    sensitive=true
+  }[keywords,comments,strings]%
+
+
+%% Yacc: Bison
+
+%% Listings does not support ``moreotherkeywords'', so we cannot
+%% simply inherit.  To bad for code duplication.
+\lstdefinelanguage[Bison]{Yacc}%
+  {otherkeywords=%
+    {\%binary,\%debug,\%default-prec,\%define,\%defines,\%destructor,
+      \%dprec,\%error-verbose,\%expect,\%expect-rr,\%file-prefix,
+      \%fixed-output-files,\%initial-action,\%glr-parser,
+      \%language,\%left,
+      \%lex-param,\%locations,\%merge,\%name-prefix,\%no-default-prec,
+      \%no-lines,\%nonassoc,\%nondeterministic-parser,\%nterm,\%output,
+      \%parse-param,\%prec,\%printer,\%pure-parser,\%right,\%skeleton,
+      \%start,\%term,\%token,\%token-table,\%type,\%union,\%verbose,\%yacc,
+      \%\%,\%\{,\%\},|,:,
+      \$\$,\$1,\$2,\$3,\$4,\$5,\$6,\$7,\$8,\$9,
+      @\$,@1,@2,@3,@4,@5,@6,@7,@8,@9
+    },%
+    keywords={\%seeREADME},%
+    morecomment=[n]{/*}{*/},%
+    morecomment=[s]{//},%
+    morestring=[b]{"},%
+    sensitive=true
+  }[keywords,comments,strings]%
+
+\lstdefinelanguage{Bison}[Bison]{Yacc}{}
 
 % hiperligações
 \usepackage{hyperref}
@@ -158,6 +204,13 @@ Para compilar a aplicação deve-se correr o comando \texttt{make gco} na direct
 
 A aplicação aceita um argumento. Este argumento é o nome da primeira configuração que deve ser carregada. Se não forem fornecidos argumentos, a aplicação tentará carregar o ficheiro \texttt{default.cfg}. Caso o carregamento da configuração inicial não tenha sucesso a aplicação termina.
 
+\subsubsection{Comandos}
+Existe a possibilidade de utilização de um ficheiro de comandos (em alternativa a escrever manualmente os comandos) para automatizar todo o processo de gestão dos resultados de campeonatos.
+
+Para cada comando existe também uma forma alternativa mais curta para acelerar a escrita de comandos.
+
+Outra facilidade é a possibilidade de adicionar um \texttt{'!'} ao nome do comando (mesmo na sua forma curta) para forçar a ação (neste momento esta funcionalidade é suportada nos comandos de guardar e terminar aplicação).
+
 Depois de iniciada, a aplicação possui um ambiente de consola onde se podem usar os seguinte comandos:
 \begin{description}
 \item[\begin{tabular}{l}
@@ -210,6 +263,8 @@ q!\\
 \end{description}
 
 \newpage
+\subsubsection{Configuração}
+\label{desc_config}
 No ficheiro de configuração devem constar as seguintes informações, todas obrigatórias, uma por linha no formato \texttt{chave valor}.
 
 \begin{description}
@@ -231,6 +286,8 @@ No ficheiro de configuração devem constar as seguintes informações, todas ob
 	Indicação da coluna onde se pode obter o nome do atleta. Deve respeitar o mesmo formato da especificação de um campo na lista de campos, isto é, \texttt{'\$'} seguido da posição da coluna.
 \end{description}
 
+\subsubsection{Prova}
+
 O ficheiro CSV é um ficheiro que representa uma tabela com os resultados de uma prova, onde cada linha representa o desempenho de um atleta e cada coluna um campo. Os campos são separados por \texttt{';'}. Existe uma forte restrição na escrita dos ficheiros CSV para assegurar o bom funcionamento da aplicação: todas as linhas têm de ter um número de campos igual ao número de campos da primeira linha. Existem outras propriedades que devem ser asseguradas, por exemplo, que a coluna designada como chave realmente identifica de forma única um atleta, caso contrário as informações de vários atletas são fundidas e ignoradas dependendo da ordem em que são lidas pela aplicação.
 
 \newpage
@@ -242,6 +299,8 @@ Para concretizar o projeto, foram desenvolvidos 3 \emph{parsers}:
 \item Parser de ficheiros de comandos;
 \item Parser de ficheiros de prova.
 \end{itemize}
+
+\subsubsection{Módulos}
 
 Dividimos também a aplicação por módulos. Alguns módulos contêm analisadores léxicos e sintáticos, outros são apenas conjuntos de estruturas de dados e funções que estão de algum modo relacionadas. Os módulos presentes no projeto são:
 \begin{description}
@@ -268,6 +327,9 @@ Dividimos também a aplicação por módulos. Alguns módulos contêm analisador
 \end{description}
 
 \newpage
+
+\subsubsection{Nomes de ficheiro}
+
 Foi feito um esforço por manter os ficheiros organizados. Nem todos os módulos possuem ficheiros de todos os tipos, por exemplo, alguns não precisam de analisar ficheiros e por isso não têm ficheiros para uso do \emph{flex} e \emph{yacc}. Os nomes dos ficheiros seguem a seguinte organização (onde @ é o nome do módulo):
 
 \begin{description}
@@ -356,9 +418,9 @@ Apresenta-se agora uma tabela onde se mostra claramente que ficheiros compõem c
 \end{table}
 
 \newpage
-\subsection{Especificação da Linguagem de Configurações da Aplicação}
+\subsection{Módulo de Configurações}
 
-\subsubsection{Gramática Abstrata}
+\subsubsection{Gramática abstrata}
 
 \begin{lstlisting}[language=C, caption={Gramática abstrata utilizada pelo \emph{GABS}}]
 <ga>
@@ -381,8 +443,8 @@ Apresenta-se agora uma tabela onde se mostra claramente que ficheiros compõem c
 </ga>
 \end{lstlisting}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%ESTRUTURAS-CONFIGUraÇÕES%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Estrutura de Dados da Especificação de Configurações}
+
+\subsubsection{Estrutura de Dados de Suporte}
 A estrutura que é gerada para o armazenamento dos campos que a gramática abstrata definiu, é dividida consoante o nível em que se está. Assim, começa-se pela estrutura que vai abranger mais campos, que neste caso corresponde ao número total de configurações, depois pela configuração, e, por último, a estrutura que vai guardar um campo para uma configuração.
 
 \begin{lstlisting}[language=C, caption={Estrutura de dados para armazenar as configurações.}]
@@ -398,6 +460,7 @@ struct sConfs
   } u;
 };
 \end{lstlisting}
+
 \newpage
 \begin{lstlisting}[language=C, caption={Estrutura de dados que armazena uma configuração.}]
 struct sConf 
@@ -418,6 +481,12 @@ struct sConf
     struct {
         int s1;
       } d5;
+    struct {
+        int s1;
+      } d6;
+    struct {
+        int s1;
+      } d7;
   } u;
 };
 \end{lstlisting}
@@ -437,10 +506,9 @@ struct sLcampos
 };
 \end{lstlisting}
 
-Verifica-se aqui que cada \textsf{struct} acima apresentada deriva de cada uma das produções que foram indicadas na gramática abstrata.
-As produções que foram usadas para definir a gramática abstrata são as mesmas que foram usadas para definir o \textsf{yacc}.
-\newpage
+Verifica-se aqui que cada \texttt{struct} acima apresentada deriva de cada uma das produções que foram indicadas na gramática abstrata.
 
+\newpage
 \subsubsection{Assinatura das funções utilizadas}
 Aqui serão apresentadas as assinaturas das funções que foram utilizadas para dar suporte à implementação do projeto desenvolvido.
 
@@ -465,7 +533,7 @@ Lcampos  cons_cfg_Lcampos_Lcampos( Lcampos a1, int a2);
 Lcampos  cons_cfg_Lcampos_Campo( int a1);
 \end{lstlisting} 
 
-Os construtores da aplicação são criados automaticamente pelo \textsf{gabs}. Esta ferramenta para além de criar as estrutura de dados, cria também todos os construtores necessários para a criação da mesma.
+Os construtores da aplicação são criados automaticamente pelo \emph{gabs}. Esta ferramenta para além de criar as estrutura de dados, cria também todos os construtores necessários para o preenchimento da mesma.
 
 \begin{lstlisting}[language=C, caption={Funções do ficheiro de configuração.}]
 /* -----------------------------------
@@ -492,9 +560,10 @@ int cfg_get_NCampos( Confs cfgs );
 char* cfg_Campos_seleccionado( Confs cfgs, int totalCampos );
 \end{lstlisting} 
 
-Embora já estejam os construtores definidos automaticamente foi necessário criar novas funções para ser possível manusear a estrutura de dados e criar funcionalidades. Deste modo, foram criadas funções que permitem ir "buscar" algum campo específico, ou fazer operações como de validação, imprimir, entre outras.
+Estas "custom functions" foram criadas para manipular os dados que foram armazenados. Estas funções servem para validar, imprimir, obter determinados valores, entre outras operações de carácter auxiliar.
 
-\textbf{Nota:} Foi necessário desenvolver a função \texttt{Lcampos cfg\_Lcampos\_reverse( Lcampos l )}, uma vez que a gramática definida neste programa tem recursividade à esquerda e era necessário imprimir os valores pela ordem correta, daí a necessidade da criação desta função.
+Por exemplo a função \texttt{Lcampos cfg\_Lcampos\_reverse( Lcampos l )}, permite inverter a ordem dos campos para ficarem na mesma ordem em que foram lidos. Isto é necessário uma vez que a gramática definida neste programa tem recursividade à esquerda no reconhecimento dos campos.
+
 \newpage
 \begin{lstlisting}[language=C, caption={Funções de libertação de memória.}]
 /* -----------------------------------
@@ -506,22 +575,18 @@ void free_cfg_Conf( Conf cfg );
 void free_cfg_Confs( Confs cfgs );
 \end{lstlisting} 
 
-Foram implementadas funções de libertação de memória para garantir que toda a memória, que inicialmente foi criada pelo malloc, existisse um free, garantindo assim que a aplicação não tem qualquer tipo de memory leek.
+Foram implementadas funções de libertação de memória numa tentativa de evitar memory leaks.
 
 \newpage
-%%%%%%%%%%%%%%%%%%%%%%%%%%yacc-CONFIGUraÇÕES%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{\textsf{Yacc}}
-No ficheiro do \textsf{yacc} existe, para cada produção, que seja "apanhada", uma função correspondente.
+\subsubsection[Bison]{\texttt{Yacc}}
 
-\begin{lstlisting}[language=C, caption={Yacc do ficheiro de configuração.}]
+\begin{lstlisting}[language={}, caption={Yacc do módulo de configurações.}]
 %token TITULO NPROVAS NTOP CAMPOS TEMPO CHAVE NOME str num
 %{
 #include <stdio.h>
 #include <stdlib.h>
 #include "cfg.lib.h"
-
 #define YYERROR_VERBOSE
-
 extern unsigned int cfglineno;
 extern int cfglex (void);
 extern int gco_set_Config(Confs cfg);
@@ -538,7 +603,6 @@ extern void cfglex_destroy();
 %type <cfg_str> str Titulo
 %type <cfg_num> num Nprovas Ntop Tempo Campo Chave Nome
 %start Z
-
 %type <cfg_confs> Z Configuracoes
 %type <cfg_conf> Configuracao
 %type <cfg_campos> Lcampos Campos
@@ -546,7 +610,7 @@ extern void cfglex_destroy();
 Z : Configuracoes '$' { $$ = $1;
                         cfglex_destroy();
                         if( gco_set_Config($$) == 0 )
-                            YyaccEPT;
+                            YYACCEPT;
                         YYABORT; };
 
 Configuracoes : Configuracao '\n' Configuracoes {$$ = cons_cfg_Confs($1,$3);}
@@ -570,7 +634,6 @@ Tempo   : TEMPO '$' num  { $$ = $3; };
 Chave   : CHAVE '$' num  { $$ = $3; };
 Nome    : NOME '$' num   { $$ = $3; };
 
-
 Lcampos : Lcampos ';' Campo { $$ = cons_cfg_Lcampos_Lcampos($1,$3); }
         | Campo             { $$ = cons_cfg_Lcampos_Campo($1); }
         ;
@@ -584,16 +647,14 @@ int yyerror( char* s ){
 }
 \end{lstlisting} 
 
-Para o ficheiro de configuração o \textsf{yacc} apanha os campos relativos à configuração do ficheiro. Cada uma das produções trata de um caso específico relativo aos campos. Assim, genericamente existe um campo e uma lista de campos, sendo necessário adiciona-lo à lista, daí ser necessário existir a seguinte função: \texttt{\$\$ = cons\_cfg\_Lcampos\_Lcampos(\$1,\$3); }
+\texttt{Configurações} é um conjunto de \texttt{Configuração}, que por sua vez pode ser qualquer uma das várias instruções de configuração. A maioria das produções do lado direito de \texttt{Configuração} apenas captura um valor numérico ou uma \textit{string}, apenas a produção \texttt{Campos} é mais complexa, pois captura uma lista de campos.
 
-A informação que o \textsf{yacc} recebe vem do processamento que o \textsf{flex} faz do ficheiro de configuração.
-Quando a informação do \textsf{flex} é recebida pelo \textsf{yacc}, este apenas tem de associar as suas produções de modo a que se incluída na estrutura correta.
+No final do reconhecimento da lista de configurações, esta lista é validada e, caso seja válida, definida como configuração ativa.
 
 \newpage
-%%%%%%%%%%%%%%%%%%%%%%%%%%lex-CONFIGUraÇÕES%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{\textsf{Flex}}
+\subsubsection[Flex]{\texttt{Flex}}
 
-\begin{lstlisting}[language=C, caption={Flex utilizado para o tratamento do ficheiro de configuração.}] 
+\begin{lstlisting}[language={}, caption={Flex do módulo de configurações.}] 
 %{
 #define YY_NO_INPUT
 #include <string.h>
@@ -637,44 +698,23 @@ Quando a informação do \textsf{flex} é recebida pelo \textsf{yacc}, este apen
 [\n]+       return '\n';
 
 <*>[ \t] ;
-<*>.     { /*printf("flex: %c (%d)\n", *cfgtext, *cfgtext);*/ }
-
+<*>.     ;
 %%
-
 int cfgwrap(){
     return 1;
 }
 \end{lstlisting}
 
-A informação que o ficheiro \textsf{flex} recebe é proveniente do ficheiro de configuração.
-Depois de se reconhecer os campos, estes são passados do \textsf{flex} para o \textsf{yacc} através da estrutura que é interna no \textsf{yacc}.
-Por exemplo, quando se utiliza a função \texttt{cfglval.cfg\_str}, significa que se está a passar (neste caso) uma string ao campo cfg\_str da union, onde posteriormente o \textsf{yacc} irá adiciona-lo à sua estrutura.
+O analisador léxico reconhece linhas começadas pelas chaves especificadas para o ficheiro de configuração (ver \ref{desc_config} sobre a estrutura dos ficheiros de configuração). Todas as linhas que não correspondem a uma instrução de configuração válida são ignoradas.
+
+
 \newpage
+\subsection{Módulo de Comandos}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%CMD%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Especificação para a Linguagem de Comandos da Consola}
-A aplicação desenvolvida possui um ambiente de consola com alguns comandos básicos:
-\begin{itemize}
-\item \textbf{Carregar configuração}: o sistema inicializa-se sempre com esta operação. Esta operação está sempre disponível para ser possível alterar a configuração.
-\item \textbf{Carregar base de dados}: o sistema carrega para memória o estado de um torneio previamente gravado.
-\item \textbf{Carregar resultado de prova}: o sistema carrega e processa um ficheiro CSV. Como resultado desta operação produz um ficheiro HTML com a pontuação de cada atleta, ordenado por ordem descente de pontos.
-\item \textbf{Calcular ranking}: em qualquer momento poderá ser invocada esta operação à qual o sistema responder com uma listagem em HTML do ranking.
-\item \textbf{Gravar base de dados}: o sistema guarda em memória o estado da aplicação.
-\item \textbf{Imprimir}: que apresenta a informação através de uma página HTML.
-\item \textbf{Save}: que guarda o estado atual do sistema.
-\item \textbf{Sair}: o sistema termina a aplicação, se o estado atual não tiver sido previamente gravado deverá lançar um atleta e pedir configuração para prosseguir.
-\end{itemize}
-\newpage
-%%%%%%%%%%%%%%%%%%%%%%%%%%GRAMÁTICA-CMD%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Especificação para a Linguagem de Comandos da Consola}
-
-Esta gramática é definida depois de se ter analisado as produções que se podem ter quando estamos a tratar os comandos.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%FUNÇÕES-CMD%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Assinatura das funções utilizadas}
-As assinaturas das funções que foram utilizadas para dar suporte à implementação do projeto, nesta fase, foram as seguintes:
+As assinaturas das funções que foram utilizadas para implementar a componente de linha de comandos são as seguintes:
 
-\begin{lstlisting}[language=C, caption={Construtores do ficheiro de consola.}]
+\begin{lstlisting}[language=C, caption={Ações semânticas do módulo.}]
 .h do cmd
 #ifndef __CMD_LIB_H
 #define __CMD_LIB_H
