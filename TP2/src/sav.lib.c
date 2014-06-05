@@ -12,7 +12,6 @@
 extern void cmd_lex_push(FILE* file );
 extern void cmd_lex_pop();
 
-extern int cmd_shouldQuitOnEOF;
 extern int cmdparse();
 extern void cmdset_in(FILE * in_str);
 

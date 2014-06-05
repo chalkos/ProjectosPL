@@ -19,7 +19,7 @@
 \usepackage{color}
 \usepackage{listings}
 \lstset{ %
-language=C++,                   % choose the language of the code
+language=C,                     % choose the language of the code
 basicstyle=\footnotesize,       % the size of the fonts that are used for the code
 numbers=left,                   % where to put the line-numbers
 numberstyle=\footnotesize,      % the size of the fonts that are used for the line-numbers
@@ -94,9 +94,6 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 % checkmarks
 \usepackage{tikz}
 \def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
-
-% escrever acentos e coisas do género sem que o latex se desoriente
-\usepackage[utf8]{inputenc}
 
 % para ter imagens, depois define a directoria de imagens
 \usepackage{graphicx}
@@ -286,7 +283,7 @@ No ficheiro de configuração devem constar as seguintes informações, todas ob
 	Indicação da coluna onde se pode obter o nome do atleta. Deve respeitar o mesmo formato da especificação de um campo na lista de campos, isto é, \texttt{'\$'} seguido da posição da coluna.
 \end{description}
 
-\subsubsection{Prova}
+\subsubsection{CSV}
 
 O ficheiro CSV é um ficheiro que representa uma tabela com os resultados de uma prova, onde cada linha representa o desempenho de um atleta e cada coluna um campo. Os campos são separados por \texttt{';'}. Existe uma forte restrição na escrita dos ficheiros CSV para assegurar o bom funcionamento da aplicação: todas as linhas têm de ter um número de campos igual ao número de campos da primeira linha. Existem outras propriedades que devem ser asseguradas, por exemplo, que a coluna designada como chave realmente identifica de forma única um atleta, caso contrário as informações de vários atletas são fundidas e ignoradas dependendo da ordem em que são lidas pela aplicação.
 
@@ -510,9 +507,9 @@ Verifica-se aqui que cada \texttt{struct} acima apresentada deriva de cada uma d
 
 \newpage
 \subsubsection{Assinatura das funções utilizadas}
-Aqui serão apresentadas as assinaturas das funções que foram utilizadas para dar suporte à implementação do projeto desenvolvido.
+Aqui serão apresentadas as assinaturas das funções que foram utilizadas para dar suporte à implementação do módulo de Configurações.
 
-\begin{lstlisting}[language=C, caption={Construtores do ficheiro de configuração.}]
+\begin{lstlisting}[language=C, caption={Construtores do módulo de configuração.}]
 /* -----------------------------------
  * Constructor Function Signatures
  * -----------------------------------
@@ -535,7 +532,7 @@ Lcampos  cons_cfg_Lcampos_Campo( int a1);
 
 Os construtores da aplicação são criados automaticamente pelo \emph{gabs}. Esta ferramenta para além de criar as estrutura de dados, cria também todos os construtores necessários para o preenchimento da mesma.
 
-\begin{lstlisting}[language=C, caption={Funções do ficheiro de configuração.}]
+\begin{lstlisting}[language=C, caption={Funções do módulo de configuração.}]
 /* -----------------------------------
  * Custom Function Signatures
  * -----------------------------------
@@ -565,7 +562,7 @@ Estas "custom functions" foram criadas para manipular os dados que foram armazen
 Por exemplo a função \texttt{Lcampos cfg\_Lcampos\_reverse( Lcampos l )}, permite inverter a ordem dos campos para ficarem na mesma ordem em que foram lidos. Isto é necessário uma vez que a gramática definida neste programa tem recursividade à esquerda no reconhecimento dos campos.
 
 \newpage
-\begin{lstlisting}[language=C, caption={Funções de libertação de memória.}]
+\begin{lstlisting}[language=C, caption={Funções de libertação de memória do módulo de configuração.}]
 /* -----------------------------------
  * Destructor Function Signatures
  * -----------------------------------
@@ -578,9 +575,9 @@ void free_cfg_Confs( Confs cfgs );
 Foram implementadas funções de libertação de memória numa tentativa de evitar memory leaks.
 
 \newpage
-\subsubsection[Bison]{\texttt{Yacc}}
+\subsubsection[Yacc]{\texttt{Yacc}}
 
-\begin{lstlisting}[language={}, caption={Yacc do módulo de configurações.}]
+\begin{lstlisting}[language={}, caption={Yacc do módulo de configuração.}]
 %token TITULO NPROVAS NTOP CAMPOS TEMPO CHAVE NOME str num
 %{
 #include <stdio.h>
@@ -654,7 +651,7 @@ No final do reconhecimento da lista de configurações, esta lista é validada e
 \newpage
 \subsubsection[Flex]{\texttt{Flex}}
 
-\begin{lstlisting}[language={}, caption={Flex do módulo de configurações.}] 
+\begin{lstlisting}[language={}, caption={Flex do módulo de configuração.}] 
 %{
 #define YY_NO_INPUT
 #include <string.h>
@@ -707,22 +704,13 @@ int cfgwrap(){
 
 O analisador léxico reconhece linhas começadas pelas chaves especificadas para o ficheiro de configuração (ver \ref{desc_config} sobre a estrutura dos ficheiros de configuração). Todas as linhas que não correspondem a uma instrução de configuração válida são ignoradas.
 
-
 \newpage
 \subsection{Módulo de Comandos}
 
 \subsubsection{Assinatura das funções utilizadas}
-As assinaturas das funções que foram utilizadas para implementar a componente de linha de comandos são as seguintes:
+Aqui serão apresentadas as assinaturas das funções que foram utilizadas para dar suporte à implementação do módulo de Comandos.
 
-\begin{lstlisting}[language=C, caption={Ações semânticas do módulo.}]
-.h do cmd
-#ifndef __CMD_LIB_H
-#define __CMD_LIB_H
-
-#include <stdlib.h>
-
-#define CMD_PROMPT "> "
-
+\begin{lstlisting}[language=C, caption={Construtores do módulo de comandos.}]
 // carrega uma nova configuracao
 void cmd_config(char* ficheiro);
 
@@ -740,21 +728,34 @@ void cmd_save(char* ficheiro, int force);
 
 // sair da aplicacao
 int cmd_quit();
-
-#endif
 \end{lstlisting} 
 
-Neste caso é importante referir que quando são executadas funções \texttt{void cmd\_config(char* ficheiro)} e \texttt{void cmd\_import(char* ficheiro);} estas recebem o parser do ficheiro que lhe está associado. Se se tiver o cmd\_config o parser que será invocado será aquele que é responsável pelo ficheiro de configuração. O cmd\_import "chama" o parser que é responsável pelo ficheiro CSV.
+A função \texttt{cmd\_config} é chamada para ler um novo ficheiro de configuração, verificando se o ficheiro existe e, caso exista, entregando o controlo ao módulo de Configurações, que irá tratar de processar o ficheiro de configuração.
+
+As funções \texttt{cmd\_save} e \texttt{cmd\_load} guardam e carregam o estado da aplicação, respetivamente, com o auxílio do módulo de Savestate.
+
+A função \texttt{cmd\_import} importa um ficheiro CSV de uma prova para as estruturas de dados da aplicação utilizando o módulo de CSV.
+
+A função \texttt{cmd\_print} utiliza o módulo HTM para escrever o relatório do campeonato em HTML.
+
+A função \texttt{cmd\_quit} termina a aplicação caso todas as alterações tenham sido guardadas.
 
 A função \texttt{void cmd\_print();} é responsável por invocar a função que vai dar origem à página HTML pretendida.
-%%%%%%%%%%%%%%%%%%%%%%%%%%yacc-CMD%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{\textsf{Yacc}}
 
-No ficheiro do \textsf{yacc} cada produção que seja "apanhada" é chamada à função correspondente para tratar da operação que foi capturada.
+\newpage
+\subsubsection[Yacc]{\texttt{Yacc}}
 
-\begin{lstlisting}[language=C, caption={Yacc do ficheiro cmd.}]
+\begin{lstlisting}[language={}, caption={Yacc do módulo de comandos.}]
+%token CONFIG LOAD IMPORT PRINT SAVE FSAVE QUIT FQUIT FICHEIRO
+%{
+#include <stdio.h>
+#include "cmd.lib.h"
+#define YYERROR_VERBOSE
+
 extern int cmdlex (void);
 extern void cmdlex_destroy();
+extern void sav_load_done();
+extern int sav_loading;
 %}
 %union{ char* cmd_ficheiro; }
 %type <cmd_ficheiro> FICHEIRO
@@ -763,22 +764,25 @@ extern void cmdlex_destroy();
 Comandos : Comando '\n' Comandos
          | 
          ;
+
 Comando : Config
         | Load
         | Import
         | Print
         | Save
         | Quit
-        | {/*| error  { printf("Comando invalido2.\n%s", CMD_PROMPT); yyclearin; yyerrok; }*/}
+        | 
         ;
 
-Config : CONFIG FICHEIRO { cmd_config($2); printf(CMD_PROMPT); };
+Config : CONFIG FICHEIRO { cmd_config($2); printf(CMD_PROMPT); }
        | CONFIG
+       ;
 
-Load : LOAD FICHEIRO { cmd_load($2); printf(CMD_PROMPT); };
+Load : LOAD FICHEIRO { cmd_load($2); if(!sav_loading) printf(CMD_PROMPT); }
      | LOAD
+     ;
 
-Import : IMPORT FICHEIRO { cmd_import($2); printf(CMD_PROMPT); }
+Import : IMPORT FICHEIRO { cmd_import($2); if(!sav_loading) printf(CMD_PROMPT); }
        | IMPORT
        ;
 
@@ -791,26 +795,24 @@ Save : SAVE FICHEIRO { cmd_save($2, 0); printf(CMD_PROMPT); }
 Print : PRINT { cmd_print(); printf(CMD_PROMPT); };
 
 Quit : QUIT  { if(cmd_quit()){
-                    cmdlex_destroy();
-                    YyaccEPT;
+                    YYACCEPT;
                }else{
                     printf(CMD_PROMPT);
                }}
-     | FQUIT { cmdlex_destroy(); YyaccEPT; }
+     | FQUIT { YYACCEPT;}
      ;
-
 %%
 int yyerror( char* s ){
-    //fprintf(stderr, "%s", s);
     return 0;
 }
 \end{lstlisting} 
 
-Para além do ficheiro \textsf{yacc} criado para a especificação do ficheiro de configurações, foi necessário criar outro ficheiro \textsf{yacc} para a fazer a especificação do cmd. Assim, por exemplo, no caso de ser "apanhado" o \textsf{PRINT} é chamada a função \texttt{cmd\_print}, que vai imprimir a informação relativa aos jogadores para uma página \textsf{HTML}.
+Esta gramática permite reconhecer os vários comandos e suas variantes. Os erros de comandos inválidos são reconhecidos no \emph{flex}, daí a gramática ter algumas regras aparentemente incorretas, como o \texttt{SAVE} sem o nome de ficheiro como argumento. Este comportamento é esperado e permite que o controlo dos erros seja feito do lado do \emph{flex}.
 
-\subsubsection{\textsf{Flex}}
+\newpage
+\subsubsection[Flex]{\texttt{Flex}}
 
-\begin{lstlisting}[language=C, caption={Flex do ficheiro cmd.}]
+\begin{lstlisting}[language={}, caption={Flex do módulo de comandos.}]
 %{
 #define YY_NO_INPUT
 #include <string.h>
@@ -846,7 +848,7 @@ Para além do ficheiro \textsf{yacc} criado para a especificação do ficheiro d
 
 [\n]+    { return '\n'; }
 
-<ficheiro>[^\n]+ { /* se houver erros, tentar um duplicate aqui */
+<ficheiro>[^\n]+ { 
                    //cmdlval.cmd_ficheiro = strdup(cmdtext);
                    cmdlval.cmd_ficheiro = cmdtext;
                    BEGIN 0;
@@ -866,7 +868,6 @@ Para além do ficheiro \textsf{yacc} criado para a especificação do ficheiro d
 . ;
 
 %%
-
 void cmd_lex_push( FILE* sav_file_import ){
     cmdpush_buffer_state(cmd_create_buffer(sav_file_import, YY_BUF_SIZE));
 }
@@ -880,18 +881,12 @@ int cmdwrap(){
 }
 \end{lstlisting}
 
-O \textsf{flex} neste caso está associado ao input que é produzido pelo utilizador, isto é, no caso do cmd significa que não estamos a trabalhar com a nossa própria consola.
+Tal como referido na secção anterior, o \emph{flex} tem uma série de regras especialmente criadas para capturarem vários tipos de situações de erro e apenas enviar conteúdo válido para o \emph{yacc}.
 
-Devido ao facto de termos a nossa própria consola isso implica termos o parsing que reconhece os comandos que estão a ser introduzidos, para depois esses comandos serem passados ao \textsf{yacc}, que vai determinar que função é desencadeada como esse comando.
-
-\subsection{Especificação para os Ficheiros de Resultados}
-%%%%%%%%%%%%%%%%%%%%%%%%%%GRAMÁTICA-FICHEIROS-DE-RESULTADOS-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsubsection{Gramática Especificação para os Ficheiros de Resultados}
-
-A gramática abstrata que se segue vai ser usada para gerar a estrutura de representação intermédia para o ficheiro de resultados.
-
-\begin{lstlisting}[language=C, caption={Gramática para a linguagem de especificação para os ficheiros de resultados.}]
+\newpage
+\subsection{Módulo de CSV}
+\subsubsection{Gramática Abstrata}
+\begin{lstlisting}[language={}, caption={Gramática abstrata utilizada pelo \emph{GABS}.}]
 <ga>
   
   Linhas -> cons_csv_Linhas(Linha Linhas)
@@ -908,15 +903,13 @@ A gramática abstrata que se segue vai ser usada para gerar a estrutura de repre
  </ga>
 \end{lstlisting}
 
-As produções que se podem encontrar na gramática abstrata são provenientes da definição de produções a que consideramos importantes para tratar a informação que pode ser encontrada num ficheiro de resultados.
+Esta especificação da gramática abstrata permite ao \emph{GABS} gerar os construtores e as estruturas necessárias ao armazenamento de um ficheiro de prova em formato CSV.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%ESTRUTURA DE DADOS -FICHEIROS-DE-RESULTADOS-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Estrutura de Dados da Especificação dos Ficheiros de Resultados}
+A produção \texttt{Linhas} corresponde a uma lista de Linhas. A produção \texttt{Linha} corresponde a uma linha, ou uma série de campos separados por \texttt{';'}. A produção \texttt{Campo} corresponde ao valor do campo, que é armazenado caso seja não-nulo.
 
-A estrutura que é gerada para o armazenamento dos campos que a gramática abstrata definiu, é dividida consoante o nível em que estamos. Assim, se começarmos por ter a estrutura que vai abranger mais campos, que neste caso, corresponde ao total de linhas que constituem o ficheiro, significa que depois teremos o que é uma linha e por último a estrutura que vai guardar um campo.
-
-\begin{lstlisting}[language=C, caption={Estrutura de dados para armazenar a especificação dos ficheiros de resultados.}]
-
+\newpage
+\subsubsection{Estrutura de Dados de Suporte}
+\begin{lstlisting}[language={}, caption={Estrutura de dados para armazenar as provas.}]
 /* --- Linhas ---*/
 struct sLinhas 
 { int flag;
@@ -955,19 +948,17 @@ struct sCampo
       } d2;
   } u;
 };
-
 \end{lstlisting}
 
+A gramática gerada pelo \emph{GABS} de acordo com a gramática abstrata fornecida.
+
+\newpage
 \subsubsection{Assinatura das funções utilizadas}
-Nesta secção serão apresentadas as assinaturas das funções que foram utilizadas para dar suporte à implementação do projeto.
-
-\begin{lstlisting}[language=C, caption={Construtores do ficheiro de resultados.}]
-
+\begin{lstlisting}[language=C, caption={Construtores do módulo de prova.}]
 /* -----------------------------------
  * Constructor Function Signatures
  * -----------------------------------
  */
-
 Linhas  cons_csv_Linhas( Linha a1, Linhas a2);
 Linhas  cons_csv_Linhas_NIL();
 
@@ -976,8 +967,9 @@ Linha  cons_csv_Linha_Fim( Campo a1);
 
 Campo  cons_csv_Campo( char * a1);
 Campo  cons_csv_Campo_NIL();
+\end{lstlisting} 
 
-
+\begin{lstlisting}[language=C, caption={Funções do módulo de prova.}]
 /* -----------------------------------
  * Custom Function Signatures
  * -----------------------------------
@@ -991,7 +983,9 @@ int csv_tempo_to_int(char* str);
 
 // indice_campo comeca em 1
 char* csv_get_campo(Linha campos, int indice_campo);
+\end{lstlisting} 
 
+\begin{lstlisting}[language=C, caption={Funções de libertação de memória do módulo de prova.}]
 /* -----------------------------------
  * Destructor Function Signatures
  * -----------------------------------
@@ -1004,13 +998,12 @@ void free_csv_Linhas (Linhas lcsv);
 
 \end{lstlisting} 
 
-Nesta secção são apresentadas as assinaturas das funções que são usadas, tanto para fazer a inicialização das estrutura de dados (criadas pelo \textsf{gabs}), quer como as funções que foram necessárias definir, de modo a ser possível efetuar operações sobre as mesmas.
+Nesta secção são apresentadas as assinaturas das funções que são usadas, tanto para fazer a inicialização das estrutura de dados, quer como as funções que foram necessárias definir, de modo a ser possível efetuar operações sobre a estrutura de dados.
 
-Para além das funções que são responsáveis por fazer a libertação de toda a memória que foi utilizada, temos a função \texttt{Linha csv\_Linha\_reverse( Linha l );} que é utilizada para imprimir a forma como os campos foram lidos. Esta função é necessária devido ao facto de se ter definido uma gramática com recursividade à esquerda.
+Para além das funções que são responsáveis por fazer a libertação de toda a memória que foi utilizada, existe a função \texttt{Linha csv\_Linha\_reverse( Linha l );} que é utilizada inverter a ordem dos campos. De forma semelhante à leitura dos campos no módulo de configuração, é necessário inverter a ordem dos campos devido à utilização de uma gramática com recursividade à esquerda.
 
 \newpage
-
-\subsubsection{\textsf{Yacc}}
+\subsubsection[Yacc]{\texttt{Yacc}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%yacc-FICHEIROS-DE-RESULTADOS-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 No ficheiro do \textsf{yacc} cada produção que seja "apanhada" é sempre chamada a função correspondente para tratar o caso que foi apanhado.
 
@@ -1073,11 +1066,10 @@ int yyerror( char* s ){
 }
 \end{lstlisting}
 
-A informação que o \textsf{yacc} recebe vem do processamento que o \textsf{flex} faz do ficheiro de configuração que é passado ao \textsf{flex}.
-Quando a informação do \textsf{flex} é recebida pelo \textsf{yacc}, este apenas tem de a associar a uma das suas produções de modo a ser incluída na estrutura correta.
+O \emph{yacc} neste módulo é bastante simples, tendo apenas de chamar os construtores e ir populando a estrutura de dados.
+
 \newpage
-%%%%%%%%%%%%%%%%%%%%%%%%%%lex-FICHEIROS-DE-RESULTADOS-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{\textsf{Flex}}
+\subsubsection[Flex]{\texttt{Flex}}
 
 \begin{lstlisting}
 %{
@@ -1102,46 +1094,54 @@ int csvwrap(){
 }
 \end{lstlisting}
 
-O \textsf{flex} relativo ao parsing do fihceiro CSV é relativamente simples, isto deve-se ao facto de se ter definido que todos os campos do ficheiro são strings, assim sendo o único tratamento que é necessário fazer aqui e o de ver onde acaba cada string, o tratamento dos \\n, a forma de separação de cada campo e por fim o EOF.
-
-Com esta implementação o \textsf{yacc} é responsável por decidir o modo como se irá tratar cada campo que recebe do \textsf{flex}.
+O \textsf{flex} apenas envia as strings, caracteres de separação de linha e campo e o \emph{End of File} para o \emph{yacc} processar.
  
 \newpage
-\subsection{Tratamento da Informação do Atleta}
+\subsection{Módulo do Atleta}
 
 Um dos requisitos necessários para o desenvolvimento da plataforma era o cálculo da pontuação dos atletas. 
 
-Uma vez que existem vários atletas foi necessário a criação de uma estrutura que nos permitisse guardar a informação de cada uma dos atletas que participam no Campeonato Orientação.
+Uma vez que existem vários atletas foi necessário a criação de uma estrutura que nos permitisse guardar a informação de cada uma dos atletas que participam no campeonato.
 
 Essa estrutura é então composta por:
-\begin{itemize}
-\item \textsf{ID}: identificador de atleta;
-\item \textsf{nome}: nome do atleta;
-\item \textsf{score}: lista de ponto obtidos em cada prova;
-\item \textsf{tempo\_ultima\_prova}: tempo que o atleta obteve na última prova decorrida.
-\end{itemize}
+\begin{description}
+\item[char* ID] \hfill \\
+	Identificador único do atleta;
+\item[char* nome] \hfill \\
+	Nome do atleta;
+\item[LInt scores] \hfill \\
+	Uma lista ligada de inteiros com as pontuações do atleta por ordem decrescente;
+\item[int tempo\_ultima\_prova] \hfill \\
+	Campo usado para calcular a pontuação do atleta numa prova.
+\end{description}
 
 Para além de termos a informação do atleta foi necessário implementar também uma estrutura que permitisse guardar todos os atletas que participam numa prova.
 
 Assim sendo as estruturas implementadas foram as seguintes:
 
-\begin{lstlisting}[language=C, caption={Estrutura de um atleta.}]
+\begin{lstlisting}[language=C, caption={Estruturas de dados do módulo de atletas.}]
+typedef struct sAtletas *Atletas;
+typedef struct sAtleta *Atleta;
+typedef struct sLInt *LInt;
+
 struct sLInt {
     LInt proximo;
-    int num;};
-
+    int num;
+};
 struct sAtletas{
     Atletas proximo;
-    Atleta atleta;};
-
+    Atleta atleta;
+};
 struct sAtleta{
     char* ID;
     char* nome;
     LInt scores;
-    int tempo_ultima_prova;};
+    int tempo_ultima_prova;
+};
 \end{lstlisting}
 
-\begin{lstlisting}[language=C, caption={Assinatura das funções.}]
+\newpage
+\begin{lstlisting}[language=C, caption={Assinatura das funções do módulo de atletas.}]
 Atleta atl_novo_atleta(char* id, char* nome);
 void atl_add_score(Atleta atleta, int score);
 int atl_get_score(Atleta atleta, int nTop);
@@ -1159,24 +1159,23 @@ void atl_free_AtletasList(Atletas atletas);
 void atl_free_Atleta(Atleta atleta);
 void atl_free_Scores(LInt scores);
 
-/******************
- * Ler dados dos atletas a partir do csv
- * ***************/
 
+// Ler dados dos atletas a partir do csv
 Atletas atl_ler_csv( Confs cfg, Linhas csv, Atletas atletas );
 Atletas atl_ler_tempos( Confs cfg, Linhas csv, Atletas atletas );
-#endif
 \end{lstlisting}
 
-O tratamento desta informação serve para se poder analisar e processar os rankings das pontuações dos atletas. Deste modo, um dos requisitos necessários para processar foi os tempos obtidos por cada jogador de forma, a que mais tarde, fosse possível criar no HTML dos rankings de provas, atletas, etc.
+Estas funções permitem manipular e obter as informações do atleta quando é necessário.
 
 \newpage
-%%%%%%%%%%%%%%%%%%%%%%%%%HTML%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{HTML}
-
+\subsection{Módulo de HTML}
 Um dos resultados finais deste projeto é gerar uma página HTML que permita evidenciar o ranking das provas e também é mais uma forma de apresentação do resultados obtidos.
 
 \begin{lstlisting}[language=C, caption={Assinatura das funções.}]
+//public
+void htm_print();
+
+//privadas (definidas no .c)
 void htm_print_indice();
 void htm_print_provas();
 void htm_print_resultados();
@@ -1184,29 +1183,28 @@ int htm_begin();
 void htm_end();
 \end{lstlisting}
 
-Como a criação de um ficheiro HTML era necessário ter um cuidado especial e foi preciso definir o HTMl por partes.
-Assim, a apresentação do HTML parte por ter um índice para os rankings que poderá ser visível ao longo da página, seguindo, então, pelos respetivos rankings dos atletas no campeonato.
+Este módulo usa todo um conjunto de variáveis globais que foram sendo definidas ao longo da execução do programa para gerar uma página HTML com os resultados do campeonato até ao momento.
 
 \newpage
 \section{Conclusão}
 
-Após concluir todo o desenvolvimento deste segundo projeto, de Processamento de Linguagens, é fácil fazer um balanço de todo este percurso realizado. Para além de ter sido um desafio implementar um programa de processamento de Gestão de Campeonatos de Orientação, que se aplica ao contexto da vida real, foi também aliciante concluir o trabalho e todas as etapas que foram propostas.
-Ao longo do desenvolvimento do projeto o grupo desenvolveu competências em diversas ferramentas como \textsf{C}, HTML, \textsf{flex}, \textsf{yacc}, gramáticas independentes do contexto, que serão uma mais valia para o mercado de trabalho e para a vida profissional. 
+Neste projeto houve uma série de dificuldades e de situações onde existiram pequenos erros que demoraram muito tempo a corrigir, desde a ordem de \emph{includes} à ordem de compilações na makefile, passando pelas decisões entre recursividade à esquerda ou direita nas gramáticas e corrigir o \texttt{d1.s1} para \texttt{d2.s1} ao lidar com as estruturas de dados do \emph{GABS}. Foi um desafio conseguir colocar tantos módulos a interagir (corretamente) entre si. Foi outro desafio conseguir colocar vários \emph{parsers} a funcionar em sintonia.
 
+Apesar de todas as dificuldades, no fim do projeto tudo encaixou na perfeição.
 
 \newpage
 \section{Anexos}
 
 \subsection{Makefile}
 
-\begin{lstlisting}[language=C, caption={Makefile}]
+\begin{lstlisting}[language={}, caption={Makefile}]
 .PHONY: clean
 
 GDB=-Wall -g
 
 #----------------\
 #  Tokenizers    \
-#----------------\
+#----------------
 
 cmdtok : cmd.tok.c lex.cmd.o cmd.tab.o cmd.lib.o cmd.mockups.o
 	gcc $(GDB) -o $@ $^ -ll
@@ -1217,9 +1215,9 @@ cfgtok : cfg.tok.c lex.cfg.o cfg.tab.o cfg.lib.o
 csvtok : csv.tok.c lex.csv.o csv.tab.o csv.lib.o
 	gcc $(GDB) -o $@ $^ -ll
 
-#----------------\
-#  Gco           \
-#----------------\
+#----------------\ 
+#  Gco           \ 
+#----------------
 
 gco : gco.lib.c sav.lib.o htm.lib.o atl.lib.o cfg.lib.o lex.cfg.o cfg.tab.o cmd.lib.o lex.cmd.o cmd.tab.o csv.lib.o lex.csv.o csv.tab.o
 	gcc $(GDB) -o $@ $^
@@ -1234,9 +1232,9 @@ atl.lib.o : atl.lib.c atl.lib.h cfg.lib.h csv.lib.h
 sav.lib.o : sav.lib.c sav.lib.h
 	gcc $(GDB) -c sav.lib.c
 
-#----------------\
-#  Cfg           \
-#----------------\
+#----------------\ 
+#  Cfg           \ 
+#----------------
 
 cfg : cfg.main.c cfg.lib.o lex.cfg.o cfg.tab.o
 	gcc $(GDB) -o $@ $^ -ll
@@ -1258,7 +1256,7 @@ lex.cfg.c : cfg.l
 
 #----------------\
 #  Cmd           \
-#----------------\
+#----------------
 
 cmd : cmd.main.c cmd.lib.o lex.cmd.o cmd.tab.o cmd.mockups.o
 	gcc $(GDB) -o $@ $^ -ll
@@ -1284,7 +1282,7 @@ lex.cmd.c : cmd.l
 
 #----------------\
 #  CSV           \
-#----------------\
+#----------------
 
 csv : csv.main.c csv.lib.o lex.csv.o csv.tab.o
 	gcc $(GDB) -o $@ $^ -ll
@@ -1305,7 +1303,7 @@ lex.csv.c : csv.l
 	flex -Pcsv csv.l
 #----------------\
 #  Extras        \
-#----------------\
+#----------------
 
 clean :
 	$(RM) gabs
