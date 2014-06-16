@@ -1,7 +1,5 @@
 #ProjectosPL
 
-Projectos de Processamento de Linguagens (UMinho 2014)
+Projectos e exercício das aulas práticas de Processamento de Linguagens (UMinho 2014)
 
-##Trabalho Prático 1
-
-(Wiki Markup)[http://en.wikipedia.org/wiki/Help:Wiki_markup]
+Os enunciados dos exercícios podem ser encontrados em http://www3.di.uminho.pt/~jcr/AULAS/plc2009/fichas/
